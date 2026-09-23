@@ -26,8 +26,8 @@ export const business = {
   phoneSecondary: { display: '062 544 58 53', e164: '+41625445853' },
   mobileEmanuel: { display: '+41 76 605 13 07', e164: '+41766051307', label: 'Emanuel Verdile, Mobile' },
   whatsapp: { display: '+41 76 743 84 30', e164: '+41767438430' },
-  email: 'diego.verdile@newlivingdesign.ch',
-  emailSecondary: 'emanuel.verdile@newlivingdesign.ch',
+  email: 'emanuel.verdile@newlivingdesign.ch',
+  emailSecondary: 'diego.verdile@newlivingdesign.ch',
 
   geo: { lat: 47.2842067, lng: 7.9477531 },
   mapsLink: 'https://maps.app.goo.gl/ZyhcBb3qb2JXkgny9',
@@ -64,7 +64,7 @@ export interface BathPackage {
   id: 'essenza' | 'colore' | 'atelier';
   name: string;
   price: number;        // CHF inkl. MwSt., Richtpreis
-  priceLabel: string;   // formatiert, z. B. "21'300"
+  priceLabel: string;   // formatiert, z. B. "23'000"
   claim: string;
   description: string;
   includes: string[];
@@ -81,8 +81,8 @@ export const bathPackages: BathPackage[] = [
   {
     id: 'essenza',
     name: 'Essenza',
-    price: 21300,
-    priceLabel: "21'300",
+    price: 23000,
+    priceLabel: "23'000",
     claim: 'Das saubere, solide Bad mit dem ersten Farbtupfer',
     description:
       'Alles, was ein neues Bad braucht, mit Markenprodukten aus unserer Ausstellung. Farbe der Platten, des Möbels und der Armaturen wählen Sie frei innerhalb der Serie.',
@@ -102,9 +102,9 @@ export const bathPackages: BathPackage[] = [
   {
     id: 'colore',
     name: 'Colore',
-    price: 27700,
-    priceLabel: "27'700",
-    claim: 'Grossformat, farbige Keramik, Armaturen verchromt',
+    price: 27500,
+    priceLabel: "27'500",
+    claim: 'Grossformat, farbige Keramik und Armaturen in Ihrer Wunschoberfläche',
     description:
       'Unser meistgewähltes Bad: Platten 60×120 oder 120×120, WC und Duschwanne in Farbe, verchromte Armaturen in zwei Serien, Möbel matt lackiert. Farbe kostet bei uns nichts extra.',
     includes: [
@@ -113,7 +113,7 @@ export const bathPackages: BathPackage[] = [
       'Badmöbel 100 cm, matt lackiert in Wunschfarbe',
       'Spiegelschrank Pirovano 90 cm, zwei Türen',
       'Farbige Duschwanne, Walk-in-Glas und Duschrinne',
-      'Armaturen verchromt, Serie Up+ (rund) oder Ran (eckig) nach Wahl',
+      'Armaturen: Serie Up+ (rund) oder Ran (eckig) und Oberfläche nach Wahl',
       'Abgestimmtes Zubehör, Kleinmaterial, Schalter',
       '3D-Rendering in Ihrer Farbwahl vor der Unterschrift',
       'Demontage bis Übergabe durch NLD, Entsorgung inklusive',
@@ -125,8 +125,8 @@ export const bathPackages: BathPackage[] = [
   {
     id: 'atelier',
     name: 'Atelier',
-    price: 36800,
-    priceLabel: "36'800",
+    price: 36500,
+    priceLabel: "36'500",
     claim: 'Das Bad nach Mass: freistehend, edle Materialien, auf Zeichnung',
     description:
       'Für grössere Bäder und besondere Wünsche: Grossformate oder Steinoptik, freistehende Badewanne, Möbel nach Mass, Designarmaturen und Lichtkonzept. Bemusterung in der Ausstellung.',
@@ -160,7 +160,7 @@ export const individualPackage = {
 } as const;
 
 export const packageNote =
-  'Richtpreise inkl. Material, Montage und 8.1 % MwSt. für ein Bad von ca. 6 m² mit ca. 21 m² Plattenfläche (Dusche, Wand-WC, Waschtisch mit Möbel). Grössere Bäder: Zuschlag pro zusätzlichem Quadratmeter Platten, siehe Paket. Der Fixpreis gilt nach der Besichtigung vor Ort und ist 30 Tage gültig.';
+  'Richtpreise inkl. Material, Montage und 8.1 % MwSt. für ein Referenzbad von ca. 6 m² mit ca. 21 m² Plattenfläche. Der verbindliche Fixpreis gilt nach Besichtigung und Aufmass vor Ort. Zusatzarbeiten und grössere Flächen werden vor der Freigabe ausgewiesen.';
 
 /** Öffnungszeiten als schema.org OpeningHoursSpecification */
 export const openingHoursSpecification = business.openingHours.map((h) => ({
@@ -182,7 +182,7 @@ export const localBusinessJsonLd = {
   email: business.email,
   image: `${business.siteUrl}/og-image.jpg`,
   logo: `${business.siteUrl}/logo.png`,
-  priceRange: "CHF 21'300 – 45'000",
+  priceRange: "CHF 23'000 – 45'000",
   address: {
     '@type': 'PostalAddress',
     streetAddress: business.address.street,

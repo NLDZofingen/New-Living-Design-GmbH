@@ -8,17 +8,18 @@ const cx = (...classes: Array<string | false | undefined>) =>
 
 const About: React.FC = () => {
   return (
-    <main className={styles.about}>
+    <main id="main-content" className={styles.about}>
       <Helmet>
-        <title>Über uns | New Living Design GmbH</title>
+        <title>Über New Living Design | Ausstellung in Zofingen</title>
+        <link rel="canonical" href="https://newlivingdesign.ch/ueber-uns" />
         <meta
           name="description"
-          content="Lernen Sie die New Living Design GmbH kennen – familiengeführt, mit Showroom in Zofingen (AG). Wir stehen für Qualität, persönliche Beratung und zuverlässige Innenausstattung."
+          content="New Living Design ist ein familiengeführtes Unternehmen in Zofingen für Bad, Küchen, Platten und Wellness – mit persönlicher Beratung und Ausstellung."
         />
         <meta property="og:title" content="Über uns | New Living Design GmbH" />
         <meta
           property="og:description"
-          content="Familiengeführt, qualitätsverliebt und mit klarer Vision: Erfahren Sie mehr über die Geschichte und Werte der New Living Design GmbH."
+          content="Aus der praktischen Arbeit mit Materialien und Umbauten entstanden: New Living Design und die Ausstellung in Zofingen."
         />
         <meta property="og:image" content={`https://newlivingdesign.ch${heroImg}`} />
         <meta property="og:type" content="website" />
@@ -27,7 +28,7 @@ const About: React.FC = () => {
         <meta name="twitter:title" content="Über uns | New Living Design GmbH" />
         <meta
           name="twitter:description"
-          content="Innenausstattung mit Herz: Unsere Geschichte, Werte und Kontaktinformationen."
+          content="Wir denken vom Material bis zum fertigen Raum. Lernen Sie New Living Design in Zofingen kennen."
         />
         <meta name="twitter:image" content={heroImg} />
 
@@ -40,7 +41,7 @@ const About: React.FC = () => {
             "image": "https://newlivingdesign.ch" + heroImg,
             "url": "https://newlivingdesign.ch/ueber-uns",
             "telephone": "+41625445854",
-            "email": "diego.verdile@newlivingdesign.ch",
+            "email": "emanuel.verdile@newlivingdesign.ch",
             "address": {
               "@type": "PostalAddress",
               "streetAddress": "Im Römerquartier 4A",
@@ -86,11 +87,12 @@ const About: React.FC = () => {
         <div className={styles["hero-container"]}>
           <div className={styles["hero-content"]}>
             <h1 className={styles["hero-title"]}>
-              <span className={styles["title-highlight"]}>Über uns</span>
+              <span>Wir denken vom Material bis zum fertigen Raum.</span>
             </h1>
             <p className={styles["hero-subtitle"]}>
-              Familiengeführt, qualitätsverliebt und mit klarer Vision: Innenausstattung,
-              die lange Freude macht.
+              New Living Design ist ein familiengeführtes Unternehmen mit Ausstellung in Zofingen. Wir verbinden
+              praktische Erfahrung aus Umbau und Plattenarbeiten mit der Auswahl von Badprodukten, Küchen,
+              Oberflächen und Wellnesslösungen.
             </p>
           </div>
           <div className={styles["hero-scroll-indicator"]}>
@@ -104,35 +106,32 @@ const About: React.FC = () => {
       <section className={cx(styles.section, styles.dark)}>
         <div className={styles.container}>
           <div className={cx(styles["section-header"], styles.centered)}>
-            <span className={styles["section-label"]}>Unsere Geschichte</span>
-            <h2 className={styles["section-title"]}>Von der Fliese zum Full-Interior</h2>
+            <span className={styles["section-label"]}>Wie New Living Design arbeitet</span>
+            <h2 className={styles["section-title"]}>Aus der Praxis entstanden</h2>
           </div>
 
           <div className={styles.grid}>
             <article className={styles.card}>
-              <h3>Wurzeln</h3>
+              <h3>Der Blick fürs Material</h3>
               <p>
-                Die New Living Design startete als Fliesenlegerfirma und hat sich Schritt
-                für Schritt auf den Verkauf hochwertiger Innenausstattungs-Produkte
-                spezialisiert.
+                Unsere Arbeit begann bei Oberflächen, Formaten und ihrer sauberen Verarbeitung.
+                Diese Nähe zum Material prägt bis heute, wie wir Produkte beurteilen und miteinander kombinieren.
               </p>
             </article>
 
             <article className={styles.card}>
-              <h3>Showroom & Nähe</h3>
+              <h3>Die Ausstellung in Zofingen</h3>
               <p>
-                Mit der Zeit kam ein eigener Ausstellungsraum in <strong>Zofingen (AG) </strong>
-                hinzu, damit Kundinnen und Kunden Materialien und Oberflächen live erleben
-                können. Als <strong>Familienunternehmen</strong> legen wir Wert auf persönliche
-                Beratung und eine Atmosphäre zum Wohlfühlen.
+                Ein Muster auf dem Bildschirm ersetzt nicht den Eindruck vor Ort. Deshalb können Kundinnen und Kunden
+                in Zofingen Platten, Möbel, Armaturen und Farben nebeneinander sehen, anfassen und vergleichen.
               </p>
             </article>
 
             <article className={styles.card}>
-              <h3>Ausblick</h3>
+              <h3>Der ganze Raum</h3>
               <p>
-                Die New Living Design arbeitet an neuen Konzepten, weitere Ausstellungsräume in der Schweiz
-                sind in Planung, um noch näher bei den Projekten zu sein.
+                Heute beraten wir zu Bad, Küchen, Platten und Wellness. Je nach Projekt kommen 3D-Visualisierung,
+                Lieferung, Montage oder die Koordination einer Renovation hinzu.
               </p>
             </article>
           </div>
@@ -143,32 +142,32 @@ const About: React.FC = () => {
       <section className={cx(styles.section, styles.light)}>
         <div className={styles.container}>
           <div className={cx(styles["section-header"], styles.centered)}>
-            <span className={styles["section-label"]}>Zahlen & Fakten</span>
-            <h2 className={styles["section-title"]}>Das Wichtigste kompakt</h2>
+            <span className={styles["section-label"]}>New Living Design in Kürze</span>
+            <h2 className={styles["section-title"]}>Was Sie über uns wissen sollten</h2>
           </div>
 
           <div className={styles.facts}>
             <div className={styles.fact}>
               <div className={styles["fact-badge"]}>2023</div>
               <div className={styles["fact-content"]}>
-                <h4>Gründung der GmbH</h4>
-                <p>Eintrag im Handelsregister des Kantons Aargau.</p>
+                <h4>New Living Design GmbH</h4>
+                <p>Seit 2023 als GmbH im Kanton Aargau eingetragen.</p>
               </div>
             </div>
 
             <div className={styles.fact}>
-              <div className={styles["fact-badge"]}>Leitung</div>
+              <div className={styles["fact-badge"]}>Ansprechpartner</div>
               <div className={styles["fact-content"]}>
-                <h4>Diego Verdile</h4>
-                <p>Geschäftsführung.</p>
+                <h4>Emanuel Verdile</h4>
+                <p>Ihr Ansprechpartner für Beratung, Termine und Projektanfragen.</p>
               </div>
             </div>
 
             <div className={styles.fact}>
-              <div className={styles["fact-badge"]}> Showroom </div>
+              <div className={styles["fact-badge"]}>Ausstellung</div>
               <div className={styles["fact-content"]}>
-                <h4>Zofingen (AG)</h4>
-                <p>Ausstellungsraum für Materialien & Lösungen.</p>
+                <h4>Zofingen</h4>
+                <p>Materialien und Produkte in unserer Ausstellung im Römerquartier vergleichen.</p>
               </div>
             </div>
           </div>
@@ -179,8 +178,8 @@ const About: React.FC = () => {
       <section className={cx(styles.section, styles.dark)}>
         <div className={styles.container}>
           <div className={cx(styles["section-header"], styles.centered)}>
-            <span className={styles["section-label"]}>Wofür wir stehen</span>
-            <h2 className={styles["section-title"]}>Unsere Werte</h2>
+            <span className={styles["section-label"]}>Woran Sie unsere Arbeit erkennen</span>
+            <h2 className={styles["section-title"]}>Drei Grundsätze</h2>
           </div>
 
           <div className={styles.values}>
@@ -191,8 +190,8 @@ const About: React.FC = () => {
                   <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="2"/>
                 </svg>
               </div>
-              <h4>Qualität</h4>
-              <p>Ausgewählte Produkte, saubere Ausführung, langlebige Ergebnisse.</p>
+              <h4>Am Material entscheiden</h4>
+              <p>Wir zeigen reale Muster und erklären Unterschiede bei Wirkung, Nutzung und Pflege.</p>
             </div>
 
             <div className={styles["value-item"]}>
@@ -202,8 +201,11 @@ const About: React.FC = () => {
                   <circle cx="9" cy="7" r="4" stroke="currentColor" strokeWidth="2"/>
                 </svg>
               </div>
-              <h4>Persönliche Beratung</h4>
-              <p>Familiengeführt, wir nehmen uns Zeit und bleiben nah am Projekt.</p>
+              <h4>Als Ganzes prüfen</h4>
+              <p>
+                Wir betrachten nicht nur das einzelne Produkt, sondern auch Proportionen, Anschlüsse, Farben und die
+                Produkte daneben.
+              </p>
             </div>
 
             <div className={styles["value-item"]}>
@@ -212,8 +214,11 @@ const About: React.FC = () => {
                   <path d="M3 12h6l3 7 3-14 3 7h3" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                 </svg>
               </div>
-              <h4>Zuverlässigkeit</h4>
-              <p>Planbar in Timing, Budget und Kommunikation, vom Erstkontakt bis Montage.</p>
+              <h4>Vereinbarungen klar festhalten</h4>
+              <p>
+                Produkte, Leistungen und Zuständigkeiten werden vor Bestellung oder Ausführung nachvollziehbar
+                beschrieben.
+              </p>
             </div>
           </div>
         </div>
@@ -224,7 +229,7 @@ const About: React.FC = () => {
         <div className={styles.container}>
           <div className={styles["contact-wrap"]}>
             <div className={styles["contact-block"]}>
-              <h3>Kontakt</h3>
+              <h3>Ausstellung und Kontakt</h3>
               <p className={styles["contact-lines"]}>
                 New Living Design GmbH<br />
                 Im Römerquartier 4A<br />
@@ -241,6 +246,9 @@ const About: React.FC = () => {
                 <li><span>Samstag</span><span>09:00–13:00</span></li>
                 <li><span>Sonntag</span><span>Geschlossen</span></li>
               </ul>
+              <p className={styles["contact-note"]}>
+                Termin nach Vereinbarung, auch ausserhalb der Öffnungszeiten.
+              </p>
             </div>
           </div>
         </div>

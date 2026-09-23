@@ -9,10 +9,11 @@ const AGB: React.FC = () => {
   useEffect(() => setIsVisible(true), []);
 
   return (
-    <main className={styles.page}>
+    <main id="main-content" className={styles.page}>
       {/* SEO Head */}
       <Helmet>
         <title>AGB | New Living Design GmbH</title>
+        <link rel="canonical" href="https://newlivingdesign.ch/agb" />
         <meta
           name="description"
           content="Allgemeine Geschäftsbedingungen (AGB) der New Living Design GmbH für Beratung, Verkauf, Lieferung und Montage von Innenausstattungen."

@@ -1,372 +1,189 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
-import styles from './Home.module.css';
-import trinidadImage from '../../assets/FebalCasa_Cucina_Moderna_Origina_AntaProfiloAlluminio_Vol1_Compo8e.webp';
-import clubRoomImage from '../../assets/22-Private-House-Club-Room.jpg.webp';
 import { SEOHead } from '../../components';
 import { business, bathPackages, localBusinessJsonLd } from '../../config/business';
-import { badumbauFaq } from '../../data/faq';
-import { homeReferencePhotos, photoUrl } from '../../data/references';
-import { posts as blogPosts, formatDate } from '../../lib/blog';
+import { homeReferencePhotos, photoUrl, referenceById } from '../../data/references';
+import { areaById, areaHref, areas, imageOf, supplierHref, suppliers, suppliersInArea, type AreaId, type SupplierImage, type SupplierKey } from '../../data/suppliers';
+import styles from './Home.module.css';
 
-const GOOGLE_RATING = { value: '5.0', count: 23 }; // Google Unternehmensprofil, Stand September 2026
+const kitchen = referenceById('kueche-insel-messing');
+const heroRef = referenceById('bad-marmoroptik-grau-schwarz');
+const heroPhoto = heroRef?.photos.find((p) => p.file === 'bad-marmor-grau-02.webp');
+
+type Shot = { image: SupplierImage; supplier?: SupplierKey; credit?: { label: string; href: string } };
+type Chapter = { id: AreaId; more: string; main: Shot; side: Shot[] };
+
+const kitchenImage: SupplierImage = { src: photoUrl('kueche-insel-messing-01.webp'), srcSet: `${photoUrl('kueche-insel-messing-01.webp', true)} 480w, ${photoUrl('kueche-insel-messing-01.webp')} 900w`, width: 900, height: 1600, alt: 'Realisierte Küche mit Insel, Messingdetails und Einbaugeräten' };
+
+// Vier Bereiche als Kapitel: ein Hauptbild, zwei Nebenbilder; jeder Bildnachweis führt zur Marke im Katalog.
+const chapters: Chapter[] = [
+  { id: 'bad', more: 'Bad ansehen',
+    main: { image: imageOf('edone'), supplier: 'edone' }, side: [{ image: imageOf('gessi'), supplier: 'gessi' }, { image: imageOf('cielo'), supplier: 'cielo' }] },
+  { id: 'kuechen', more: 'Küchen ansehen',
+    main: { image: kitchenImage, credit: { label: kitchen?.title ?? 'Referenzen', href: '/referenzen#kueche-insel-messing' } }, side: [{ image: imageOf('febal', 'Origina', 0), supplier: 'febal' }, { image: imageOf('febal', 'Origina', 1), supplier: 'febal' }] },
+  { id: 'platten', more: 'Platten ansehen',
+    main: { image: imageOf('lafabbrica'), supplier: 'lafabbrica' }, side: [{ image: imageOf('sicis', 'Elegance'), supplier: 'sicis' }, { image: imageOf('skema'), supplier: 'skema' }] },
+  { id: 'wellness', more: 'Wellness ansehen',
+    main: { image: imageOf('novellini', 'Home Oasis'), supplier: 'novellini' }, side: [{ image: imageOf('megius'), supplier: 'megius' }, { image: imageOf('albatros'), supplier: 'albatros' }] },
+];
+
+// Bildnachweis führt zur Marke im Bereich des Kapitels (Megius/Novellini haben Bad- und Wellness-Seiten).
+const creditOf = (shot: Shot, area: AreaId) => shot.credit ?? (shot.supplier ? { label: suppliers.find((x) => x.key === shot.supplier)?.name ?? '', href: supplierHref(shot.supplier, area) } : undefined);
+
+const Figure: React.FC<{ shot: Shot; area: AreaId; sizes: string; className?: string }> = ({ shot, area, sizes, className }) => {
+  const credit = creditOf(shot, area);
+  return (
+    <figure className={className}>
+      <img {...shot.image} sizes={sizes} loading="lazy" decoding="async" />
+      {credit && <figcaption>{shot.supplier ? 'Marke' : 'Referenz'}: <Link to={credit.href}>{credit.label}</Link></figcaption>}
+    </figure>
+  );
+};
 
 const Home: React.FC = () => {
-  const [isVisible, setIsVisible] = useState(false);
-
-  useEffect(() => {
-    setIsVisible(true);
-  }, []);
-
-  const homeFaq = badumbauFaq.slice(0, 4);
-  const heroImage = photoUrl('bad-marmor-grau-01.webp');
-
+  const showroomImage = photoUrl('ausstellung-zofingen-01.webp');
   return (
     <main id="main-content" className={styles.home}>
-      <SEOHead
-        title="Badumbau & Küchen in Zofingen | New Living Design"
-        description={`Badumbau, Küchen und Platten aus einer Hand in Zofingen (AG): Ausstellung, 3D-Planung, eigene Equipe. Drei Badpakete mit Fixpreis ab CHF ${bathPackages[0].priceLabel}. Wir arbeiten in Aarau, Olten, Sursee, Langenthal und Umgebung.`}
-        keywords="Badumbau Zofingen, Badezimmer Zofingen, Küchen Zofingen, Badsanierung Aargau, Bäderstudio Zofingen, Plattenleger Zofingen, Badplanung 3D, New Living Design"
-        url="/"
-        type="website"
-        structuredData={localBusinessJsonLd}
-        image={`${business.siteUrl}${heroImage}`}
-      />
+      <SEOHead title="Bad, Küchen, Platten & Wellness in Zofingen | New Living Design"
+        description="Bad, Küchen, Platten und Wellness in Zofingen: Materialien vergleichen, persönlich beraten lassen und Bad oder Küche auf Wunsch in 3D planen."
+        keywords="Bad Zofingen, Küchen Zofingen, Küchenplanung, Badmöbel, Platten, Keramikplatten, Wellness, Ausstellung Zofingen, New Living Design"
+        url="/" type="website" structuredData={localBusinessJsonLd} image={`${business.siteUrl}${showroomImage}`} />
 
-      {/* Hero Section */}
-      <section className={styles.hero}>
-        <div className={styles['hero-background']}>
-          <div className={styles['hero-overlay']}></div>
-          <img
-            src={heroImage}
-            alt="Badumbau von New Living Design Zofingen: Bad in grauer Marmoroptik mit schwarzen Armaturen"
-            className={styles['hero-bg-image']}
-            fetchPriority="high"
-          />
-        </div>
-        <div className={styles['hero-container']}>
-          <div className={`${styles['hero-content']} ${isVisible ? styles.visible : ''}`}>
-            <h1 className={styles['hero-title']}>
-              <span className={styles['title-line']}>Badumbau und Küchen in Zofingen</span>
-              <span className={styles['title-highlight']}>New Living Design</span>
-            </h1>
-            <div className={styles['hero-description']}>
-              <p>
-                Ausstellung, 3D-Planung und Umbau aus einer Hand. Drei Badpakete mit Fixpreis ab CHF {bathPackages[0].priceLabel},
-                Farbe ohne Aufpreis. Für Zofingen, Aarau, Olten, Sursee, Langenthal und Umgebung.
-              </p>
-            </div>
-            <div className={styles['hero-actions']}>
-              <Link to="/badumbau-zofingen" className={styles['hero-cta']}>Badumbau und Preise</Link>
-              <a href={`tel:${business.phone.e164}`} className={styles['hero-cta-secondary']}>{business.phone.display}</a>
-            </div>
-            <p className={styles['hero-meta']}>
-              Ausstellung {business.address.street}, {business.address.zip} {business.address.city} · Mo–Fr {business.openingHours[0].opens}–{business.openingHours[0].closes}, Sa {business.openingHours[1].opens}–{business.openingHours[1].closes}
-            </p>
+      {/* Hero: vollflächiges Projektbild, Typografie-Panel ragt in den nächsten Abschnitt */}
+      <section className={styles.hero} aria-labelledby="home-title">
+        <figure className={styles.heroFigure}>
+          <img src={photoUrl('bad-marmor-grau-02.webp')} alt={heroPhoto?.alt ?? ''} width="1600" height="1102" fetchPriority="high" />
+          {heroRef && <figcaption><Link to={`/referenzen#${heroRef.id}`}>{heroRef.title}</Link></figcaption>}
+        </figure>
+        <div className={styles.heroPanel}>
+          <p className={styles.eyebrow}><span className={styles.dot} /> Ausstellung in Zofingen</p>
+          <h1 id="home-title" className={styles.heroTitle}>Bad, Küchen, Platten &amp; Wellness.</h1>
+          <p className={styles.heroLead}>Nicht einzeln ausgesucht. Als Raum gedacht.</p>
+          <p className={styles.heroText}>Wir kombinieren Materialien, Farben und Produkte so, dass sie zu Ihrem Raum, Ihrem Stil und Ihrem Budget passen. Wir beraten Sie persönlich in unserer Ausstellung in Zofingen. Bad und Küche visualisieren wir auf Wunsch in 3D.</p>
+          <div className={styles.actions}>
+            <Link to="/kontakt" className={`${styles.button} ${styles.buttonLight}`}>Ausstellungsberatung anfragen</Link>
+            <a href="#sortiment" className={styles.textLink}>Produkte entdecken</a>
           </div>
-          <div className={styles['hero-scroll-indicator']}>
-            <div className={styles['scroll-dot']}></div>
-            <span>Scrollen Sie nach unten</span>
-          </div>
+          <div className={styles.heroAddress}><span>{business.address.street}</span><span>{business.address.zip} {business.address.city}</span></div>
         </div>
       </section>
 
-      {/* Badpakete */}
-      <section className={styles.packages}>
-        <div className={styles['packages-container']}>
-          <div className={styles['section-header']}>
-            <span className={styles['section-label']}>Was kostet ein Badumbau?</span>
-            <h2 className={styles['section-title']}>Drei Badpakete, ein Fixpreis</h2>
-            <p className={styles['section-intro']}>
-              Richtpreise inkl. Material, Montage und MwSt. für ein Bad von 6 bis 8 m². Innerhalb der Serie wählen Sie
-              Platten, Farben und Armaturen frei.
-            </p>
+      {/* Vier Bereiche als Kapitel: Index, dann je ein Hauptbild mit zwei Nebenbildern */}
+      <section id="sortiment" className={styles.journey} aria-labelledby="sortiment-title">
+        <div className={styles.container}>
+          <div className={styles.journeyHead}>
+            <div><p className={styles.eyebrow}>Bad, Küchen, Platten und Wellness</p><h2 id="sortiment-title">Vier Bereiche. Eine stimmige Auswahl.</h2></div>
+            <nav aria-label="Bereiche" className={styles.index}>
+              <ol>{chapters.map((c, i) => <li key={c.id}><a href={`#bereich-${c.id}`}><span>{String(i + 1).padStart(2, '0')}</span>{areaById(c.id)?.title}</a></li>)}</ol>
+            </nav>
+            <Link to="/produkte" className={styles.textLink}>Alle Produkte ansehen</Link>
           </div>
-          <div className={styles['packages-grid']}>
-            {bathPackages.map((p) => (
-              <Link key={p.id} to={`/badumbau-zofingen#paket-${p.id}`} className={`${styles['package-card']} ${p.highlight ? styles['package-card-highlight'] : ''}`}>
-                <span className={styles['package-name']}>{p.name}</span>
-                <span className={styles['package-price']}>ab CHF {p.priceLabel}</span>
-                <span className={styles['package-claim']}>{p.claim}</span>
-                <span className={styles['package-link']}>Details und Inhalt →</span>
-              </Link>
-            ))}
-          </div>
-
-          {/* Hinweis auf den Badplaner */}
-          <aside className={styles['planner-box']}>
-            <div>
-              <span className={styles['planner-eyebrow']}>Neu</span>
-              <h3>Badplaner – Ihr Bad als Ideenbild</h3>
-              <p>Paket wählen, Foto vom Bad machen, in 30 Sekunden ein Ideenbild erhalten. Kostenlos und unverbindlich.</p>
-            </div>
-            <Link to="/badplaner" className={styles['planner-cta']}>Badplaner starten</Link>
-          </aside>
-        </div>
-      </section>
-
-      {/* Bewertungen */}
-      <section className={styles.reviews}>
-        <div className={styles['reviews-container']}>
-          <div className={styles['reviews-rating']}>
-            <span className={styles['reviews-stars']} aria-hidden="true">★★★★★</span>
-            <span className={styles['reviews-value']}>{GOOGLE_RATING.value}</span>
-          </div>
-          <p className={styles['reviews-text']}>
-            <strong>{GOOGLE_RATING.count} Bewertungen bei Google</strong>, Durchschnitt {GOOGLE_RATING.value} von 5. Unsere Kunden aus der Region
-            schreiben über Beratung, Ausführung und das fertige Bad.
-          </p>
-          <div className={styles['reviews-actions']}>
-            <a href="https://www.google.com/maps/search/?api=1&query=New+Living+Design+Zofingen" target="_blank" rel="noopener noreferrer" className={styles['reviews-link']}>
-              Bewertungen lesen
-            </a>
-            <a href={business.reviewLink} target="_blank" rel="noopener noreferrer" className={styles['reviews-link-secondary']}>
-              Bewertung schreiben
-            </a>
-          </div>
-        </div>
-      </section>
-
-      {/* Services Section */}
-      <section className={styles.services}>
-        <div className={styles['services-container']}>
-          <div className={styles['section-header']}>
-            <span className={styles['section-label']}>Was wir bieten</span>
-            <h2 className={styles['section-title']}>Erstklassige Dienstleistungen</h2>
-          </div>
-
-          <div className={styles['services-grid']}>
-            <div className={styles['services-content']}>
-              <div className={styles['services-image-container']}>
-                <div className={styles['image-frame']}>
-                  <img
-                    src={trinidadImage}
-                    alt="Trinidad Badezimmer Design"
-                    className={styles['services-img']}
-                  />
-                  <div className={styles['image-overlay']}>
-                    <div className={styles['overlay-content']}>
-                      <h3>Premium Küchen und Badezimmer</h3>
-                      <p>Hochwertige Einrichtungen</p>
-                    </div>
+          {chapters.map((c, i) => {
+            const brands = suppliersInArea(c.id);
+            const area = areaById(c.id)!;
+            return (
+              <article key={c.id} id={`bereich-${c.id}`} className={`${styles.chapter} ${i % 2 ? styles.chapterAlt : ''} ${c.main.image.height > c.main.image.width ? styles.chapterPortrait : ''}`} aria-labelledby={`bereich-${c.id}-title`}>
+                <div className={styles.chapterText}>
+                  <span className={styles.storyNumber} aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
+                  <h3 id={`bereich-${c.id}-title`}>{area.title}</h3>
+                  <p className={styles.storyLabel}>{area.label}</p>
+                  <p className={styles.storyBody}>{area.text}</p>
+                  <div className={styles.chapterLinks}>
+                    <Link to={`/produkte#${c.id}`} className={styles.textLink}>{c.more}</Link>
+                    <Link to={areaHref(c.id)} className={styles.textLink}>{brands.length === 1 ? '1 Marke' : `${brands.length} Marken`} und Serien</Link>
                   </div>
                 </div>
-              </div>
-
-              <div className={styles['services-text']}>
-                <div className={styles['services-features']}>
-                  <div className={styles['feature-item']}>
-                    <div className={styles['feature-icon']}>
-                      <svg viewBox="0 0 24 24" fill="none">
-                        <path d="M9 12l2 2 4-4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                        <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="2" />
-                      </svg>
-                    </div>
-                    <div className={styles['feature-content']}>
-                      <h4>Erstklassiger Service</h4>
-                      <p>Bei New Living Design steht ein erstklassiger Service an oberster Stelle.</p>
-                    </div>
-                  </div>
-
-                  <div className={styles['feature-item']}>
-                    <div className={styles['feature-icon']}>
-                      <svg viewBox="0 0 24 24" fill="none">
-                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" stroke="currentColor" strokeWidth="2" />
-                        <circle cx="9" cy="7" r="4" stroke="currentColor" strokeWidth="2" />
-                        <path d="M23 21v-2a4 4 0 0 0-3-3.87" stroke="currentColor" strokeWidth="2" />
-                        <path d="M16 3.13a4 4 0 0 1 0 7.75" stroke="currentColor" strokeWidth="2" />
-                      </svg>
-                    </div>
-                    <div className={styles['feature-content']}>
-                      <h4>Persönliche Betreuung</h4>
-                      <p>Unser engagiertes Team begleitet Sie Schritt für Schritt – von der Auswahl des perfekten Produkts, über eine individuelle Beratung, bis hin zur termingerechten Lieferung und professionellen Montage.</p>
-                    </div>
-                  </div>
-
-                  <div className={styles['feature-item']}>
-                    <div className={styles['feature-icon']}>
-                      <svg viewBox="0 0 24 24" fill="none">
-                        <path d="M22 12h-4l-3 9L9 3l-3 9H2" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                      </svg>
-                    </div>
-                    <div className={styles['feature-content']}>
-                      <h4>Massgeschneiderte Lösungen</h4>
-                      <p>Dabei legen wir grossen Wert darauf, Ihre Wünsche und Bedürfnisse zu berücksichtigen, um sicherzustellen, dass Sie mit dem Endergebnis rundum zufrieden sind.</p>
-                    </div>
-                  </div>
+                <Figure shot={c.main} area={c.id} className={styles.chapterMain} sizes="(max-width: 767px) 100vw, (max-width: 1100px) 66vw, 760px" />
+                <div className={styles.chapterSide}>
+                  {c.side.map((shot) => <Figure key={shot.image.src} shot={shot} area={c.id} sizes="(max-width: 767px) 50vw, (max-width: 1100px) 33vw, 380px" />)}
                 </div>
+              </article>
+            );
+          })}
+          <p className={styles.imageNote}>Die gezeigte Küche wurde von uns realisiert. Weitere Motive zeigen ausgewählte Produkte unserer Lieferanten. Auswahl und Verfügbarkeit klären wir persönlich mit Ihnen.</p>
+        </div>
+      </section>
 
-                <div className={styles['services-cta-container']}>
-                  <Link to="/dienstleistungen" className={styles['services-cta']}>
-                    <span>Zu den Dienstleistungen</span>
-                    <svg className={styles['cta-arrow']} viewBox="0 0 24 24" fill="none">
-                      <path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                    </svg>
+      {/* Weg zum vollständigen Katalog: Zahlen je Bereich statt einer Namensliste */}
+      <section className={styles.catalog} aria-labelledby="catalog-title">
+        <div className={`${styles.container} ${styles.catalogGrid}`}>
+          <div>
+            <p className={styles.eyebrow}>Unsere Marken</p>
+            <h2 id="catalog-title">Marken, aus denen eine stimmige Auswahl wird.</h2>
+            <p className={styles.catalogIntro}>Nicht jedes Produkt passt zu jedem Raum. Wir nutzen die Sortimente unserer Partner, um Materialien, Funktionen und Oberflächen passend zu Ihrem Projekt zusammenzustellen.</p>
+            <Link to="/partner" className={styles.button}>Alle {suppliers.length} Marken ansehen</Link>
+          </div>
+          <ul className={styles.catalogAreas}>
+            {areas.map((a) => {
+              const n = suppliersInArea(a.id).length;
+              return (
+                <li key={a.id}>
+                  <Link to={areaHref(a.id)}>
+                    <strong>{n}</strong>
+                    <span>{a.title}</span>
+                    <small>{a.groups.map((g) => g.title).join(' · ')}</small>
                   </Link>
-                </div>
-              </div>
-            </div>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+      </section>
+
+      <section className={styles.showroom} aria-labelledby="showroom-title">
+        <div className={`${styles.container} ${styles.showroomGrid}`}>
+          <figure className={styles.showroomFigure}>
+            <img src={showroomImage} srcSet={`${photoUrl('ausstellung-zofingen-01.webp', true)} 480w, ${showroomImage} 1200w`} sizes="(max-width: 767px) 100vw, 40vw" alt="Einblick in unsere Ausstellung in Zofingen: Waschtische, ovale Spiegel und eine Wand in Onyxoptik" width="1200" height="1600" loading="lazy" decoding="async" />
+            <figcaption><span>New Living Design</span><span>Unsere Ausstellung</span></figcaption>
+          </figure>
+          <div className={styles.showroomText}>
+            <p className={styles.eyebrow}>Ausstellung in Zofingen</p><h2 id="showroom-title">Was am Bildschirm gefällt, muss im Raum überzeugen.</h2>
+            <p className={styles.showroomIntro}>Oberflächen wirken je nach Licht, Format und Umgebung anders. In unserer Ausstellung vergleichen Sie Platten, Möbel, Armaturen und Farben direkt miteinander. Wir stellen mit Ihnen eine Auswahl zusammen, die nicht nur einzeln gefällt, sondern als Ganzes funktioniert.</p>
+            <Link to="/kontakt" className={`${styles.button} ${styles.buttonLight}`}>Beratung in Zofingen anfragen</Link>
+          </div>
+          <div className={styles.visitCard}>
+            <p className={styles.visitLabel}>Wir freuen uns auf Ihren Besuch.</p>
+            <address><strong>{business.address.street}</strong><br />{business.address.zip} {business.address.city}</address>
+            <dl>{business.openingHours.map((hours) => <div key={hours.days}><dt>{hours.days}</dt><dd>{hours.opens}–{hours.closes}</dd></div>)}</dl>
+            <p className={styles.visitNote}>{business.openingHoursNote}</p>
+            <div className={styles.visitLinks}><a href={business.mapsLink} target="_blank" rel="noopener noreferrer" className={styles.textLink}>Route planen</a><a href={`tel:${business.phone.e164}`} className={styles.textLink}>{business.phone.display}</a></div>
+            <a href={business.mapsLink} target="_blank" rel="noopener noreferrer" className={styles.reviewLink}>Kundenstimmen auf Google lesen</a>
           </div>
         </div>
       </section>
 
-      {/* Products Section */}
-      <section className={styles['products']}>
-        <div className={styles['products-container']}>
-          <div className={styles['section-header']}>
-            <span className={styles['section-label']}>Entdecken Sie</span>
-            <h2 className={styles['section-title']}>Unsere Produktvielfalt</h2>
-          </div>
-
-          <div className={styles['products-content']}>
-            <div className={styles['products-text']}>
-              <div className={styles['products-features']}>
-                <div className={styles['feature-item']}>
-                  <div className={styles['feature-icon']}>
-                    <svg viewBox="0 0 24 24" fill="none">
-                      <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" stroke="currentColor" strokeWidth="2" />
-                    </svg>
-                  </div>
-                  <div className={styles['feature-content']}>
-                    <h4>Premium Badezimmer</h4>
-                    <p>Hochwertige Sanitäranlagen und moderne Badezimmermöbel für Ihr Traumhadbad.</p>
-                  </div>
-                </div>
-
-                <div className={styles['feature-item']}>
-                  <div className={styles['feature-icon']}>
-                    <svg viewBox="0 0 24 24" fill="none">
-                      <rect x="2" y="3" width="20" height="14" rx="2" ry="2" stroke="currentColor" strokeWidth="2" />
-                      <line x1="8" y1="21" x2="16" y2="21" stroke="currentColor" strokeWidth="2" />
-                      <line x1="12" y1="17" x2="12" y2="21" stroke="currentColor" strokeWidth="2" />
-                    </svg>
-                  </div>
-                  <div className={styles['feature-content']}>
-                    <h4>Wohnraum Design</h4>
-                    <p>Stilvolle Möbel und Accessoires für jeden Raum Ihres Zuhauses.</p>
-                  </div>
-                </div>
-
-                <div className={styles['feature-item']}>
-                  <div className={styles['feature-icon']}>
-                    <svg viewBox="0 0 24 24" fill="none">
-                      <polygon points="12,2 2,7 12,12 22,7 12,2" stroke="currentColor" strokeWidth="2" />
-                      <polyline points="2,17 12,22 22,17" stroke="currentColor" strokeWidth="2" />
-                      <polyline points="2,12 12,17 22,12" stroke="currentColor" strokeWidth="2" />
-                    </svg>
-                  </div>
-                  <div className={styles['feature-content']}>
-                    <h4>Massgeschneiderte Lösungen</h4>
-                    <p>Individuelle Anpassungen nach Ihren persönlichen Wünschen und Bedürfnissen.</p>
-                  </div>
-                </div>
-              </div>
-
-              <div className={styles['products-cta-container']}>
-                <Link to="/produkte" className={styles['products-cta']}>
-                  <span>Alle Produkte entdecken</span>
-                  <svg className={styles['cta-arrow']} viewBox="0 0 24 24" fill="none">
-                    <path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                  </svg>
-                </Link>
-              </div>
-            </div>
-
-            <div className={styles['products-image-container']}>
-              <div className={styles['image-frame']}>
-                <img
-                  src={clubRoomImage}
-                  alt="Elegantes Wohnzimmer mit modernem Design"
-                  className={styles['products-img']}
-                />
-                <div className={styles['image-overlay']}>
-                  <div className={styles['overlay-content']}>
-                    <h3>Luxuriöse Wohnräume</h3>
-                    <p>Moderne Eleganz trifft auf höchste Qualität</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Referenzen */}
-      <section className={styles.references}>
-        <div className={styles['references-container']}>
-          <div className={styles['section-header']}>
-            <span className={styles['section-label']}>Referenzen</span>
-            <h2 className={styles['section-title']}>Bäder und Küchen, die wir gebaut haben</h2>
-          </div>
-          <div className={styles['references-grid']}>
+      <section className={`${styles.section} ${styles.references}`} aria-labelledby="references-title">
+        <div className={styles.container}>
+          <div className={styles.sectionHead}><div><p className={styles.eyebrow}>Echte Projekte aus der Region</p><h2 id="references-title">Von uns geplant. Für Kunden realisiert.</h2></div><Link to="/referenzen" className={styles.textLink}>Referenzen ansehen</Link></div>
+          <div className={styles.referenceGrid}>
             {homeReferencePhotos.map(({ reference, photo }) => (
-              <Link key={reference.id} to={`/referenzen#${reference.id}`} className={styles['reference-card']}>
-                <img src={photoUrl(photo.file, true)} alt={photo.alt} loading="lazy" width="640" height="853" />
-                <span className={styles['reference-caption']}>{reference.title}</span>
+              <Link key={reference.id} to={`/referenzen#${reference.id}`} className={styles.referenceCard}>
+                <img src={photoUrl(photo.file, true)} srcSet={`${photoUrl(photo.file, true)} 480w, ${photoUrl(photo.file)} 1067w`} sizes="(max-width: 767px) 100vw, 40vw" alt={photo.alt} loading="lazy" decoding="async" width="480" height="640" /><div><h3>{reference.title}</h3></div>
               </Link>
             ))}
-          </div>
-          <div className={styles['references-cta-container']}>
-            <Link to="/referenzen" className={styles['services-cta']}>
-              <span>Alle Referenzen</span>
-              <svg className={styles['cta-arrow']} viewBox="0 0 24 24" fill="none">
-                <path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-            </Link>
           </div>
         </div>
       </section>
 
-      {/* Blog */}
-      {blogPosts.length > 0 && (
-        <section className={styles.blog}>
-          <div className={styles['blog-container']}>
-            <div className={styles['section-header']}>
-              <span className={styles['section-label']}>Aus dem Blog</span>
-              <h2 className={styles['section-title']}>Wissen aus unseren Baustellen</h2>
-            </div>
-            <div className={styles['blog-grid']}>
-              {blogPosts.slice(0, 3).map((p) => (
-                <Link key={p.slug} to={p.url} className={styles['blog-card']}>
-                  <img src={p.image} alt={p.imageAlt} loading="lazy" width="800" height="533" />
-                  <div className={styles['blog-card-text']}>
-                    <span className={styles['blog-card-meta']}>{p.category} · {formatDate(p.date)}</span>
-                    <h3>{p.title}</h3>
-                    <p>{p.description}</p>
-                  </div>
-                </Link>
-              ))}
-            </div>
-            <div className={styles['references-cta-container']}>
-              <Link to="/blog" className={styles['services-cta']}>
-                <span>Alle Beiträge</span>
-                <svg className={styles['cta-arrow']} viewBox="0 0 24 24" fill="none">
-                  <path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
-              </Link>
-            </div>
-          </div>
-        </section>
-      )}
+      <section className={styles.planner} aria-labelledby="planner-title">
+        <div className={`${styles.container} ${styles.plannerInner}`}>
+          <div><p className={styles.eyebrow}>Ein erster Eindruck</p><h2 id="planner-title">Ein Ideenbild, bevor Sie sich festlegen.</h2><p>Mit dem Badplaner probieren Sie ausgewählte Materialien und Farben auf einem Foto Ihres Badezimmers aus. Das Ergebnis ist eine erste Inspiration – kostenlos und unverbindlich, aber keine verbindliche Planung.</p></div>
+          <Link to="/badplaner" className={`${styles.button} ${styles.buttonLight}`}>Badplaner ausprobieren</Link>
+        </div>
+      </section>
 
-      {/* FAQ */}
-      <section className={styles.faq}>
-        <div className={styles['faq-container']}>
-          <div className={styles['section-header']}>
-            <span className={styles['section-label']}>Häufige Fragen</span>
-            <h2 className={styles['section-title']}>Kosten, Dauer, Ablauf</h2>
-          </div>
-          <div className={styles['faq-list']}>
-            {homeFaq.map((item) => (
-              <details key={item.question} className={styles['faq-item']}>
-                <summary>{item.question}</summary>
-                <p>{item.answer}</p>
-              </details>
-            ))}
-          </div>
-          <div className={styles['faq-cta-container']}>
-            <Link to="/badumbau-zofingen#faq" className={styles['faq-link']}>Alle Fragen zum Badumbau</Link>
-          </div>
+      <section className={`${styles.section} ${styles.renovation}`} aria-labelledby="renovation-title">
+        <div className={styles.container}>
+          <div className={styles.sectionHead}><div><p className={styles.eyebrow}>Wenn Sie nicht nur Produkte suchen</p><h2 id="renovation-title">Vom ausgewählten Bad zum kompletten Umbau.</h2><p className={styles.renovationIntro}>Für Badumbauten im Umkreis von rund 40 km um Zofingen koordinieren wir auf Wunsch den gesamten Ablauf – von der Demontage über Sanitär-, Elektro- und Plattenarbeiten bis zur Montage und Übergabe. Unsere drei Badpakete geben Ihnen dafür eine klare erste Preisorientierung.</p></div><Link to="/badumbau-zofingen" className={styles.textLink}>Badumbau und Pakete ansehen</Link></div>
+          <div className={styles.packageRow}>{bathPackages.map((pkg) => <Link key={pkg.id} to={`/badumbau-zofingen#paket-${pkg.id}`}><span>{pkg.name}</span><strong>ab CHF {pkg.priceLabel}</strong></Link>)}</div>
+          <p className={styles.imageNote}>Richtpreise inkl. Material, Montage und MwSt. Der Fixpreis gilt nach der Besichtigung vor Ort.</p>
+        </div>
+      </section>
+
+      <section className={styles.contact} aria-labelledby="contact-title">
+        <div className={`${styles.container} ${styles.contactInner}`}>
+          <div><p className={styles.eyebrow}>Der nächste Schritt</p><h2 id="contact-title">Was möchten Sie verändern?</h2><p>Bringen Sie Fotos, einen Grundriss oder einfach Ihre erste Idee mit. Wir klären gemeinsam, welche Produkte und welcher nächste Schritt zu Ihrem Projekt passen.</p></div>
+          <div className={styles.contactActions}><Link to="/kontakt" className={styles.button}>Beratung anfragen</Link><a href={`tel:${business.phone.e164}`} className={styles.textLink}>{business.phone.display} anrufen</a></div>
         </div>
       </section>
     </main>

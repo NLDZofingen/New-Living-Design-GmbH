@@ -72,8 +72,8 @@ export default function handler(request: Request) {
         height: 630,
       }
     );
-  } catch (e: any) {
-    console.log(`${e.message}`);
+  } catch (e) {
+    console.log(`${(e as { message?: string }).message}`);
     return new Response(`Failed to generate the image`, {
       status: 500,
     });

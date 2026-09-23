@@ -21,8 +21,6 @@ Disallow: /agb
 
 # Block assets and admin paths
 Disallow: /src/
-Disallow: /*.css$
-Disallow: /*.js$
 Disallow: /*.json$
 
 # Crawl delay for bots

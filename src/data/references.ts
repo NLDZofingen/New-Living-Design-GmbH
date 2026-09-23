@@ -23,10 +23,10 @@ export interface Reference {
 }
 
 export const categoryLabels: Record<ReferenceCategory, string> = {
-  bad: 'Badumbau',
-  kueche: 'Küche',
+  bad: 'Bäder',
+  kueche: 'Küchen',
   'gaeste-wc': 'Gäste-WC',
-  wohnraum: 'Wohnraum',
+  wohnraum: 'Wohnräume',
   ausstellung: 'Ausstellung',
 };
 
@@ -237,8 +237,9 @@ export const references: Reference[] = [
 
 export const referenceById = (id: string): Reference | undefined => references.find((r) => r.id === id);
 
-/** Fotos für die Startseite: das jeweils erste Bild der wichtigsten Projekte */
-export const homeReferencePhotos = references
-  .filter((r) => r.category === 'bad' || r.category === 'kueche')
-  .slice(0, 6)
-  .map((r) => ({ reference: r, photo: r.photos[0] }));
+/** Bewusste, kurze Auswahl; die vollständigen Referenzen bleiben unverändert. */
+const homeReferenceIds = ['bad-marmoroptik-grau-schwarz', 'dusche-zellige-petrol-messing', 'wohnraum-boden-marmoroptik'];
+export const homeReferencePhotos = homeReferenceIds.flatMap((id) => {
+  const reference = referenceById(id);
+  return reference?.photos[0] ? [{ reference, photo: reference.photos[0] }] : [];
+});

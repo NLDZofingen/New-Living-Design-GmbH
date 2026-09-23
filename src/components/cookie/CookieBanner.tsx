@@ -1,27 +1,50 @@
-import React from 'react';
+import React, { useState } from 'react';
 import CookieConsent from 'react-cookie-consent';
 import { BANNER_COOKIE, saveConsent } from '../../utils/tracking';
 import './CookieBanner.css';
 
 const CookieBanner: React.FC = () => {
+    // Statistik und Marketing sind zwei getrennte Entscheidungen. Der dritte
+    // Knopf nimmt nur die Statistik an; die Werbesignale bleiben gesperrt.
+    // react-cookie-consent blendet sich nur bei den eigenen zwei Knoepfen aus,
+    // darum hier der eigene Sichtbarkeitsschalter.
+    const [hidden, setHidden] = useState(false);
+
+    // Blendet sich das Banner aus, faellt der Tastaturfokus sonst auf <body>
+    // zurueck und die naechste Tabulatortaste beginnt wieder ganz oben.
+    const moveFocusToPage = () => {
+        const main = document.getElementById('main-content');
+        if (!main) return;
+        if (!main.hasAttribute('tabindex')) main.setAttribute('tabindex', '-1');
+        main.focus({ preventScroll: true });
+    };
+
     const handleAccept = () => {
         saveConsent({ analytics: true, marketing: true });
+        moveFocusToPage();
     };
 
     const handleDecline = () => {
         saveConsent({ analytics: false, marketing: false });
+        moveFocusToPage();
     };
 
-    const handleSettings = () => {
-        // Scroll to cookie settings on data protection page
-        window.location.href = '/datenschutz#cookie-settings';
+    const handleStatistikOnly = () => {
+        saveConsent({ analytics: true, marketing: false });
+        setHidden(true);
+        moveFocusToPage();
     };
 
+    // ariaAcceptLabel und ariaDeclineLabel: ohne sie liest ein Screenreader die
+    // englischen Vorgaben der Bibliothek ("Accept cookies") statt der Beschriftung.
     return (
         <CookieConsent
             location="bottom"
+            visible={hidden ? 'hidden' : 'byCookieValue'}
             buttonText="Alle Cookies akzeptieren"
             declineButtonText="Nur notwendige"
+            ariaAcceptLabel="Alle Cookies akzeptieren"
+            ariaDeclineLabel="Nur notwendige Cookies"
             enableDeclineButton
             onAccept={handleAccept}
             onDecline={handleDecline}
@@ -34,7 +57,8 @@ const CookieBanner: React.FC = () => {
                 boxShadow: "0 -8px 32px rgba(0, 0, 0, 0.4), 0 -2px 8px rgba(0, 0, 0, 0.3)",
                 backdropFilter: "blur(15px)",
                 borderTop: "2px solid rgba(255, 255, 255, 0.15)",
-                padding: "25px",
+                padding: "10px 16px",
+                alignItems: "center",
                 zIndex: 999999
             }}
             buttonStyle={{
@@ -63,9 +87,16 @@ const CookieBanner: React.FC = () => {
                 marginLeft: "10px"
             }}
             contentStyle={{
-                flex: "1 0 300px",
+                flex: "1 1 300px",
                 margin: "0",
+                minWidth: "0",
+                width: "100%",
                 maxWidth: "none"
+            }}
+            customContainerAttributes={{
+                role: 'region',
+                'aria-label': 'Cookie-Einwilligung',
+                'aria-live': 'polite',
             }}
             containerClasses="cookie-banner-container"
             buttonClasses="cookie-banner-accept"
@@ -73,26 +104,14 @@ const CookieBanner: React.FC = () => {
         >
             <div className="cookie-banner-content">
                 <div className="cookie-banner-text">
-                    <h4>Cookies und Datenschutz</h4>
                     <p>
-                        Wir verwenden Cookies, damit die Website funktioniert und um zu verstehen, wie sie genutzt wird.
-                        Statistik (Google Analytics) und Marketing (Meta Pixel) laden wir nur mit Ihrer Zustimmung.
-                        Sie können Ihre Wahl jederzeit in der <a href="/datenschutz#cookie-settings" style={{ color: "#ffffff", textDecoration: "underline" }}>Datenschutzerklärung</a> ändern.
-                    </p>
-                    <p style={{ fontSize: "12px", color: "#9ca3af", marginTop: "10px" }}>
-                        <strong style={{ color: "#ffffff" }}>Notwendig:</strong> immer aktiv ·{' '}
-                        <strong style={{ color: "#ffffff" }}>Statistik:</strong> Google Analytics ·{' '}
-                        <strong style={{ color: "#ffffff" }}>Marketing:</strong> Meta Pixel
-                    </p>
-                    <div className="cookie-banner-buttons">
-                        <button
-                            onClick={handleSettings}
-                            className="cookie-banner-settings-btn"
-                            type="button"
-                        >
-                            Einstellungen
+                        Statistik (Google Analytics) und Marketing (Meta Pixel) nur mit Ihrer Zustimmung, je einzeln.{' '}
+                        <button type="button" className="cookie-banner-link" onClick={handleStatistikOnly}>
+                            Nur Statistik
                         </button>
-                    </div>
+                        {' · '}
+                        <a href="/datenschutz#cookie-settings" style={{ color: "#ffffff", textDecoration: "underline" }}>Datenschutz</a>
+                    </p>
                 </div>
             </div>
         </CookieConsent>

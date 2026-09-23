@@ -4,6 +4,9 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
+    "test": "node scripts/test-badplaner.mjs",
+    "typecheck:api": "tsc -p tsconfig.badplaner.json",
+    "check:catalog": "node scripts/check-catalog.mjs",
     "dev": "vite",
     "build": "node scripts/fetch-swatches.mjs && tsc -b && vite build && node scripts/prerender.mjs",
     "build:spa": "tsc -b && vite build",
@@ -33,6 +36,7 @@
     "eslint-plugin-react-hooks": "^5.2.0",
     "eslint-plugin-react-refresh": "^0.4.20",
     "globals": "^16.3.0",
+    "sharp": "^0.35.4",
     "typescript": "~5.8.3",
     "typescript-eslint": "^8.35.1",
     "vite": "^7.0.4",

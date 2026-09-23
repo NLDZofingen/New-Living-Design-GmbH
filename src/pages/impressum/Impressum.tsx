@@ -9,13 +9,14 @@ const Impressum: React.FC = () => {
   useEffect(() => setIsVisible(true), []);
 
   return (
-    <main className={styles.page}>
+    <main id="main-content" className={styles.page}>
       {/* SEO Head */}
       <Helmet>
         <title>Impressum | New Living Design GmbH</title>
+        <link rel="canonical" href="https://newlivingdesign.ch/impressum" />
         <meta
           name="description"
-          content="Impressum der New Living Design GmbH mit Angaben gemäss schweizerischem Recht (UWG/OR) und EU-Standards: Anbieter, Handelsregister, Unternehmenszweck, Haftung, Urheberrecht."
+          content="Impressum der New Living Design GmbH in Zofingen: Anbieter, Handelsregister, Unternehmenszweck, Haftung und Urheberrecht."
         />
         <meta property="og:title" content="Impressum | New Living Design GmbH" />
         <meta

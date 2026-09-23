@@ -1,0 +1,13 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ES2022",
+    "moduleResolution": "bundler",
+    "lib": ["ES2022", "DOM"],
+    "strict": true,
+    "skipLibCheck": true,
+    "rootDir": ".",
+    "noEmit": true
+  },
+  "include": ["api/badplaner.ts", "server/badplaner/**/*.ts", "src/pages/badplaner/imageValidation.ts", "src/pages/badplaner/resizeImage.ts", "src/pages/badplaner/imagesLoad.ts", "src/utils/tracking.ts"]
+}

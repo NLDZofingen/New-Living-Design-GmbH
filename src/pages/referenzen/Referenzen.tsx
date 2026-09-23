@@ -74,7 +74,7 @@ const Referenzen: React.FC = () => {
   const galleryJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'CollectionPage',
-    name: 'Referenzen: Badumbau und Küchen von New Living Design',
+    name: 'Referenzen: Bäder, Küchen & Wohnräume | New Living Design',
     url: `${business.siteUrl}/referenzen`,
     hasPart: references.map((r) => ({
       '@type': 'ImageGallery',
@@ -99,10 +99,10 @@ const Referenzen: React.FC = () => {
   const currentPhoto = current && lightbox ? current.photos[lightbox.photoIndex] : null;
 
   return (
-    <main className={styles.page}>
+    <main id="main-content" className={styles.page}>
       <SEOHead
-        title="Referenzen: Bäder und Küchen aus Zofingen | New Living Design"
-        description="Ausgeführte Badumbauten und Küchen von New Living Design in Zofingen und Umgebung: Marmoroptik, Zellige, Travertin, Messing und Schwarz. Fotos der fertigen Projekte."
+        title="Referenzen: Bäder, Küchen & Wohnräume | New Living Design"
+        description="Realisierte Bäder, Küchen, Gäste-WCs und Wohnräume von New Living Design in Zofingen und Umgebung – mit Materialien und Details im Überblick."
         keywords="Referenzen Badumbau, Badezimmer Fotos, Küche Referenz Zofingen, Bad Marmoroptik, Badumbau Aargau Beispiele"
         url="/referenzen"
         type="website"
@@ -112,11 +112,11 @@ const Referenzen: React.FC = () => {
 
       <section className={styles.intro}>
         <div className={styles.container}>
-          <span className={styles.sectionLabel}>Referenzen</span>
-          <h1 className={styles.title}>Bäder und Küchen, die wir gebaut haben</h1>
+          <span className={styles.sectionLabel}>Realisierte Projekte</span>
+          <h1 className={styles.title}>Räume, die aus guten Entscheidungen entstanden sind.</h1>
           <p className={styles.lede}>
-            Echte Projekte aus der Region, fotografiert nach der Übergabe. Geplant und begleitet von New Living Design,
-            mit Produkten aus unserer Ausstellung in Zofingen.
+            Diese Bilder zeigen keine Musterwohnungen, sondern ausgeführte Projekte aus unserer Arbeit. Zu jedem Raum
+            sehen Sie, welche Platten, Farben, Produkte und Details zusammengebracht wurden.
           </p>
           <div className={styles.filters} role="tablist" aria-label="Kategorie">
             {filters.map((f) => (
@@ -172,13 +172,14 @@ const Referenzen: React.FC = () => {
 
       <section className={styles.cta}>
         <div className={styles.container}>
-          <h2>Ihr Bad könnte das nächste sein</h2>
+          <h2>Welche Entscheidungen passen zu Ihrem Raum?</h2>
           <p>
-            Drei Badpakete mit Fixpreis, Farbe ohne Aufpreis, Umbau durch unsere eigene Equipe.
+            Zeigen Sie uns, welches Projekt oder welches Detail Ihnen gefällt. In der Ausstellung vergleichen wir
+            passende Materialien und klären, wie sich die Idee auf Ihren Raum übertragen lässt.
           </p>
           <div className={styles.ctaRow}>
-            <Link to="/badumbau-zofingen" className={styles.ctaPrimary}>Badumbau und Preise</Link>
-            <a href={`tel:${business.phone.e164}`} className={styles.ctaSecondary}>{business.phone.display}</a>
+            <Link to="/kontakt" className={styles.ctaPrimary}>Beratung anfragen</Link>
+            <Link to="/badumbau-zofingen" className={styles.ctaSecondary}>Badumbau und Preise ansehen</Link>
           </div>
         </div>
       </section>

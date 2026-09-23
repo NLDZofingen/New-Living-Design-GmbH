@@ -19,8 +19,6 @@ export { default as BlogPost } from '../pages/blog/BlogPost';
 export { default as SEOHead } from './seo/SEOHead';
 export { default as Breadcrumbs } from './seo/Breadcrumbs';
 
-// Common Components
-export { default as OptimizedImage } from './common/OptimizedImage';
 
 // Cookie Banner
 export { default as CookieBanner } from './cookie/CookieBanner';

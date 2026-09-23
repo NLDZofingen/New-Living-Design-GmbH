@@ -11,11 +11,11 @@ import { trackLead } from '../../utils/tracking';
 const PAGE_URL = `${business.siteUrl}/badumbau-zofingen`;
 
 const steps = [
-  { n: '1', title: 'Beratung in der Ausstellung', text: 'Sie sehen Platten, Möbel, Armaturen und die drei Pakete in echt. Eine Stunde, kostenlos, mit Termin.' },
-  { n: '2', title: 'Besichtigung vor Ort', text: 'Wir messen Ihr Bad aus, prüfen Leitungen und Anschlüsse und klären, was möglich ist.' },
-  { n: '3', title: 'Planung mit 3D-Rendering und Fixpreis', text: 'Sie erhalten Ihr Bad als 3D-Bild in der gewählten Farbe und eine Offerte mit Fixpreis, 30 Tage gültig.' },
-  { n: '4', title: 'Umbau in 2 bis 3 Wochen', text: 'Unsere eigene Equipe baut um: Demontage, Sanitär, Elektro, Gips, Platten, Maler, Montage. Ein Ansprechpartner.' },
-  { n: '5', title: 'Übergabe', text: 'Wir übergeben Ihnen das fertige Bad, erklären die Technik und bleiben erreichbar.' },
+  { n: '1', title: 'Auswahlberatung in Zofingen', text: 'Sie vergleichen Platten, Möbel, Keramik und Armaturen in der Ausstellung und legen die gewünschte Richtung fest.' },
+  { n: '2', title: 'Besichtigung und Aufmass', text: 'Wir messen den Raum, prüfen Anschlüsse und Zugänglichkeit und klären, welche Arbeiten erforderlich sind.' },
+  { n: '3', title: 'Planung und verbindliche Offerte', text: 'Sie erhalten die abgestimmte Auswahl, je nach Paket eine 3D-Visualisierung und eine Offerte mit klar beschriebenem Leistungsumfang.' },
+  { n: '4', title: 'Termine und Ausführung', text: 'Wir bestellen die bestätigten Produkte und koordinieren die vereinbarten Facharbeiten in der richtigen Reihenfolge. Vor dem Start kennen Sie Ablauf und Zuständigkeiten.' },
+  { n: '5', title: 'Abnahme und Übergabe', text: 'Nach Abschluss prüfen wir die vereinbarten Leistungen gemeinsam und übergeben Ihnen das fertige Bad.' },
 ];
 
 const Badumbau: React.FC = () => {
@@ -34,7 +34,7 @@ const Badumbau: React.FC = () => {
     '@id': `${PAGE_URL}#service`,
     name: 'Badumbau in Zofingen und im Aargau',
     serviceType: 'Badumbau, Badsanierung, Badplanung',
-    description: 'Kompletter Badumbau aus einer Hand: Beratung in der Ausstellung, Planung mit 3D-Rendering, Sanitär, Plattenarbeiten, Möbel und Montage. Drei Badpakete mit Fixpreis.',
+    description: 'Badumbau mit Auswahl in der Ausstellung, Besichtigung vor Ort, 3D-Planung und koordinierten Facharbeiten. Drei Pakete als Preisorientierung, Fixpreis nach Aufmass.',
     url: PAGE_URL,
     provider: { '@id': `${business.siteUrl}/#organization` },
     areaServed: business.areaServed.map((name) => ({ '@type': 'City', name })),
@@ -97,10 +97,10 @@ const Badumbau: React.FC = () => {
   };
 
   return (
-    <main className={styles.page}>
+    <main id="main-content" className={styles.page}>
       <SEOHead
-        title="Badumbau Zofingen und Aargau, komplett aus einer Hand | New Living Design"
-        description={`Badumbau in Zofingen, Aarau, Olten, Sursee und Umgebung: Beratung in der Ausstellung, 3D-Planung, Fixpreis. Drei Badpakete ab CHF ${bathPackages[0].priceLabel} inkl. Material und Montage. Farbe ohne Aufpreis.`}
+        title="Badumbau in Zofingen & Umgebung | New Living Design"
+        description={`Badumbau rund um Zofingen: Auswahl in der Ausstellung, Besichtigung vor Ort, 3D-Planung und drei Pakete ab CHF ${bathPackages[0].priceLabel}. Fixpreis nach Aufmass.`}
         keywords="Badumbau Zofingen, Badsanierung Aargau, Badumbau Kosten Schweiz, Badezimmer renovieren Zofingen, Badplanung 3D, Badpaket Fixpreis, Bad umbauen Aarau Olten Sursee"
         url="/badumbau-zofingen"
         type="website"
@@ -120,27 +120,28 @@ const Badumbau: React.FC = () => {
           />
         </div>
         <div className={`${styles.heroContent} ${isVisible ? styles.visible : ''}`}>
-          <p className={styles.eyebrow}>Badumbau · Zofingen · Aargau</p>
+          <p className={styles.eyebrow}>Badumbau in Zofingen und Umgebung</p>
           <h1 className={styles.heroTitle}>
-            Badumbau in Zofingen und im Aargau,
-            <span> komplett aus einer Hand</span>
+            Ein neues Bad.
+            <span> Klar geplant und koordiniert.</span>
           </h1>
           <p className={styles.heroText}>
-            Beratung in unserer Ausstellung, Planung mit 3D-Rendering, Umbau durch die eigene Equipe.
-            Drei Badpakete mit Fixpreis ab CHF {bathPackages[0].priceLabel}. Farbe kostet bei uns nichts extra.
+            Sie wählen Materialien und Produkte in unserer Ausstellung. Wir prüfen Ihr Bad vor Ort, planen die
+            vereinbarte Lösung und koordinieren die nötigen Facharbeiten bis zur Übergabe. Unsere drei Badpakete
+            geben Ihnen eine erste Preisorientierung ab CHF {bathPackages[0].priceLabel}; den verbindlichen Fixpreis
+            erhalten Sie nach der Besichtigung.
           </p>
           <div className={styles.heroActions}>
-            <a href={`tel:${business.phone.e164}`} data-lead="badumbau-hero" className={styles.ctaPrimary}>
-              {business.phone.display} anrufen
+            <a href="#anfrage" className={styles.ctaPrimary}>
+              Besichtigung anfragen
             </a>
-            <a href="#anfrage" className={styles.ctaSecondary}>
-              Kostenlose Beratung anfragen
+            <a href="#pakete" className={styles.ctaSecondary}>
+              Badpakete vergleichen
             </a>
           </div>
           <p className={styles.heroMeta}>
-            Ausstellung {business.address.street}, {business.address.zip} {business.address.city} ·{' '}
-            {business.openingHours[0].days} {business.openingHours[0].opens}–{business.openingHours[0].closes},{' '}
-            {business.openingHours[1].days} {business.openingHours[1].opens}–{business.openingHours[1].closes}
+            Ausstellung: {business.address.street}, {business.address.zip} {business.address.city} ·{' '}
+            Termin nach Vereinbarung
           </p>
         </div>
       </section>
@@ -150,17 +151,18 @@ const Badumbau: React.FC = () => {
         <div className={styles.container}>
           <div className={styles.sectionHeader}>
             <span className={styles.sectionLabel}>Was kostet ein Badumbau?</span>
-            <h2 className={styles.sectionTitle}>Drei Badpakete, ein Fixpreis</h2>
+            <h2 className={styles.sectionTitle}>Drei Pakete als klare Preisorientierung</h2>
             <p className={styles.sectionIntro}>
-              Aus über 20 Bädern, die wir im letzten Jahr geplant haben, haben wir drei Pakete gemacht.
-              Innerhalb der Serie wählen Sie Farben und Oberflächen frei, ohne dass sich der Preis ändert.
+              Jedes Paket verbindet Produkte, Materialien und Arbeiten zu einer nachvollziehbaren Grundlage.
+              Innerhalb der jeweils genannten Serie wählen Sie Farben und Oberflächen ohne Aufpreis. Abweichende
+              Masse, zusätzliche Arbeiten und individuelle Lösungen klären wir vor der verbindlichen Offerte.
             </p>
           </div>
 
           <div className={styles.packages}>
             {bathPackages.map((p) => (
               <article key={p.id} id={`paket-${p.id}`} className={`${styles.package} ${p.highlight ? styles.packageHighlight : ''}`}>
-                {p.highlight && <span className={styles.packageBadge}>Meistgewählt</span>}
+                {p.highlight && <span className={styles.packageBadge}>Häufig gewählt</span>}
                 <h3 className={styles.packageName}>{p.name}</h3>
                 <p className={styles.packageClaim}>{p.claim}</p>
                 <p className={styles.packagePrice}>
@@ -187,7 +189,7 @@ const Badumbau: React.FC = () => {
             <div>
               <span className={styles.plannerEyebrow}>Neu</span>
               <h3>Badplaner – Ihr Bad als Ideenbild</h3>
-              <p>Paket wählen, Foto vom Bad machen, in 30 Sekunden ein Ideenbild mit den gewählten Platten und Farben erhalten. Kostenlos und unverbindlich.</p>
+              <p>Paket wählen, Foto vom Bad machen, in bis zu zwei Minuten ein Ideenbild mit den gewählten Platten und Farben erhalten. Kostenlos und unverbindlich.</p>
             </div>
             <Link to="/badplaner" className={styles.ctaDark}>Badplaner starten</Link>
           </aside>
@@ -198,7 +200,7 @@ const Badumbau: React.FC = () => {
       <section id="ablauf" className={`${styles.section} ${styles.dark}`}>
         <div className={styles.container}>
           <div className={styles.sectionHeader}>
-            <span className={styles.sectionLabel}>So läuft es ab</span>
+            <span className={styles.sectionLabel}>Der Ablauf</span>
             <h2 className={styles.sectionTitle}>Vom ersten Termin bis zur Übergabe</h2>
           </div>
           <ol className={styles.steps}>
@@ -219,8 +221,8 @@ const Badumbau: React.FC = () => {
       <section id="referenzen" className={`${styles.section} ${styles.light}`}>
         <div className={styles.container}>
           <div className={styles.sectionHeader}>
-            <span className={styles.sectionLabel}>Referenzen</span>
-            <h2 className={styles.sectionTitle}>Bäder, die wir gebaut haben</h2>
+            <span className={styles.sectionLabel}>Aus unserer Arbeit</span>
+            <h2 className={styles.sectionTitle}>So wirken Materialien im fertigen Bad</h2>
           </div>
           <div className={styles.refGrid}>
             {referenceProjects.map((r) => (
@@ -234,7 +236,7 @@ const Badumbau: React.FC = () => {
             ))}
           </div>
           <div className={styles.center}>
-            <Link to="/referenzen" className={styles.ctaDark}>Alle Referenzen ansehen</Link>
+            <Link to="/referenzen" className={styles.ctaDark}>Alle Badreferenzen ansehen</Link>
           </div>
         </div>
       </section>
@@ -243,7 +245,7 @@ const Badumbau: React.FC = () => {
       <section id="gebiet" className={`${styles.section} ${styles.dark}`}>
         <div className={styles.container}>
           <div className={styles.sectionHeader}>
-            <span className={styles.sectionLabel}>Wir arbeiten in</span>
+            <span className={styles.sectionLabel}>Unser Ausführungsgebiet</span>
             <h2 className={styles.sectionTitle}>Rund 40 km um Zofingen</h2>
           </div>
           <ul className={styles.places}>
@@ -252,7 +254,8 @@ const Badumbau: React.FC = () => {
             ))}
           </ul>
           <p className={styles.placesNote}>
-            Und in den Gemeinden dazwischen. Besichtigung vor Ort in diesem Gebiet kostenlos.
+            Wir übernehmen Badumbauten in Zofingen sowie in den aufgeführten Gemeinden und der näheren Umgebung.
+            Ob Ihr Projekt im Gebiet liegt, klären wir direkt mit Ihrer Anfrage.
           </p>
         </div>
       </section>
@@ -279,11 +282,11 @@ const Badumbau: React.FC = () => {
       <section id="anfrage" className={`${styles.section} ${styles.dark}`}>
         <div className={styles.container}>
           <div className={styles.sectionHeader}>
-            <span className={styles.sectionLabel}>Kostenlose Beratung</span>
-            <h2 className={styles.sectionTitle}>Sagen Sie uns, wann Sie starten möchten</h2>
+            <span className={styles.sectionLabel}>Badumbau anfragen</span>
+            <h2 className={styles.sectionTitle}>Erzählen Sie uns von Ihrem Bad.</h2>
             <p className={styles.sectionIntroLight}>
-              Wir rufen Sie innerhalb eines Arbeitstages zurück und vereinbaren den Termin in der Ausstellung oder bei Ihnen zu Hause.
-              Oder direkt: <a href={`tel:${business.phone.e164}`} data-lead="badumbau-formtext">{business.phone.display}</a>, WhatsApp{' '}
+              Grösse, Wohnort und gewünschter Startzeitpunkt reichen für den ersten Kontakt. Wir melden uns persönlich
+              und schlagen den passenden nächsten Termin vor. Oder direkt: <a href={`tel:${business.phone.e164}`} data-lead="badumbau-formtext">{business.phone.display}</a>, WhatsApp{' '}
               <a href={`https://wa.me/${business.whatsapp.e164.replace('+', '')}`} data-lead="badumbau-formtext" target="_blank" rel="noopener noreferrer">{business.whatsapp.display}</a>.
             </p>
           </div>
@@ -331,17 +334,19 @@ const Badumbau: React.FC = () => {
               </label>
             </div>
             <label className={`${styles.field} ${styles.fieldFull}`}>
-              <span>Ihr Bad (optional)</span>
-              <textarea name="message" rows={4} placeholder="Grösse, Alter, was Sie sich wünschen" />
+              <span>Was möchten Sie verändern? (optional)</span>
+              <textarea name="message" rows={4} placeholder="Zum Beispiel: Badewanne durch Dusche ersetzen, neue Platten, Möbel und WC" />
             </label>
             <div className={styles.formActions}>
               <button type="submit" className={styles.ctaPrimary} disabled={status === 'sending'}>
                 {status === 'sending' ? 'Wird gesendet…' : 'Rückruf anfordern'}
               </button>
-              {status === 'ok' && <p className={styles.success}>Danke, wir melden uns innerhalb eines Arbeitstages.</p>}
+              {status === 'ok' && <p className={styles.success}>Danke. Ihre Anfrage ist bei uns angekommen. Wir melden uns persönlich bei Ihnen.</p>}
               {status === 'error' && (
                 <p className={styles.error}>
-                  Das hat nicht geklappt. Rufen Sie uns an: <a href={`tel:${business.phone.e164}`} data-lead="badumbau-fehler">{business.phone.display}</a>
+                  Die Anfrage konnte nicht gesendet werden. Rufen Sie uns unter{' '}
+                  <a href={`tel:${business.phone.e164}`} data-lead="badumbau-fehler">{business.phone.display}</a> an
+                  oder versuchen Sie es später erneut.
                 </p>
               )}
             </div>

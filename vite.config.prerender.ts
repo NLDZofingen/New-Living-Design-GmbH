@@ -48,6 +48,6 @@ export default defineConfig({
   },
   // Add prerendering configuration
   define: {
-    __PRERENDER__: JSON.stringify((import.meta as any).env.MODE === 'production')
+    __PRERENDER__: JSON.stringify((import.meta as ImportMeta & { env: { MODE: string } }).env.MODE === 'production')
   }
 })

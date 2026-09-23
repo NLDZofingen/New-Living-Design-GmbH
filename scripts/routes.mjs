@@ -2,6 +2,7 @@
  * Alle Routen der Website, an einer Stelle:
  *
  *   - feste Seiten aus routes.json
+ *   - Katalog aus src/data/catalog.json: /produkte/<bereich> und /produkte/<bereich>/<marke>
  *   - Blogartikel aus src/content/blog/<slug>.md (ein Artikel = eine Datei,
  *     die Route /blog/<slug> entsteht aus dem Dateinamen)
  *
@@ -46,9 +47,18 @@ export function getBlogPosts() {
     .sort((a, b) => (a.date < b.date ? 1 : -1))
 }
 
-/** Feste Seiten plus Blogübersicht plus Artikel. */
+/** Katalogseiten: jeder Bereich und jede Marke in jedem ihrer Bereiche. */
+export function getCatalogRoutes() {
+  const catalog = JSON.parse(fs.readFileSync(path.join(root, 'src', 'data', 'catalog.json'), 'utf8'))
+  return catalog.areas.flatMap((area) => {
+    const brands = [...new Set(area.groups.flatMap((g) => g.brands))]
+    return [`/produkte/${area.id}`, ...brands.map((b) => `/produkte/${area.id}/${b}`)]
+  })
+}
+
+/** Feste Seiten plus Katalog plus Blogübersicht plus Artikel. */
 export function getRoutes() {
   const fixed = JSON.parse(fs.readFileSync(path.join(root, 'routes.json'), 'utf8'))
   const blog = getBlogPosts().map((p) => p.route)
-  return [...fixed, ...blog.filter((r) => !fixed.includes(r))]
+  return [...fixed, ...getCatalogRoutes(), ...blog.filter((r) => !fixed.includes(r))]
 }

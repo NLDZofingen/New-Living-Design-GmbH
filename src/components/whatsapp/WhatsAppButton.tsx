@@ -2,7 +2,7 @@ import React from 'react';
 import { business } from '../../config/business';
 import './WhatsAppButton.css';
 
-const message = encodeURIComponent('Guten Tag, ich interessiere mich für einen Badumbau. Können Sie mich zurückrufen?');
+const message = encodeURIComponent('Guten Tag, ich interessiere mich für Ihre Produkte und eine Beratung in Ihrer Ausstellung. Können Sie mich kontaktieren?');
 const href = `https://wa.me/${business.whatsapp.e164.replace('+', '')}?text=${message}`;
 
 /** Fester WhatsApp-Knopf unten rechts, auf allen Seiten. Klick wird über installLeadClickTracking gemeldet (lead_whatsapp). */

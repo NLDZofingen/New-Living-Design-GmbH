@@ -10,13 +10,14 @@ const DataSecurity: React.FC = () => {
   useEffect(() => setIsVisible(true), []);
 
   return (
-    <main className={styles.page}>
+    <main id="main-content" className={styles.page}>
       {/* SEO Head */}
       <Helmet>
         <title>Datenschutzerklärung | New Living Design GmbH</title>
+        <link rel="canonical" href="https://newlivingdesign.ch/datenschutz" />
         <meta
           name="description"
-          content="Datenschutzerklärung der New Living Design GmbH. Informationen zur Verarbeitung personenbezogener Daten bei Website-Nutzung, Kontaktaufnahme und Terminvereinbarung."
+          content="Datenschutzerklärung der New Living Design GmbH: Verarbeitung personenbezogener Daten bei Website-Nutzung, Kontakt und Terminvereinbarung."
         />
         <meta property="og:title" content="Datenschutzerklärung | New Living Design GmbH" />
         <meta
@@ -175,8 +176,8 @@ const DataSecurity: React.FC = () => {
               <li><strong>Bildgenerierung:</strong> Das Foto und die Materialangaben werden an <strong>Google LLC</strong> (Gemini API, USA) übermittelt, um das Ideenbild zu erzeugen.
                 Google verwendet Daten aus der bezahlten API gemäss seinen Nutzungsbedingungen nicht zum Training seiner Modelle. Übermittlung in die USA auf Basis
                 des Data Privacy Framework bzw. von Standardvertragsklauseln.</li>
-              <li><strong>Keine Speicherung auf unseren Servern:</strong> Foto und Ideenbild werden nicht auf unseren Servern gespeichert. Sie werden uns zusammen mit Ihren Angaben
-                per E-Mail zugestellt; als Versanddienst nutzen wir <strong>Resend Inc.</strong> (USA). Fällt dieser aus, gehen die Angaben ohne Bilder über <strong>Formspree Inc.</strong> (USA) an uns.</li>
+              <li><strong>Keine Speicherung auf unseren Servern:</strong> Foto und Ideenbild werden nicht auf unseren Servern gespeichert. Sie werden uns per E-Mail zugestellt,
+                sobald das Ideenbild erstellt ist, auch wenn Sie danach keine Kontaktangaben hinterlassen; Ihre Kontaktangaben folgen mit einer zweiten E-Mail; als Versanddienst nutzen wir <strong>Resend Inc.</strong> (USA). Fällt dieser aus, gehen die Angaben ohne Bilder über <strong>Formspree Inc.</strong> (USA) an uns.</li>
               <li><strong>Löschung:</strong> Fotos und Ideenbilder löschen wir spätestens 30 Tage nach Abschluss der Anfrage, sofern kein Auftrag zustande kommt.</li>
               <li><strong>Rechtsgrundlage:</strong> Ihre Einwilligung (Checkbox vor dem Erstellen des Ideenbilds). Sie können die Einwilligung jederzeit mit Wirkung für die Zukunft
                 per E-Mail an die oben genannte Adresse widerrufen; wir löschen die Daten dann umgehend.</li>

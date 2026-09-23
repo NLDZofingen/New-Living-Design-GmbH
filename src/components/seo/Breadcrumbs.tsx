@@ -18,7 +18,7 @@ const Breadcrumbs: React.FC<BreadcrumbsProps> = ({ customBreadcrumbs }) => {
     '/produkte': 'Produkte',
     '/dienstleistungen': 'Dienstleistungen',
     '/partner': 'Partner',
-    '/booking': 'Online Termin buchen',
+    '/booking': 'Termin anfragen',
     '/ueber-uns': 'Über uns',
     '/kontakt': 'Kontakt',
     '/datenschutz': 'Datenschutz',

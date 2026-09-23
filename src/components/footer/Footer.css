@@ -204,9 +204,11 @@
 
 .footer-contact-content {
   flex: 1;
+  min-width: 0;
 }
 
 .footer-contact-link {
+  display: block;
   color: #9ca3af;
   text-decoration: none;
   font-size: 0.875rem;
@@ -233,6 +235,13 @@
   font-size: 0.875rem;
   padding: 0.5rem 0;
   border-bottom: 1px solid rgba(226, 232, 240, 0.1);
+}
+
+.footer-hours-note {
+  margin: 0.75rem 0 0;
+  font-size: 0.8125rem;
+  line-height: 1.45;
+  color: #9ca3af;
 }
 
 .footer-hours-days {
@@ -391,6 +400,54 @@
   
   .footer-hours-time {
     text-align: left;
+  }
+}
+
+@media (max-width: 240px) {
+  .footer-container {
+    padding-inline: 0.75rem;
+  }
+
+  .footer-content {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .footer-section,
+  .footer-logo,
+  .footer-tagline,
+  .footer-quicklinks,
+  .footer-social-links {
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .footer-logo {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .footer-logo-image {
+    width: auto;
+    max-width: 100%;
+    height: auto;
+    max-height: 3rem;
+  }
+
+  .footer-brand-name,
+  .footer-tagline,
+  .footer-quicklink,
+  .footer-contact-link {
+    overflow-wrap: anywhere;
+  }
+
+  .footer-quicklinks,
+  .footer-social-links {
+    justify-content: center;
+    gap: 0.5rem;
+  }
+
+  .footer-social-links {
+    flex-wrap: wrap;
   }
 }
 

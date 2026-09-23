@@ -1,0 +1,3177 @@
+{
+  "$comment": "Katalog: Bereiche > Fachgebiete > Marken > Serien > Bilder. Aktive Marken und Kategorien laut NLD (23.09.2026). Bilder: 'pack' = public/images/<pack>-<width>w.webp (dazu -960w.webp, wenn breiter als 960 px), 'asset' = Datei in src/assets. Serien mit 'extra': true sind Einzelbilder ohne vollständige Serie (Abschnitt «Weitere Bilder»), zählen nicht für die Mindestanforderung. Nur echte, freigegebene Fotos.",
+  "areas": [
+    {
+      "id": "bad",
+      "title": "Bad",
+      "label": "Aufeinander abgestimmt",
+      "text": "Badmöbel, Waschtische, Armaturen, Keramik, Dusche und Badewanne – gemeinsam ausgewählt, damit Form, Farbe und Funktion zusammenpassen.",
+      "groups": [
+        {
+          "title": "Badmöbel",
+          "brands": [
+            "rexa",
+            "edone",
+            "archeda",
+            "froidevaux",
+            "pirovano"
+          ]
+        },
+        {
+          "title": "Armaturen",
+          "brands": [
+            "treemme",
+            "newform",
+            "gessi",
+            "luce"
+          ]
+        },
+        {
+          "title": "Sanitärkeramik",
+          "brands": [
+            "cielo",
+            "scarabeo",
+            "galassia",
+            "azzurra"
+          ]
+        },
+        {
+          "title": "Duschen & Duschabtrennungen",
+          "brands": [
+            "megius",
+            "novellini",
+            "vismaravetro"
+          ]
+        },
+        {
+          "title": "Badaccessoires",
+          "brands": [
+            "capannoli"
+          ]
+        },
+        {
+          "title": "Designheizkörper",
+          "brands": [
+            "antrax",
+            "cordivari",
+            "caleido"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "kuechen",
+      "title": "Küchen",
+      "label": "Für Ihren Alltag geplant",
+      "text": "Raumaufteilung, Fronten, Arbeitsflächen, Geräte und Licht. Mit 3D-Planung, Lieferung, Montage und auf Wunsch mit Renovation der bestehenden Küche.",
+      "groups": [
+        {
+          "title": "Küchenwelten",
+          "brands": [
+            "febal"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "platten",
+      "title": "Platten",
+      "label": "Vom Muster in den Raum",
+      "text": "Keramik, Feinsteinzeug, Mosaik und Grossformate für Wand und Boden – ausgewählt nach Wirkung, Nutzung und Pflege.",
+      "groups": [
+        {
+          "title": "Keramik, Feinsteinzeug & Grossformate",
+          "brands": [
+            "energieker",
+            "emilgroup",
+            "lafabbrica",
+            "supergres",
+            "ariana",
+            "acquario"
+          ]
+        },
+        {
+          "title": "Mosaik",
+          "brands": [
+            "sicis",
+            "mosavit"
+          ]
+        },
+        {
+          "title": "Parkett & Holz",
+          "brands": [
+            "skema"
+          ]
+        },
+        {
+          "title": "SPC & Designböden",
+          "brands": [
+            "deco",
+            "zenon"
+          ]
+        },
+        {
+          "title": "Dekorative Wandbeläge & Tapeten",
+          "brands": [
+            "inkiostro"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "wellness",
+      "title": "Wellness",
+      "label": "Entspannung, die zum Raum passt",
+      "text": "Sauna, Dampfbad, Wellnesskabine oder Whirlwanne. Wir klären Platz, Anschlüsse und Nutzung und zeigen Ihnen passende Möglichkeiten.",
+      "groups": [
+        {
+          "title": "Whirlpool & Minipool",
+          "brands": [
+            "novellini",
+            "albatros"
+          ]
+        },
+        {
+          "title": "Sauna",
+          "brands": [
+            "novellini",
+            "albatros"
+          ]
+        },
+        {
+          "title": "Hammam & Dampfbad",
+          "brands": [
+            "novellini",
+            "megius"
+          ]
+        },
+        {
+          "title": "Wellness-Duschen",
+          "brands": [
+            "novellini",
+            "megius"
+          ]
+        },
+        {
+          "title": "Badewannen",
+          "brands": [
+            "novellini",
+            "albatros"
+          ]
+        }
+      ]
+    }
+  ],
+  "suppliers": {
+    "rexa": {
+      "name": "Rexa Design",
+      "url": "https://rexadesign.it/",
+      "series": [
+        {
+          "area": "bad",
+          "name": "Unico",
+          "images": [
+            {
+              "pack": "katalog/bad/rexa/unico-01",
+              "width": 1667,
+              "height": 1667,
+              "alt": "Rexa Design Unico: Waschtisch mit integriertem Becken und Wandregal von oben, Wand mit Reliefdekor",
+              "sha1": "24800ff4491bc952f94fd04da085027134d659db"
+            },
+            {
+              "pack": "katalog/bad/rexa/unico-02",
+              "width": 1024,
+              "height": 1024,
+              "alt": "Rexa Design Unico: freistehender Waschtischblock vor Holzlamellen mit zwei schmalen Spiegeln",
+              "sha1": "31b6ac4885b6c94fccbc5f54434c4945d5eeaec6"
+            },
+            {
+              "pack": "katalog/bad/rexa/unico-03",
+              "width": 1024,
+              "height": 1024,
+              "alt": "Rexa Design Unico: Detail des monolithischen Waschtischs mit schwarzer Armatur",
+              "sha1": "4b24043686ed85d1ea93df0d3dc4364897764faa"
+            }
+          ]
+        },
+        {
+          "area": "bad",
+          "name": "Moode",
+          "images": [
+            {
+              "pack": "katalog/bad/rexa/moode-01",
+              "width": 2000,
+              "height": 1334,
+              "alt": "Rexa Design Moode Waschtischanlage mit zwei runden Spiegeln vor Marmorwand und freistehender Badewanne",
+              "sha1": "04e20b051f7059de40c397b15675b19160885c0b"
+            },
+            {
+              "pack": "katalog/bad/rexa/moode-02",
+              "width": 1024,
+              "height": 1024,
+              "alt": "Rexa Design Moode: hängendes Waschtischmöbel in Dunkelbraun mit breitem Spiegel",
+              "sha1": "b2388eca95c1cbd8d9e96965258c94c3435d747e"
+            },
+            {
+              "pack": "katalog/bad/rexa/moode-03",
+              "width": 1024,
+              "height": 1024,
+              "alt": "Rexa Design Moode: Doppelwaschtisch aus dunklem Holz mit zwei Spiegeln vor grauer Wand",
+              "sha1": "18df487677ae6c1bf09b3885f765662b7b5ee6b8"
+            },
+            {
+              "pack": "katalog/bad/rexa/moode-04",
+              "width": 1024,
+              "height": 1024,
+              "alt": "Rexa Design Moode: Hochschrank und Waschtischmöbel in einem hellen Bad mit Holzdecke",
+              "sha1": "feca1c181aa7339f25dac8a11dccd0f468f7f9d5"
+            },
+            {
+              "pack": "katalog/bad/rexa/moode-05",
+              "width": 1024,
+              "height": 1024,
+              "alt": "Rexa Design Moode: Waschtischmöbel mit Holzfronten und offenem Fach, zwei ovale Spiegel",
+              "sha1": "f1da63234a225487da129ed14faf84a57122fd9b"
+            },
+            {
+              "pack": "katalog/bad/rexa/moode-06",
+              "width": 1024,
+              "height": 1024,
+              "alt": "Rexa Design Moode: Detail Waschtisch in dunkler Marmoroptik mit Wandarmatur",
+              "sha1": "ad6879962e6d19b91d3c5b5c7210a517b61d6da6"
+            }
+          ]
+        }
+      ]
+    },
+    "edone": {
+      "name": "Edoné",
+      "url": "https://www.edonedesign.it/en",
+      "series": [
+        {
+          "area": "bad",
+          "name": "Hexis",
+          "images": [
+            {
+              "pack": "katalog/bad/edone/hexis-01",
+              "width": 1920,
+              "height": 1080,
+              "alt": "Edoné Hexis: Badezimmer mit Waschtischmöbel in dunklem Holz, Glasvitrine und freistehender Badewanne",
+              "sha1": "898e65d6ad303c527a0502bed5a22317804cff63"
+            },
+            {
+              "pack": "katalog/bad/edone/hexis-02",
+              "width": 1920,
+              "height": 1080,
+              "alt": "Edoné Hexis: grosszügiges Bad mit Waschtisch, Badewanne und Hochschränken mit Glasfronten",
+              "sha1": "5875d939c8d842588934aee85e98b3841124d5a2"
+            },
+            {
+              "pack": "katalog/bad/edone/hexis-03",
+              "width": 1920,
+              "height": 1080,
+              "alt": "Edoné Hexis: Waschtischmöbel in Beige mit hinterleuchtetem Spiegel",
+              "sha1": "ff4360b8c89fb6c4d9e2c0587eea68247c0d20a5"
+            },
+            {
+              "pack": "katalog/bad/edone/hexis-04",
+              "width": 1920,
+              "height": 1080,
+              "alt": "Edoné Hexis: Waschtischmöbel in Schwarz unter einem halbrunden Spiegel, Dusche mit Glaswand",
+              "sha1": "84570a0a8babc2cea67e1d02061e7637e97e154d"
+            },
+            {
+              "pack": "katalog/bad/edone/hexis-05",
+              "width": 1096,
+              "height": 640,
+              "alt": "Edoné Hexis: Bad mit freistehender Badewanne, Waschtischmöbel in dunklem Holz und offener Dusche",
+              "sha1": "13b18865f1a3977041cc173d3a93ba279b096f94"
+            }
+          ]
+        },
+        {
+          "area": "bad",
+          "name": "Calipso",
+          "images": [
+            {
+              "pack": "katalog/bad/edone/calipso-01",
+              "width": 1920,
+              "height": 1080,
+              "alt": "Edoné Calipso: Bad mit Waschtisch in Grün, zwei ovalen Spiegeln und Glaswand",
+              "sha1": "b72dfda1a9a9ed828152cf21a6b8a268c72713aa"
+            },
+            {
+              "pack": "katalog/bad/edone/calipso-02",
+              "width": 1920,
+              "height": 1080,
+              "alt": "Edoné Calipso: Waschtischmöbel aus Holz mit freistehender Badewanne vor grossem Fenster",
+              "sha1": "5a4ab31c3506dadad54c7543541ca079862eeef3"
+            },
+            {
+              "pack": "katalog/bad/edone/calipso-03",
+              "width": 1920,
+              "height": 1080,
+              "alt": "Edoné Calipso: Doppelwaschtisch mit gerillter Front und runder Badewanne",
+              "sha1": "39ace2ff5f575a700a73bc1728e324a786ddf6ba"
+            },
+            {
+              "pack": "katalog/bad/edone/calipso-04",
+              "width": 1920,
+              "height": 1080,
+              "alt": "Edoné Calipso: Waschtischmöbel in Schwarz und Holzwand mit Badewanne im Hintergrund",
+              "sha1": "e41859e34cfe47c3b3ba8055b73921d8b7520940"
+            }
+          ]
+        }
+      ]
+    },
+    "archeda": {
+      "name": "Archeda",
+      "url": "https://www.archeda.eu/",
+      "series": [
+        {
+          "area": "bad",
+          "name": "Tulle Studio",
+          "images": [
+            {
+              "pack": "katalog/bad/archeda/tulle-studio-01",
+              "width": 2000,
+              "height": 1335,
+              "alt": "Archeda Tulle Studio: weisses Waschtischmöbel mit gerillter Front, rundem Spiegel und freistehender Badewanne",
+              "sha1": "0b5513537c2975a69ef986a0b7ac2187d99a071d"
+            },
+            {
+              "pack": "katalog/bad/archeda/tulle-studio-02",
+              "width": 1536,
+              "height": 1025,
+              "alt": "Archeda Tulle Studio: Doppelwaschtisch in Dunkelbraun mit zwei bogenförmigen Spiegeln",
+              "sha1": "0a32196d04ed2c134d19401950bb25d5d4b4481d"
+            }
+          ]
+        },
+        {
+          "area": "bad",
+          "name": "Tulle Cannettato",
+          "images": [
+            {
+              "pack": "katalog/bad/archeda/tulle-cannettato-01",
+              "width": 2000,
+              "height": 1363,
+              "alt": "Archeda Tulle Cannettato: Waschtischmöbel mit Holzfront und zwei ovalen Spiegeln unter Rundbögen",
+              "sha1": "0c69570752de2e5ad0c57a96ea4590dd1d373797"
+            },
+            {
+              "pack": "katalog/bad/archeda/tulle-cannettato-02",
+              "width": 1536,
+              "height": 1047,
+              "alt": "Archeda Tulle Cannettato: Waschtischmöbel vor Wand in Steinoptik mit rundem Spiegel",
+              "sha1": "641096fc8216339ff5819cb6246617b1073544c8"
+            }
+          ]
+        }
+      ]
+    },
+    "froidevaux": {
+      "name": "Froidevaux AG",
+      "url": "https://www.froidevaux.ch/de/",
+      "series": [
+        {
+          "area": "bad",
+          "name": "iCON Standard",
+          "images": [
+            {
+              "pack": "katalog/bad/froidevaux/icon-standard-01",
+              "width": 1200,
+              "height": 1600,
+              "alt": "Froidevaux iCON Standard: weisses Waschtischmöbel mit zwei Türen vor dunkler Backsteinwand",
+              "sha1": "67ff76b823a49c2bded5c8bceb64e5637213829e"
+            },
+            {
+              "pack": "katalog/bad/froidevaux/icon-standard-02",
+              "width": 1200,
+              "height": 1200,
+              "alt": "Froidevaux iCON Standard: Waschtischmöbel mit Keramikbecken und Griffleisten, Frontansicht",
+              "sha1": "0394fb326276a7185988a6816e2d7c2fb31f1d13"
+            }
+          ]
+        },
+        {
+          "area": "bad",
+          "name": "Connect Standard",
+          "images": [
+            {
+              "pack": "katalog/bad/froidevaux/connect-standard-01",
+              "width": 1000,
+              "height": 1000,
+              "alt": "Froidevaux Connect Standard: Waschtischmöbel in Holzoptik mit Hochschrank und beleuchtetem Spiegel",
+              "sha1": "48454de7e6e9182a8d9deb45f8c2b758497e4629"
+            },
+            {
+              "pack": "katalog/bad/froidevaux/connect-standard-02",
+              "width": 1000,
+              "height": 1000,
+              "alt": "Froidevaux Connect Standard: Badmöbelkombination in Holzoptik mit Spiegel und zwei Schränken",
+              "sha1": "690c07d3d2eb878e8a591545d7dfbfa5da8fa58f"
+            }
+          ]
+        },
+        {
+          "area": "bad",
+          "name": "Auswahl aus dem Medienpaket",
+          "images": [
+            {
+              "pack": "bad/bad-badmoebel-froidevaux-massarbeit",
+              "width": 1600,
+              "height": 900,
+              "alt": "Froidevaux Waschtischmöbel aus Holz mit zwei Aufsatzbecken"
+            }
+          ],
+          "extra": true
+        }
+      ]
+    },
+    "pirovano": {
+      "name": "Pirovano Bagni",
+      "url": "https://pirovanobagni.it/",
+      "series": [
+        {
+          "area": "bad",
+          "name": "Pilar",
+          "images": [
+            {
+              "pack": "katalog/bad/pirovano/pilar-01",
+              "width": 1500,
+              "height": 1078,
+              "alt": "Pirovano Pilar: zwei Waschtische aus Terrazzo auf Möbeln mit Holzfront unter einem Bogen",
+              "sha1": "5668e88d4f976ebc5c42b66f863e6f97b22e273e"
+            },
+            {
+              "pack": "katalog/bad/pirovano/pilar-02",
+              "width": 1200,
+              "height": 863,
+              "alt": "Pirovano Pilar: zwei Waschtischmöbel mit Rillenfront in Nussbaum und Terrazzo-Aufsatzbecken vor grauer Wand",
+              "sha1": "d29018318f9c53cb561d73f7ecf3efd44397117a"
+            },
+            {
+              "pack": "katalog/bad/pirovano/pilar-03",
+              "width": 1200,
+              "height": 787,
+              "alt": "Pirovano Pilar: Detail der Terrazzo-Waschtische mit Messingarmaturen",
+              "sha1": "226443c9c1ab8d5328e277768678fe68305e228d"
+            },
+            {
+              "pack": "katalog/bad/pirovano/pilar-04",
+              "width": 889,
+              "height": 1200,
+              "alt": "Pirovano Pilar: Waschtisch mit gerillter Front und Pendelleuchte",
+              "sha1": "c47d670b84f20d2e18ba0c0151140543ebc1b823"
+            },
+            {
+              "pack": "katalog/bad/pirovano/pilar-05",
+              "width": 800,
+              "height": 1000,
+              "alt": "Pirovano Pilar: Waschtischmöbel mit dunklem Terrazzo-Becken und offenen Regalen",
+              "sha1": "edc36ce5348ea13e4de345abe08918e7fcb3f6a5"
+            }
+          ]
+        },
+        {
+          "area": "bad",
+          "name": "Linear",
+          "images": [
+            {
+              "pack": "katalog/bad/pirovano/linear-01",
+              "width": 1200,
+              "height": 902,
+              "alt": "Pirovano Linear: Waschtischmöbel aus Holz mit Marmorplatte und rundem Spiegel",
+              "sha1": "4a895485a74d2d6776aa9af02ce5c88cc25ccdf9"
+            },
+            {
+              "pack": "katalog/bad/pirovano/linear-02",
+              "width": 800,
+              "height": 1000,
+              "alt": "Pirovano Linear: zwei weisse Waschtischmöbel mit runden Spiegeln",
+              "sha1": "82bb24ada05d54104610f0466d32ba2495bbfde8"
+            },
+            {
+              "pack": "katalog/bad/pirovano/linear-03",
+              "width": 800,
+              "height": 1000,
+              "alt": "Pirovano Linear: Doppelwaschtisch aus Holz mit zwei runden Spiegeln und Hocker",
+              "sha1": "094670010553b313a853754a6440a25ede279bfb"
+            },
+            {
+              "pack": "katalog/bad/pirovano/linear-04",
+              "width": 1200,
+              "height": 851,
+              "alt": "Pirovano Linear: Waschtischmöbel in dunkler Marmoroptik mit Spiegel und Bank",
+              "sha1": "95c6480bd5ba364a09812e79020e949ab30c0f30"
+            }
+          ]
+        },
+        {
+          "area": "bad",
+          "name": "Millennium XL",
+          "images": [
+            {
+              "pack": "katalog/bad/pirovano/millennium-xl-01",
+              "width": 1500,
+              "height": 1078,
+              "alt": "Pirovano Millennium XL: Waschtischmöbel aus Holz mit Aufsatzbecken und rundem Spiegel",
+              "sha1": "7f0b52b9ed8575aec93b873716bb5645cf91c08b"
+            },
+            {
+              "pack": "katalog/bad/pirovano/millennium-xl-02",
+              "width": 820,
+              "height": 950,
+              "alt": "Pirovano Millennium XL: Detail rundes Aufsatzbecken auf Möbel mit gerillter Holzfront",
+              "sha1": "6a538d254602d152db459f2b2daaa0661a2d9bc3"
+            },
+            {
+              "pack": "katalog/bad/pirovano/millennium-xl-03",
+              "width": 1200,
+              "height": 765,
+              "alt": "Pirovano Millennium XL: Doppelwaschtisch mit Spiegel und Hochschränken",
+              "sha1": "ba6a10c547b5b985c54018437df05434c56daca1"
+            },
+            {
+              "pack": "katalog/bad/pirovano/millennium-xl-04",
+              "width": 1200,
+              "height": 896,
+              "alt": "Pirovano Millennium XL: Waschtischmöbel mit gerillter Front, Aufsatzbecken und Wandarmatur",
+              "sha1": "6ce84c7ba7b679d54173a8c72ab883b59634e6c8"
+            }
+          ]
+        }
+      ]
+    },
+    "treemme": {
+      "name": "Rubinetterie Treemme",
+      "url": "https://www.rubinetterie3m.it/it",
+      "series": [
+        {
+          "area": "bad",
+          "name": "Aurelia",
+          "images": [
+            {
+              "pack": "katalog/bad/treemme/aurelia-01",
+              "width": 900,
+              "height": 1200,
+              "alt": "Treemme Aurelia Wand-Waschtischarmatur in Chrom mit rechteckiger Abdeckplatte",
+              "sha1": "6b744aaac3084825bdda6f5c511a86ef93cf08e3"
+            },
+            {
+              "pack": "katalog/bad/treemme/aurelia-02",
+              "width": 900,
+              "height": 1200,
+              "alt": "Treemme Aurelia Unterputz-Duschset in Chrom mit Kopfbrause, zwei Mischern und Handbrause",
+              "sha1": "b1b0fa18221aeef971278b18d45e75dae079fcc2"
+            }
+          ]
+        },
+        {
+          "area": "bad",
+          "name": "Appia",
+          "images": [
+            {
+              "pack": "katalog/bad/treemme/appia-01",
+              "width": 2000,
+              "height": 1292,
+              "alt": "Rubinetterie Treemme Appia: Doppelwaschtisch mit Wandarmaturen in Chrom, zwei runden Spiegeln und freistehender Badewanne",
+              "sha1": "494b8a579929ed5268fe407003fb2ca6c5baa61a"
+            },
+            {
+              "pack": "katalog/bad/treemme/appia-02",
+              "width": 1548,
+              "height": 2000,
+              "alt": "Rubinetterie Treemme Appia: Wandarmatur in Chrom über einem Aufsatzbecken, Detailansicht",
+              "sha1": "36f75e79b864ae7e9367efd65dd33ec84ac2a36d"
+            },
+            {
+              "pack": "katalog/bad/treemme/appia-03",
+              "width": 1548,
+              "height": 2000,
+              "alt": "Rubinetterie Treemme Appia: Waschtischarmatur in Gold auf einem weissen Waschtisch",
+              "sha1": "6c7b7a0d1e7cf382635cde4585a78f96999964ca"
+            }
+          ]
+        },
+        {
+          "area": "bad",
+          "name": "Up+",
+          "images": [
+            {
+              "pack": "katalog/bad/treemme/up-01",
+              "width": 900,
+              "height": 1200,
+              "alt": "Treemme Up+ Waschtischarmatur in Chrom mit rundem Auslauf vor dunklem Hintergrund",
+              "sha1": "1116a01b9916ae19759a309927669f36d3eafe7c"
+            }
+          ],
+          "extra": true
+        },
+        {
+          "area": "bad",
+          "name": "Ran",
+          "images": [
+            {
+              "pack": "katalog/bad/treemme/ran-01",
+              "width": 900,
+              "height": 1200,
+              "alt": "Treemme Ran Waschtischarmatur in Chrom mit flachem Auslauf an einem weissen Aufsatzbecken",
+              "sha1": "37aafdceb901a34f5256f0df33a673bfab068ae8"
+            }
+          ],
+          "extra": true
+        }
+      ]
+    },
+    "newform": {
+      "name": "Newform",
+      "url": "https://www.newform.it/it",
+      "series": [
+        {
+          "area": "bad",
+          "name": "Steel Line",
+          "images": [
+            {
+              "pack": "katalog/bad/newform/steel-line-01",
+              "width": 2000,
+              "height": 1414,
+              "alt": "Newform Steel Line: Badezimmer mit Armaturen aus Edelstahl, Pflanzen und freistehender Badewanne",
+              "sha1": "6d058c0778cb22c2126b520a0b39f7c6569c5c86"
+            },
+            {
+              "pack": "katalog/bad/newform/steel-line-02",
+              "width": 1414,
+              "height": 2000,
+              "alt": "Newform Steel Line: Wandarmatur aus Edelstahl an einem Waschtisch aus grünem Stein",
+              "sha1": "a1c7d0c8e74084523f3ef6210a864e6f9c2cd4df"
+            },
+            {
+              "pack": "katalog/bad/newform/steel-line-03",
+              "width": 1414,
+              "height": 2000,
+              "alt": "Newform Steel Line: Dusche mit Edelstahlarmaturen vor grüner Steinwand",
+              "sha1": "f2eba8c6ac59f685eee5bbad080837837cf05386"
+            },
+            {
+              "pack": "katalog/bad/newform/steel-line-04",
+              "width": 1414,
+              "height": 2000,
+              "alt": "Newform Steel Line: Standwaschtisch aus Edelstahl mit Wandarmatur und Spiegel",
+              "sha1": "ca3f49bdfb7b9ec56daa4f08bf50a55b8db83a76"
+            },
+            {
+              "pack": "katalog/bad/newform/steel-line-05",
+              "width": 1414,
+              "height": 2000,
+              "alt": "Newform Steel Line: Wannenarmatur aus Edelstahl an einer runden Badewanne",
+              "sha1": "2aabe7966e30a0668054047cd99b79db3ebcdd51"
+            }
+          ]
+        },
+        {
+          "area": "bad",
+          "name": "Ionika",
+          "images": [
+            {
+              "pack": "katalog/bad/newform/ionika-01",
+              "width": 2000,
+              "height": 1693,
+              "alt": "Newform Ionika: Duschnische mit Armaturen in Schwarz und Deckenbrause",
+              "sha1": "0bc8e07466aff4170c50bdcf688903ef596011b5"
+            },
+            {
+              "pack": "katalog/bad/newform/ionika-02",
+              "width": 1152,
+              "height": 2000,
+              "alt": "Newform Ionika: hohe Waschtischarmatur in gebürstetem Messing",
+              "sha1": "604ac3fbe14a6bbfb854847f2a0ee857d30686e2"
+            },
+            {
+              "pack": "katalog/bad/newform/ionika-03",
+              "width": 1414,
+              "height": 2000,
+              "alt": "Newform Ionika: Waschtischarmatur in Messing an einem runden Waschtisch unter einem Bogen",
+              "sha1": "805bd0b46456b06d266e9df553d029412d05aa56"
+            },
+            {
+              "pack": "katalog/bad/newform/ionika-04",
+              "width": 2000,
+              "height": 1414,
+              "alt": "Newform Ionika: Wannenrandarmatur in Messing an einer Badewanne aus grünem Stein",
+              "sha1": "bcc21ff4a958a17b6b4deb40088efc8b1891feb6"
+            },
+            {
+              "pack": "katalog/bad/newform/ionika-05",
+              "width": 1414,
+              "height": 2000,
+              "alt": "Newform Ionika: Waschtischarmatur in Schwarz an einem Standwaschtisch aus Stein",
+              "sha1": "66a9194530d24217894cdd3b477c14c38a50c72f"
+            }
+          ]
+        },
+        {
+          "area": "bad",
+          "name": "Deltazero",
+          "images": [
+            {
+              "asset": "Newform_Deltazero_P2.webp",
+              "width": 1400,
+              "height": 989,
+              "alt": "Schwarze Wannenarmatur mit Handbrause auf einer dunklen Steinfläche"
+            }
+          ],
+          "extra": true
+        }
+      ]
+    },
+    "gessi": {
+      "name": "Gessi",
+      "url": "https://www.gessi.com/en/bath",
+      "series": [
+        {
+          "area": "bad",
+          "name": "Incastri",
+          "images": [
+            {
+              "pack": "katalog/bad/gessi/incastri-01",
+              "width": 688,
+              "height": 900,
+              "alt": "Gessi Incastri: Waschtischarmatur in Messing mit geriffeltem Griff, Detail",
+              "sha1": "fe09d7dbb7aa0eccb1a19d08b8234814db8e86e1"
+            },
+            {
+              "pack": "katalog/bad/gessi/incastri-02",
+              "width": 1920,
+              "height": 1080,
+              "alt": "Gessi Incastri: Waschtischarmatur in Messing auf dunklem Untergrund vor Holzwand",
+              "sha1": "113f41b398af96cad86ad46aa9b8681fab8b174a"
+            },
+            {
+              "pack": "katalog/bad/gessi/incastri-03",
+              "width": 688,
+              "height": 900,
+              "alt": "Gessi Incastri: Standarmatur in Messing, Detail mit geriffelten Griffen",
+              "sha1": "7bdeb6d2a74f10bf9da18fafc166bb9d2312b845"
+            },
+            {
+              "pack": "katalog/bad/gessi/incastri-04",
+              "width": 1087,
+              "height": 612,
+              "alt": "Gessi Incastri: Waschtisch aus dunklem Stein mit Messingarmatur und Spiegel",
+              "sha1": "ec0d0ed21ade6d7b51a371913219c6a3b6bf1427"
+            },
+            {
+              "pack": "katalog/bad/gessi/incastri-05",
+              "width": 1087,
+              "height": 612,
+              "alt": "Gessi Incastri: Dusche mit Messingarmaturen vor Mosaikwand in Grün",
+              "sha1": "a6cc51590a19a87d1c316a73088b97318dc01a45"
+            }
+          ]
+        },
+        {
+          "area": "bad",
+          "name": "Jacqueline",
+          "images": [
+            {
+              "pack": "bad/bad-armaturen-gessi-jacqueline",
+              "width": 1136,
+              "height": 639,
+              "alt": "Gessi Designarmaturen in Bronze an dunklen Aufsatzwaschbecken"
+            },
+            {
+              "pack": "katalog/bad/gessi/jacqueline-02",
+              "width": 1000,
+              "height": 1000,
+              "alt": "Gessi Jacqueline: Waschtischarmatur in Kupfer mit Auslauf in Bambusform, Detail am Waschbecken",
+              "sha1": "5150d0bccebbb04d8bf8f2d333b385ed1c949a0b"
+            },
+            {
+              "pack": "katalog/bad/gessi/jacqueline-03",
+              "width": 1000,
+              "height": 1000,
+              "alt": "Gessi Jacqueline: zwei Standarmaturen mit Auslauf in Bambusform in Schwarz und Bronze",
+              "sha1": "37106049bcaf3810361bcc8fc2d484cffb8555db"
+            }
+          ]
+        }
+      ]
+    },
+    "luce": {
+      "name": "Luce Rubinetterie",
+      "url": "https://www.lucerubinetterie.it/rubinetteria/",
+      "series": [
+        {
+          "area": "bad",
+          "name": "Segno",
+          "images": [
+            {
+              "pack": "katalog/bad/luce/segno-01",
+              "width": 1024,
+              "height": 1024,
+              "alt": "Luce Rubinetterie Segno: Unterputz-Duschset mit Handbrause in gebürstetem Edelstahl",
+              "sha1": "397f893c52926ca4ecc09501fd9588508e9fe447"
+            },
+            {
+              "pack": "katalog/bad/luce/segno-02",
+              "width": 1200,
+              "height": 1200,
+              "alt": "Luce Rubinetterie Segno: Waschtischarmatur in gebürstetem Edelstahl mit flachem Hebel",
+              "sha1": "0e6b4da0ddf024cb04f8bc0bb69b8e0e570253b5"
+            }
+          ]
+        },
+        {
+          "area": "bad",
+          "name": "Zefiro",
+          "images": [
+            {
+              "pack": "katalog/bad/luce/zefiro-01",
+              "width": 1200,
+              "height": 1200,
+              "alt": "Luce Rubinetterie Zefiro: Waschtischarmatur in gebürstetem Edelstahl mit Stiftgriff",
+              "sha1": "e82127f8f7986af689ebfef33ee4c7cb111e6070"
+            },
+            {
+              "pack": "katalog/bad/luce/zefiro-02",
+              "width": 1200,
+              "height": 1200,
+              "alt": "Luce Rubinetterie Zefiro: Unterputz-Waschtischarmatur mit Rosette und Auslauf in Edelstahl",
+              "sha1": "db203226c7cf93218bf4f7f405fa147d155ad37f"
+            }
+          ]
+        },
+        {
+          "area": "bad",
+          "name": "Spazio",
+          "images": [
+            {
+              "pack": "katalog/bad/luce/spazio-01",
+              "width": 1200,
+              "height": 1200,
+              "alt": "Luce Rubinetterie Spazio: Dreiloch-Waschtischarmatur in gebürstetem Edelstahl",
+              "sha1": "f553a992e42860a0ec3737cef9fd2b0edae0d5ae"
+            }
+          ],
+          "extra": true
+        }
+      ]
+    },
+    "cielo": {
+      "name": "Ceramica Cielo",
+      "url": "https://www.ceramicacielo.it/en",
+      "series": [
+        {
+          "area": "bad",
+          "name": "Filo",
+          "images": [
+            {
+              "pack": "katalog/bad/cielo/filo-01",
+              "width": 1357,
+              "height": 2000,
+              "alt": "Ceramica Cielo Filo: Waschtisch in Rosa mit Spiegelschrank vor roter Wand",
+              "sha1": "dfafcaa6029f0296ddf3fc3c9bb73c1b7f656ac2"
+            },
+            {
+              "pack": "katalog/bad/cielo/filo-02",
+              "width": 1357,
+              "height": 2000,
+              "alt": "Ceramica Cielo Filo: Detail Waschtischplatte mit gerillter Holzfront",
+              "sha1": "cd67f63e2db99f59f2ca24eecb0bf0717ef46312"
+            },
+            {
+              "pack": "katalog/bad/cielo/filo-03",
+              "width": 2000,
+              "height": 1357,
+              "alt": "Ceramica Cielo Filo: Waschtisch in Taupe mit Spiegelschrank und Holzhocker",
+              "sha1": "3e24b92a9149998a8383e3d655b2984834c125c5"
+            },
+            {
+              "pack": "katalog/bad/cielo/filo-04",
+              "width": 2000,
+              "height": 1357,
+              "alt": "Ceramica Cielo Filo: Doppelwaschtisch mit Spiegelschrank und Handtüchern",
+              "sha1": "376da1be26ca976c54360c38dcc7ef9ec673f8c3"
+            },
+            {
+              "pack": "katalog/bad/cielo/filo-05",
+              "width": 1357,
+              "height": 2000,
+              "alt": "Ceramica Cielo Filo: Waschtisch mit Unterbau in Taupe, Spiegelschrank und schwarzer Wandarmatur",
+              "sha1": "bcfe5ebd5028e58f1892214298fee79c1887f7bb"
+            }
+          ]
+        },
+        {
+          "area": "bad",
+          "name": "Le Giare",
+          "images": [
+            {
+              "pack": "bad/bad-sanitaerkeramik-cielo-le-giare",
+              "width": 1600,
+              "height": 900,
+              "alt": "Weisse Le Giare Sanitärkeramik von Ceramica Cielo vor blauem Hintergrund"
+            },
+            {
+              "pack": "katalog/bad/cielo/le-giare-02",
+              "width": 1000,
+              "height": 750,
+              "alt": "Ceramica Cielo Le Giare: ovales Aufsatzbecken mit schwarzer Wandarmatur",
+              "sha1": "ebb968f1956c9471523571c964c4fe58a9ab9724"
+            },
+            {
+              "pack": "katalog/bad/cielo/le-giare-03",
+              "width": 1000,
+              "height": 750,
+              "alt": "Ceramica Cielo Le Giare: Waschtisch mit hoher schwarzer Armatur, Frontansicht",
+              "sha1": "75a5c837d2425919b365a600508ad67137df3e7d"
+            },
+            {
+              "pack": "katalog/bad/cielo/le-giare-04",
+              "width": 1000,
+              "height": 750,
+              "alt": "Ceramica Cielo Le Giare: flaches rechteckiges Aufsatzbecken mit Wandarmatur",
+              "sha1": "c88fcaf703d94d77fbcd1ecb01ebde1b97df9fdc"
+            },
+            {
+              "pack": "katalog/bad/cielo/le-giare-05",
+              "width": 1000,
+              "height": 750,
+              "alt": "Ceramica Cielo Le Giare: Standwaschtisch mit offenen Ablagen",
+              "sha1": "bc1115825f90070d26c2cb0b3bea8d704fe30c52"
+            },
+            {
+              "pack": "katalog/bad/cielo/le-giare-06",
+              "width": 1000,
+              "height": 750,
+              "alt": "Ceramica Cielo Le Giare: bodenstehendes WC in Weiss",
+              "sha1": "f40fad799c48de18cda287fbdb970891c290a348"
+            }
+          ]
+        }
+      ]
+    },
+    "scarabeo": {
+      "name": "Scarabeo Ceramiche",
+      "url": "https://scarabeoceramiche.it/collezioni/collezione-ceramica/",
+      "series": [
+        {
+          "area": "bad",
+          "name": "Fidia",
+          "images": [
+            {
+              "pack": "katalog/bad/scarabeo/fidia-01",
+              "width": 1414,
+              "height": 2000,
+              "alt": "Scarabeo Fidia: Aufsatzbecken auf Metallgestell mit Ablage vor dunkler Wand",
+              "sha1": "655dc7228821eeace898517aab2f8d742a46e305"
+            },
+            {
+              "pack": "katalog/bad/scarabeo/fidia-02",
+              "width": 2000,
+              "height": 2000,
+              "alt": "Scarabeo Fidia: Aufsatzbecken in Beige, Blau, Braun und Schwarz",
+              "sha1": "2ef06106f75412eb53db79f6328e9a5c7ee18e8f"
+            },
+            {
+              "pack": "katalog/bad/scarabeo/fidia-03",
+              "width": 1414,
+              "height": 2000,
+              "alt": "Scarabeo Fidia: rundes Aufsatzbecken in Beige auf schwarzer Konsole",
+              "sha1": "18b5c4deb7a7b2f1724fe7da2089a98be648819e"
+            },
+            {
+              "pack": "katalog/bad/scarabeo/fidia-04",
+              "width": 1414,
+              "height": 2000,
+              "alt": "Scarabeo Fidia: ovales Aufsatzbecken in Beige mit Wandarmatur",
+              "sha1": "b12a1e39a4a60d52ec8018faa2e0d795faa74c02"
+            },
+            {
+              "pack": "katalog/bad/scarabeo/fidia-05",
+              "width": 2000,
+              "height": 1414,
+              "alt": "Scarabeo Fidia: Badezimmer mit Aufsatzbecken auf Holzmöbel und WC",
+              "sha1": "35de1e96badc61e6931b251e622d2c8e28f4e469"
+            }
+          ]
+        },
+        {
+          "area": "bad",
+          "name": "Yugo",
+          "images": [
+            {
+              "pack": "katalog/bad/scarabeo/yugo-01",
+              "width": 1414,
+              "height": 2000,
+              "alt": "Scarabeo Yugo: schwarzes Aufsatzbecken vor schwarzer Wand",
+              "sha1": "3b9e836488051d24f3368086103a892f6073e5eb"
+            },
+            {
+              "pack": "katalog/bad/scarabeo/yugo-02",
+              "width": 2000,
+              "height": 2000,
+              "alt": "Scarabeo Yugo: Aufsatzbecken in verschiedenen Farben, Übersicht",
+              "sha1": "aacec8cae46fff84f96dbf4aa5510df3675f6347"
+            },
+            {
+              "pack": "katalog/bad/scarabeo/yugo-03",
+              "width": 2000,
+              "height": 1415,
+              "alt": "Scarabeo Yugo: schwarzes Becken mit Wandarmatur von oben",
+              "sha1": "40e697d1a25b1cd1634b04d936412f7e7a3c56da"
+            },
+            {
+              "pack": "katalog/bad/scarabeo/yugo-04",
+              "width": 1414,
+              "height": 2000,
+              "alt": "Scarabeo Yugo: schwarzes Aufsatzbecken auf schwarzer Konsole mit rundem Spiegel",
+              "sha1": "f80a213066f2b064e902278e2e91beceb3e71e18"
+            },
+            {
+              "pack": "katalog/bad/scarabeo/yugo-05",
+              "width": 2000,
+              "height": 1414,
+              "alt": "Scarabeo Yugo: Badezimmer mit zwei Aufsatzbecken und Liege",
+              "sha1": "b450688d9d092c3e9f174f8fecb9bd511353cd49"
+            }
+          ]
+        },
+        {
+          "area": "bad",
+          "name": "Skinny",
+          "images": [
+            {
+              "pack": "katalog/bad/scarabeo/skinny-01",
+              "width": 1434,
+              "height": 2000,
+              "alt": "Scarabeo Skinny: rechteckiges Aufsatzbecken auf weissem Möbel",
+              "sha1": "2016a621f29dfc0a1f83009ca7c2ffe5b03e1bb7"
+            },
+            {
+              "pack": "katalog/bad/scarabeo/skinny-02",
+              "width": 1434,
+              "height": 2000,
+              "alt": "Scarabeo Skinny: zwei runde Aufsatzbecken auf Holzmöbel",
+              "sha1": "b4496432997fd12d43eff54c867cefdd63281b1a"
+            },
+            {
+              "pack": "katalog/bad/scarabeo/skinny-03",
+              "width": 1434,
+              "height": 2000,
+              "alt": "Scarabeo Skinny: zwei Aufsatzbecken auf blauem Möbel",
+              "sha1": "d828fae89fa61fb93d75fadcc99ba71f6ffd1a7a"
+            },
+            {
+              "pack": "katalog/bad/scarabeo/skinny-04",
+              "width": 1434,
+              "height": 2000,
+              "alt": "Scarabeo Skinny: ovales Aufsatzbecken auf Möbel in Dunkelbraun",
+              "sha1": "a32bfd39069be8cbef2177637cbcf2135aabf26b"
+            },
+            {
+              "pack": "katalog/bad/scarabeo/skinny-05",
+              "width": 2000,
+              "height": 1427,
+              "alt": "Scarabeo Skinny: ovales Aufsatzbecken mit schwarzer Wandarmatur von oben",
+              "sha1": "dd2d04fa23c64180ca405ac99c2ad54b6ad559ac"
+            }
+          ]
+        }
+      ]
+    },
+    "galassia": {
+      "name": "Ceramica Galassia",
+      "url": "https://www.ceramicagalassia.it/catalogue",
+      "series": [
+        {
+          "area": "bad",
+          "name": "Dream",
+          "images": [
+            {
+              "pack": "katalog/bad/galassia/dream-01",
+              "width": 1132,
+              "height": 800,
+              "alt": "Ceramica Galassia Dream: Aufsatzbecken in Flieder auf Holzplatte",
+              "sha1": "105d9f7ea8476b7457928bc99a80195078929fb5"
+            },
+            {
+              "pack": "katalog/bad/galassia/dream-02",
+              "width": 1535,
+              "height": 1900,
+              "alt": "Ceramica Galassia Dream: rundes weisses Aufsatzbecken mit schwarzer Wandarmatur",
+              "sha1": "6791177b2a4c2b7064c4c367eb6a5dd5f03974c6"
+            },
+            {
+              "pack": "katalog/bad/galassia/dream-03",
+              "width": 1536,
+              "height": 1900,
+              "alt": "Ceramica Galassia Dream: Aufsatzbecken in Violett auf Holzkonsole",
+              "sha1": "ecb23198be30929e7fd8d8ad1c8359b1db3c06f4"
+            },
+            {
+              "pack": "katalog/bad/galassia/dream-04",
+              "width": 1535,
+              "height": 1900,
+              "alt": "Ceramica Galassia Dream: ovales Aufsatzbecken in Grün auf Holzgestell",
+              "sha1": "46b47b1cde24d53a1e4fc78a8e4a60c4e0d0271c"
+            },
+            {
+              "pack": "katalog/bad/galassia/dream-05",
+              "width": 1577,
+              "height": 1900,
+              "alt": "Ceramica Galassia Dream: Aufsatzbecken in Grau auf Waschtischplatte",
+              "sha1": "e5cc7769fd1a3187a99460050b2ec0b4b7bb70af"
+            }
+          ]
+        },
+        {
+          "area": "bad",
+          "name": "Meg11",
+          "images": [
+            {
+              "pack": "katalog/bad/galassia/meg11-01",
+              "width": 650,
+              "height": 550,
+              "alt": "Ceramica Galassia Meg11: wandhängendes WC in Weiss, Seitenansicht",
+              "sha1": "3a3866395b6ccebb3802d8d75774cb54c1d0ceca"
+            },
+            {
+              "pack": "katalog/bad/galassia/meg11-02",
+              "width": 650,
+              "height": 550,
+              "alt": "Ceramica Galassia Meg11: wandhängendes Bidet in Weiss",
+              "sha1": "bcf1c784a638fb164839e1289138efd79bf4322c"
+            }
+          ]
+        }
+      ]
+    },
+    "azzurra": {
+      "name": "Azzurra Ceramica",
+      "url": "https://www.azzurraceramica.it/",
+      "series": [
+        {
+          "area": "bad",
+          "name": "Anfibio",
+          "images": [
+            {
+              "pack": "katalog/bad/azzurra/anfibio-01",
+              "width": 1414,
+              "height": 1800,
+              "alt": "Azzurra Ceramica Anfibio: weisser Waschtisch mit Spiegelschrank vor grüner Wand",
+              "sha1": "1009450060ff501b90341ac3705ca509781ce1b3"
+            },
+            {
+              "pack": "katalog/bad/azzurra/anfibio-02",
+              "width": 900,
+              "height": 1225,
+              "alt": "Azzurra Ceramica Anfibio: Spiegelschrank mit Ablagen, Detail",
+              "sha1": "5a01d8ec8079427ab6844771667d8abdf0aa2f84"
+            },
+            {
+              "pack": "katalog/bad/azzurra/anfibio-03",
+              "width": 900,
+              "height": 900,
+              "alt": "Azzurra Ceramica Anfibio: Detail Waschtisch mit Ablage und Seife",
+              "sha1": "730778d819a227519339b8f45d793b40d636c70c"
+            },
+            {
+              "pack": "katalog/bad/azzurra/anfibio-04",
+              "width": 900,
+              "height": 1273,
+              "alt": "Azzurra Ceramica Anfibio: Waschtisch mit Spiegelschrank vor hellblauer Wand",
+              "sha1": "ac3b2c17123156e78664dd653036456841cd2253"
+            }
+          ]
+        },
+        {
+          "area": "bad",
+          "name": "Aurea",
+          "images": [
+            {
+              "pack": "katalog/bad/azzurra/aurea-01",
+              "width": 1549,
+              "height": 2000,
+              "alt": "Azzurra Ceramica Aurea: zwei schwarze Standwaschtische mit Spiegeln",
+              "sha1": "6e99386e207f2264fa0e664a1e52c38ca3d12f4c"
+            },
+            {
+              "pack": "katalog/bad/azzurra/aurea-02",
+              "width": 900,
+              "height": 1272,
+              "alt": "Azzurra Ceramica Aurea: schwarze freistehende Badewanne vor rosa Wand",
+              "sha1": "06681511585751ea695c1d7586c73fc6cf1de1b2"
+            },
+            {
+              "pack": "katalog/bad/azzurra/aurea-03",
+              "width": 900,
+              "height": 1273,
+              "alt": "Azzurra Ceramica Aurea: Waschtisch, WC und Bidet in Weiss",
+              "sha1": "fc5cdcd180726bbf05d379a2c9987a4060960374"
+            },
+            {
+              "pack": "katalog/bad/azzurra/aurea-04",
+              "width": 900,
+              "height": 1162,
+              "alt": "Azzurra Ceramica Aurea: zwei Aufsatzbecken auf Holzplatte mit Spiegeln",
+              "sha1": "37d119b8fa411366e771c2c87071da22e9527b8f"
+            }
+          ]
+        },
+        {
+          "area": "bad",
+          "name": "Build",
+          "images": [
+            {
+              "pack": "katalog/bad/azzurra/build-01",
+              "width": 1414,
+              "height": 2000,
+              "alt": "Azzurra Ceramica Build: Bad mit WC, Bidet und Waschtisch aus Holz vor Marmorwand",
+              "sha1": "31a97e91869c7100fb1b24e1d5f75c8e02898d56"
+            },
+            {
+              "pack": "katalog/bad/azzurra/build-02",
+              "width": 900,
+              "height": 1273,
+              "alt": "Azzurra Ceramica Build: wandhängendes WC und Bidet vor Mosaikwand",
+              "sha1": "dd6d45d0b52cf760c77b8a24704db35a7de36c5b"
+            },
+            {
+              "pack": "katalog/bad/azzurra/build-03",
+              "width": 900,
+              "height": 1273,
+              "alt": "Azzurra Ceramica Build: Waschtisch auf Holzsäule mit Wandarmatur",
+              "sha1": "2196ee46a57666047492fc522a4c1dc578faff29"
+            },
+            {
+              "pack": "katalog/bad/azzurra/build-04",
+              "width": 900,
+              "height": 1273,
+              "alt": "Azzurra Ceramica Build: eckiges WC und Bidet in Weiss",
+              "sha1": "592abb452350fc7f8bc5ca3d79417d723769d57c"
+            }
+          ]
+        }
+      ]
+    },
+    "megius": {
+      "name": "Megius",
+      "url": "https://www.megius.com/",
+      "series": [
+        {
+          "area": "bad",
+          "name": "Materia",
+          "images": [
+            {
+              "pack": "katalog/bad/megius/materia-01",
+              "width": 992,
+              "height": 992,
+              "alt": "Megius Materia: Walk-in-Dusche mit Glaswand in einem hellen Bad",
+              "sha1": "698f37babd5e4dc63371e78552fdd1d065d305a7"
+            },
+            {
+              "pack": "katalog/bad/megius/materia-02",
+              "width": 992,
+              "height": 992,
+              "alt": "Megius Materia: Duschabtrennung mit Glaswand und Stabilisationsstange",
+              "sha1": "d4bfea65131ba94763674e5abb758dc8871af118"
+            },
+            {
+              "pack": "katalog/bad/megius/materia-03",
+              "width": 992,
+              "height": 992,
+              "alt": "Megius Materia: Walk-in-Dusche mit Regal aus Holz",
+              "sha1": "4ca35a91ef06791529d0e3619dc95f37c394c129"
+            },
+            {
+              "pack": "katalog/bad/megius/materia-04",
+              "width": 992,
+              "height": 992,
+              "alt": "Megius Materia: Glasduschwand mit Messingprofil und Regal",
+              "sha1": "f044bdf4fedb8581624698a93f7a6d36f4b0c7f1"
+            }
+          ]
+        },
+        {
+          "area": "wellness",
+          "name": "Zen Combi Duo",
+          "images": [
+            {
+              "pack": "wellness/wellness-hammam-megius-zen-combi",
+              "width": 1600,
+              "height": 900,
+              "alt": "Megius Zen Combi Sauna und Hammam mit Dusche in einem modernen Wellnessraum"
+            },
+            {
+              "asset": "Zen_Combi_duo_Linear_6-1030x1030.webp",
+              "width": 1030,
+              "height": 1030,
+              "alt": "Wellness-Kabine aus dem Produktsortiment"
+            },
+            {
+              "pack": "katalog/wellness/megius/zen-combi-duo-03",
+              "width": 1030,
+              "height": 892,
+              "alt": "Megius Zen Combi Duo: Kabine mit Sauna und Dusche, schwarz mit Glasfront",
+              "sha1": "f75ee1e30025b7f5f87f441247d0fde4fc99e16f"
+            },
+            {
+              "pack": "katalog/wellness/megius/zen-combi-duo-04",
+              "width": 1030,
+              "height": 892,
+              "alt": "Megius Zen Combi Duo: Kabine mit farbigem Licht, Frontansicht",
+              "sha1": "2afd566aa23da741de3a430097f63401d6c4e9d6"
+            },
+            {
+              "pack": "katalog/wellness/megius/zen-combi-duo-05",
+              "width": 1030,
+              "height": 736,
+              "alt": "Megius Zen Combi Duo: Eckkabine mit Sauna und Dampfdusche vor grauer Wand",
+              "sha1": "7bcd210843a49236f37248251d98e120d9eb646f"
+            },
+            {
+              "pack": "katalog/wellness/megius/zen-combi-duo-06",
+              "width": 1030,
+              "height": 736,
+              "alt": "Megius Zen Combi Duo: Kabine mit blauem Licht und Holzbank",
+              "sha1": "e5fb18030aba5021e8a9c1253cb4d3af447c153e"
+            },
+            {
+              "pack": "katalog/wellness/megius/zen-combi-duo-07",
+              "width": 1030,
+              "height": 736,
+              "alt": "Megius Zen Combi Duo: Kabine in einem Wellnessraum mit Blick ins Grüne",
+              "sha1": "4e3626d834f5721bf58981e21d39d7c1ec5cbce1"
+            }
+          ]
+        },
+        {
+          "area": "wellness",
+          "name": "Zen Nude & Shower",
+          "images": [
+            {
+              "pack": "katalog/wellness/megius/zen-nude-shower-01",
+              "width": 846,
+              "height": 1030,
+              "alt": "Megius Zen Nude & Shower: Duschkabine mit Glaswänden und Messingdetails, freigestellt",
+              "sha1": "3a1f35d9900db73f8af29aaa2eea95fe17308240"
+            },
+            {
+              "pack": "katalog/wellness/megius/zen-nude-shower-02",
+              "width": 1030,
+              "height": 1015,
+              "alt": "Megius Zen Nude & Shower: Duschkabine in einem Bad in Marmoroptik",
+              "sha1": "580938ea36c07bbe0ee2af28a12d599b98386389"
+            },
+            {
+              "pack": "katalog/wellness/megius/zen-nude-shower-03",
+              "width": 1030,
+              "height": 1015,
+              "alt": "Megius Zen Nude & Shower: Duschkabine mit Glasfront, Seitenansicht",
+              "sha1": "9caef00bbf8cbd8b524ad0bf8e7673838ad72322"
+            },
+            {
+              "pack": "katalog/wellness/megius/zen-nude-shower-04",
+              "width": 1030,
+              "height": 1020,
+              "alt": "Megius Zen Nude & Shower: Duschkabine mit Holzbank und Schiebetür",
+              "sha1": "6c19ec26d03a2638229242eeb486034a4e017d14"
+            },
+            {
+              "pack": "katalog/wellness/megius/zen-nude-shower-05",
+              "width": 1030,
+              "height": 1020,
+              "alt": "Megius Zen Nude & Shower: Duschkabine mit Messinggriffen vor Marmorwand",
+              "sha1": "aea26500bf580d90bd9841255ffce95373e2e74b"
+            }
+          ]
+        },
+        {
+          "area": "bad",
+          "name": "Manolibera",
+          "images": [
+            {
+              "pack": "katalog/bad/megius/manolibera-01",
+              "width": 2000,
+              "height": 1568,
+              "alt": "Megius Manolibera: Duschkabine mit Schiebetür aus satiniertem Glas in einem Raum mit Blick auf den Pool",
+              "sha1": "e66d9f26fbea590ec89d9f62054484b4bf24c993"
+            },
+            {
+              "pack": "katalog/bad/megius/manolibera-02",
+              "width": 2000,
+              "height": 1442,
+              "alt": "Megius Manolibera: Duschtür mit geschwungenem Dekor im Glas neben einer Fensterfront",
+              "sha1": "28413e84231fbac0b1907eae2fc1e68f57499060"
+            },
+            {
+              "pack": "katalog/bad/megius/manolibera-03",
+              "width": 2000,
+              "height": 1692,
+              "alt": "Megius Manolibera: Nischendusche mit Schiebetür aus satiniertem Glas, Blick in ein Lesezimmer",
+              "sha1": "a187854edb5a055035692869b307c394696eea40"
+            }
+          ]
+        }
+      ]
+    },
+    "novellini": {
+      "name": "Novellini",
+      "url": "https://novellini.com/",
+      "series": [
+        {
+          "area": "bad",
+          "name": "Riga",
+          "images": [
+            {
+              "pack": "katalog/bad/novellini/riga-01",
+              "width": 960,
+              "height": 960,
+              "alt": "Novellini Riga: Detail des Bodenprofils der Duschabtrennung",
+              "sha1": "e883d7d196e9007753b890436769d77f972a8cb6"
+            },
+            {
+              "pack": "katalog/bad/novellini/riga-02",
+              "width": 960,
+              "height": 960,
+              "alt": "Novellini Riga: Detail des Wandprofils und der Verbindung",
+              "sha1": "c29903399d5fd0d0c35b735550a07b9660f57f06"
+            },
+            {
+              "pack": "katalog/bad/novellini/riga-03",
+              "width": 960,
+              "height": 960,
+              "alt": "Novellini Riga: Detail des Schiebemechanismus am oberen Profil",
+              "sha1": "8c3f77f3bf030d05ef3841b453ddd55b72c7def6"
+            },
+            {
+              "pack": "katalog/bad/novellini/riga-04",
+              "width": 1406,
+              "height": 900,
+              "alt": "Novellini Riga: Duschabtrennung mit goldenem Profil in einem hellen Bad",
+              "sha1": "4e8ec9d171a265e0e903619629826beb631ed0fc"
+            }
+          ]
+        },
+        {
+          "area": "wellness",
+          "name": "Celsius Combo SH",
+          "images": [
+            {
+              "pack": "katalog/wellness/novellini/celsius-combo-sh-01",
+              "width": 1600,
+              "height": 900,
+              "alt": "Novellini Celsius Combo SH: Sauna-Dusch-Kombination mit Glasfront im Wohnraum",
+              "sha1": "faf47ad9ab23dd5bcb729aaddabf9aac02a4a716"
+            },
+            {
+              "pack": "katalog/wellness/novellini/celsius-combo-sh-02",
+              "width": 920,
+              "height": 920,
+              "alt": "Novellini Celsius Combo SH: Bedienfeld an der Glaswand wird berührt",
+              "sha1": "3ac529fe4f6cbbaab5be0d77faa8fcfa91161745"
+            },
+            {
+              "pack": "katalog/wellness/novellini/celsius-combo-sh-03",
+              "width": 920,
+              "height": 1300,
+              "alt": "Novellini Celsius Combo SH: Kabine mit Sauna und Dusche, Frontansicht",
+              "sha1": "68e1b208df697b4705da6d54ed39f8c00447485d"
+            },
+            {
+              "pack": "katalog/wellness/novellini/celsius-combo-sh-04",
+              "width": 920,
+              "height": 920,
+              "alt": "Novellini Celsius Combo SH: Saunabank aus Holz mit indirektem Licht",
+              "sha1": "58bac1c9779ad95408c5e8a319c50e2a57f60439"
+            },
+            {
+              "pack": "katalog/wellness/novellini/celsius-combo-sh-05",
+              "width": 920,
+              "height": 1300,
+              "alt": "Novellini Celsius Combo SH: Lichtlinien an der Kabinendecke",
+              "sha1": "90bbca49970ce7c32260df7d1476cfd49e58a90d"
+            }
+          ]
+        },
+        {
+          "area": "bad",
+          "name": "Kuadra 2.0",
+          "images": [
+            {
+              "pack": "katalog/bad/novellini/kuadra-2-0-01",
+              "width": 1600,
+              "height": 900,
+              "alt": "Novellini Kuadra 2.0: Duschabtrennung mit Schiebetür und schwarzen Profilen vor dunkler Wand",
+              "sha1": "58b6141be18ec915262e5de144f61ab09c50efca"
+            },
+            {
+              "pack": "katalog/bad/novellini/kuadra-2-0-02",
+              "width": 2000,
+              "height": 1280,
+              "alt": "Novellini Kuadra 2.0 G+F: Eckdusche mit Drehtür und fester Seitenwand in einem hellen Bad",
+              "sha1": "8536bc84910da0c0808052278a72635e1db3b17b"
+            }
+          ]
+        },
+        {
+          "area": "wellness",
+          "name": "Fun Sauna",
+          "images": [
+            {
+              "pack": "katalog/wellness/novellini/fun-sauna-01",
+              "width": 920,
+              "height": 1300,
+              "alt": "Novellini Fun Sauna: Sauna mit Glasfront und Holzbänken",
+              "sha1": "b3e406929537bc4ded40644ea9f914f044ab2ec4"
+            },
+            {
+              "pack": "katalog/wellness/novellini/fun-sauna-02",
+              "width": 1600,
+              "height": 900,
+              "alt": "Novellini Fun Sauna: Sauna mit Glasfront in einem warm gestalteten Wohnbereich",
+              "sha1": "81523fd3d0d696a6c1ef2690529b94892d804361"
+            },
+            {
+              "pack": "katalog/wellness/novellini/fun-sauna-03",
+              "width": 920,
+              "height": 920,
+              "alt": "Novellini Fun Sauna: Saunabänke und Ofen von oben",
+              "sha1": "8b9b6e4063a8de66abe5e40e1529b8ace13d7a39"
+            },
+            {
+              "pack": "katalog/wellness/novellini/fun-sauna-04",
+              "width": 1600,
+              "height": 900,
+              "alt": "Novellini Fun Sauna: Sauna neben einem Sofa mit Pflanzen",
+              "sha1": "67af2c56932527c9afeb2a0ae8fae2d0c11c37da"
+            },
+            {
+              "pack": "katalog/wellness/novellini/fun-sauna-05",
+              "width": 920,
+              "height": 920,
+              "alt": "Novellini Fun Sauna: Saunaofen mit Steinen und Holzkübel",
+              "sha1": "420635161abab998fc23a36ee74b32768d7feabc"
+            }
+          ]
+        },
+        {
+          "area": "bad",
+          "name": "Brera",
+          "images": [
+            {
+              "pack": "katalog/bad/novellini/brera-01",
+              "width": 1600,
+              "height": 900,
+              "alt": "Novellini Brera: Eckdusche mit Glaswänden in einem Bad mit Doppelwaschtisch",
+              "sha1": "b34a80c8a2b19af76e5559bca64db2ce3cfe1955"
+            }
+          ],
+          "extra": true
+        },
+        {
+          "area": "wellness",
+          "name": "Home Oasis",
+          "images": [
+            {
+              "pack": "wellness/wellness-hero-novellini-home-oasis",
+              "width": 1600,
+              "height": 900,
+              "alt": "Novellini Home Oasis mit Sauna, Dusche und Spa in einem hellen Wellnessraum"
+            }
+          ],
+          "extra": true
+        },
+        {
+          "area": "wellness",
+          "name": "Moon",
+          "images": [
+            {
+              "pack": "wellness/wellness-whirlpool-novellini-moon",
+              "width": 1600,
+              "height": 900,
+              "alt": "Novellini Moon Whirlpool im Freien mit integrierter Beleuchtung"
+            }
+          ],
+          "extra": true
+        }
+      ]
+    },
+    "vismaravetro": {
+      "name": "Vismaravetro",
+      "url": "https://www.vismaravetro.it/en/shower-enclosure-collections",
+      "series": [
+        {
+          "area": "bad",
+          "name": "7200",
+          "images": [
+            {
+              "pack": "katalog/bad/vismaravetro/7200-01",
+              "width": 1920,
+              "height": 1248,
+              "alt": "Vismaravetro 7200: Duschkabine mit schwarzem Rahmen in einem Bad mit Holzlamellen",
+              "sha1": "d88cc5781ef9c9ab7884890b82ebbc6e0d30805e"
+            },
+            {
+              "pack": "katalog/bad/vismaravetro/7200-02",
+              "width": 1920,
+              "height": 1248,
+              "alt": "Vismaravetro 7200: Eckdusche mit Schiebetür aus Klarglas in einem hellen Bad mit Holzbalkendecke",
+              "sha1": "1da0afc3dc8f8f19adf8dd122b43315707054fa1"
+            },
+            {
+              "pack": "katalog/bad/vismaravetro/7200-03",
+              "width": 1000,
+              "height": 1430,
+              "alt": "Vismaravetro 7200: Duschabtrennung vor bodentiefem Fenster",
+              "sha1": "0c63c92b6dcb21e7ff86e159c01a7f654180de2f"
+            },
+            {
+              "pack": "katalog/bad/vismaravetro/7200-04",
+              "width": 1000,
+              "height": 1430,
+              "alt": "Vismaravetro 7200: Duschkabine mit schwarzem Rahmen und Holzlamellenwand",
+              "sha1": "43f9700bd843e16e5b997392bd6464bebfff0092"
+            },
+            {
+              "pack": "katalog/bad/vismaravetro/7200-05",
+              "width": 1000,
+              "height": 1430,
+              "alt": "Vismaravetro 7200: Detail Nische und Glaswand",
+              "sha1": "66c2fbbae2200dfcaea8a075241579b08d5832a1"
+            }
+          ]
+        },
+        {
+          "area": "bad",
+          "name": "Frame",
+          "images": [
+            {
+              "pack": "katalog/bad/vismaravetro/frame-01",
+              "width": 1920,
+              "height": 1248,
+              "alt": "Vismaravetro Frame: Walk-in-Dusche mit weissem Rahmen vor grüner Mosaikwand",
+              "sha1": "facccf58562a101050ab0154ea33ea4db5b8ee88"
+            },
+            {
+              "pack": "katalog/bad/vismaravetro/frame-02",
+              "width": 1000,
+              "height": 1430,
+              "alt": "Vismaravetro Frame: Duschwand mit weissem Rahmen vor grüner Wand",
+              "sha1": "ec30885dbf89e8193640bcd9ea626ed75d9a9868"
+            },
+            {
+              "pack": "katalog/bad/vismaravetro/frame-03",
+              "width": 1520,
+              "height": 1020,
+              "alt": "Vismaravetro Frame: Duschbereich mit Glaswand und Waschtisch in Grün",
+              "sha1": "b686a05c2016dfaf1c175c45b1275348051681a8"
+            }
+          ]
+        },
+        {
+          "area": "bad",
+          "name": "Smack",
+          "images": [
+            {
+              "pack": "katalog/bad/vismaravetro/smack-01",
+              "width": 1920,
+              "height": 1248,
+              "alt": "Vismaravetro Smack: Duschtür mit schwarzem Rahmen in einem Bad mit Holzschränken",
+              "sha1": "bcce0065715502fb207f8994b3e56d1fe4f21c01"
+            },
+            {
+              "pack": "katalog/bad/vismaravetro/smack-02",
+              "width": 1000,
+              "height": 1430,
+              "alt": "Vismaravetro Smack: Walk-in-Dusche mit schwarzem Rahmen und Holzbank",
+              "sha1": "47c6a70a2410c6e3508efcabf6c4a628cd7736ac"
+            },
+            {
+              "pack": "katalog/bad/vismaravetro/smack-03",
+              "width": 1000,
+              "height": 1430,
+              "alt": "Vismaravetro Smack: Detail Glaswand mit schwarzem Profil und Handbrause",
+              "sha1": "e39395f8cba5997f4496f4d0e421c1fba3d24efd"
+            },
+            {
+              "pack": "katalog/bad/vismaravetro/smack-04",
+              "width": 1000,
+              "height": 1430,
+              "alt": "Vismaravetro Smack: Detail Duschtürgriff und Armatur in Chrom",
+              "sha1": "d4e1ed0f6e53dd61f3401ddf1750816a825777e9"
+            },
+            {
+              "pack": "katalog/bad/vismaravetro/smack-05",
+              "width": 1520,
+              "height": 1020,
+              "alt": "Vismaravetro Smack: Duschtür mit schwarzem Rahmen und Kopfbrause",
+              "sha1": "aff85e829fce84bdc6a8c65420fd10ca064ea597"
+            }
+          ]
+        },
+        {
+          "area": "bad",
+          "name": "Suite",
+          "images": [
+            {
+              "pack": "bad/bad-duschen-vismaravetro-suite",
+              "width": 1600,
+              "height": 900,
+              "alt": "Vismaravetro Dusch- und Trennwandsystem in einem modernen Bad"
+            }
+          ],
+          "extra": true
+        }
+      ]
+    },
+    "capannoli": {
+      "name": "Capannoli",
+      "url": "https://www.capannoli.it/",
+      "series": [
+        {
+          "area": "bad",
+          "name": "Tratto C",
+          "images": [
+            {
+              "pack": "katalog/bad/capannoli/tratto-c-01",
+              "width": 1000,
+              "height": 1000,
+              "alt": "Capannoli Tratto C: Handtuchhalter in Chrom, Schrägansicht",
+              "sha1": "7814a3dee9d70a7e5ab932535516df0dc01d23de"
+            },
+            {
+              "pack": "katalog/bad/capannoli/tratto-c-02",
+              "width": 768,
+              "height": 768,
+              "alt": "Capannoli Tratto C: Bad in Marmoroptik mit Accessoires in Messing und rundem Spiegel",
+              "sha1": "4733af41bda87e1975c95becb12e942d3d12f950"
+            },
+            {
+              "pack": "katalog/bad/capannoli/tratto-c-03",
+              "width": 1280,
+              "height": 800,
+              "alt": "Capannoli Tratto C: Badezimmer mit Dusche, Hocker und Handtuchhalter",
+              "sha1": "1770200aa553e68c81c8b2f2b60e2ee471491196"
+            },
+            {
+              "pack": "katalog/bad/capannoli/tratto-c-04",
+              "width": 1229,
+              "height": 768,
+              "alt": "Capannoli Tratto C: Handtuchhalter in Chrom",
+              "sha1": "f3c5f8450e694683ae5d5a724033c4a3a7618411"
+            },
+            {
+              "pack": "katalog/bad/capannoli/tratto-c-05",
+              "width": 2000,
+              "height": 2000,
+              "alt": "Capannoli Tratto C: Handtuchstange in Chrom, Frontansicht",
+              "sha1": "f48662192a038260c40ead3690d3c72b3e86813d"
+            }
+          ]
+        },
+        {
+          "area": "bad",
+          "name": "Minima",
+          "images": [
+            {
+              "pack": "katalog/bad/capannoli/minima-01",
+              "width": 1000,
+              "height": 1000,
+              "alt": "Capannoli Minima: doppelter Handtuchhalter in Chrom",
+              "sha1": "1285f1cb0df3138bfed7131ca2a3ed8ee751da6d"
+            },
+            {
+              "pack": "katalog/bad/capannoli/minima-02",
+              "width": 768,
+              "height": 768,
+              "alt": "Capannoli Minima: runder Wandhaken in Chrom",
+              "sha1": "acce7995640aa99e56b6df7559bf951cc67092ab"
+            },
+            {
+              "pack": "katalog/bad/capannoli/minima-03",
+              "width": 768,
+              "height": 768,
+              "alt": "Capannoli Minima: runder Wandhaken in Chrom, Seitenansicht",
+              "sha1": "13002cd742e3bca7af767f242518ad349f4ef8a2"
+            },
+            {
+              "pack": "katalog/bad/capannoli/minima-04",
+              "width": 768,
+              "height": 768,
+              "alt": "Capannoli Minima: runde Wandablage in Chrom",
+              "sha1": "f29bad531aa5dc420ed44a53ebb4c709f507796f"
+            },
+            {
+              "pack": "katalog/bad/capannoli/minima-05",
+              "width": 768,
+              "height": 768,
+              "alt": "Capannoli Minima: Seifenspender, Becher und Ablage in Schwarz",
+              "sha1": "7aa4fc94fa17740a3297af8a05d78db1ab823345"
+            }
+          ]
+        },
+        {
+          "area": "bad",
+          "name": "Tratto",
+          "images": [
+            {
+              "pack": "bad/bad-accessoires-capannoli-tratto",
+              "width": 1600,
+              "height": 900,
+              "alt": "Capannoli Badaccessoires in verschiedenen Metalloberflächen an einer hellen Wand"
+            }
+          ],
+          "extra": true
+        }
+      ]
+    },
+    "antrax": {
+      "name": "Antrax IT",
+      "url": "https://www.antrax.com/",
+      "series": [
+        {
+          "area": "bad",
+          "name": "Hashi",
+          "images": [
+            {
+              "pack": "katalog/bad/antrax/hashi-01",
+              "width": 2000,
+              "height": 2000,
+              "alt": "Antrax IT Hashi: Sprossenheizkörper mit rundem Spiegel vor schwarzer Wand",
+              "sha1": "7554c4361b40d33ae6c5a6b0a30969ffb695bcf9"
+            },
+            {
+              "pack": "katalog/bad/antrax/hashi-02",
+              "width": 2000,
+              "height": 1508,
+              "alt": "Antrax IT Hashi: zwei Sprossenheizkörper in Hellgrün vor weisser Wand",
+              "sha1": "525eb949b5dad1bd99ebb8041dc76a1aa8d89a61"
+            },
+            {
+              "pack": "katalog/bad/antrax/hashi-03",
+              "width": 1309,
+              "height": 2000,
+              "alt": "Antrax IT Hashi: Sprossenheizkörper mit rundem Spiegel, Detail",
+              "sha1": "2dbe1ccc746a55c0daad04b1803a206d31e5d3f8"
+            },
+            {
+              "pack": "katalog/bad/antrax/hashi-04",
+              "width": 1309,
+              "height": 2000,
+              "alt": "Antrax IT Hashi: Sprossenheizkörper mit rechteckigem Spiegel, Detail",
+              "sha1": "05961492168bfc70958ce56dd74f3675ac30bdcf"
+            }
+          ]
+        },
+        {
+          "area": "bad",
+          "name": "Tavolina",
+          "images": [
+            {
+              "pack": "katalog/bad/antrax/tavolina-01",
+              "width": 2000,
+              "height": 2000,
+              "alt": "Antrax IT Tavolina: flacher Heizkörper als Regal mit Handtuch",
+              "sha1": "8bbf850ab49be922e160e2e79a64f1d4a96c8ddd"
+            },
+            {
+              "pack": "katalog/bad/antrax/tavolina-02",
+              "width": 2000,
+              "height": 1509,
+              "alt": "Antrax IT Tavolina: zwei Regalheizkörper über einer Ablage",
+              "sha1": "860aef420d5d8f6707e8aceb2ca82834307169fb"
+            },
+            {
+              "pack": "katalog/bad/antrax/tavolina-03",
+              "width": 2000,
+              "height": 865,
+              "alt": "Antrax IT Tavolina: Regalheizkörper mit Handtuch vor weisser Wand",
+              "sha1": "b72586f7beb40818372ed68185e825617b46b469"
+            },
+            {
+              "pack": "katalog/bad/antrax/tavolina-04",
+              "width": 2000,
+              "height": 1509,
+              "alt": "Antrax IT Tavolina: zwei Regalheizkörper über einer Ablage mit Schalen",
+              "sha1": "567cb403d69212d8175f43e767dfcc5384d4d2d9"
+            }
+          ]
+        },
+        {
+          "area": "bad",
+          "name": "Pypeline",
+          "images": [
+            {
+              "pack": "bad/bad-designheizkoerper-antrax-pypeline",
+              "width": 1600,
+              "height": 900,
+              "alt": "Antrax IT Pypeline Designheizkörper in einem schwarzen Badezimmer mit freistehender Badewanne"
+            }
+          ],
+          "extra": true
+        }
+      ]
+    },
+    "cordivari": {
+      "name": "Cordivari Design",
+      "url": "https://www.cordivaridesign.it/it/",
+      "series": [
+        {
+          "area": "bad",
+          "name": "Window",
+          "images": [
+            {
+              "pack": "katalog/bad/cordivari/window-01",
+              "width": 1500,
+              "height": 725,
+              "alt": "Cordivari Window: Handtuchheizkörper in Beige neben einem Waschtisch",
+              "sha1": "5621c33c2c065169b69fe2f6a1cc6710f4ef3f95"
+            },
+            {
+              "pack": "katalog/bad/cordivari/window-02",
+              "width": 1500,
+              "height": 725,
+              "alt": "Cordivari Window: zwei Heizkörper in Grau mit Handtüchern vor beiger Wand",
+              "sha1": "dd786e685b9e60ab26ce90d3a81b52701e1b39c4"
+            },
+            {
+              "pack": "katalog/bad/cordivari/window-03",
+              "width": 1500,
+              "height": 725,
+              "alt": "Cordivari Window: Heizkörper mit aufgeklapptem Handtuchhalter",
+              "sha1": "6282f4cdba7139203579fc9b5d1c11a38bbce450"
+            },
+            {
+              "pack": "katalog/bad/cordivari/window-04",
+              "width": 1500,
+              "height": 725,
+              "alt": "Cordivari Window: geschlossener Heizkörper in Grau, Detail",
+              "sha1": "e0b55a4fb86b60c57022177047e40235e9655909"
+            },
+            {
+              "pack": "katalog/bad/cordivari/window-05",
+              "width": 1500,
+              "height": 725,
+              "alt": "Cordivari Window: Heizkörper in Weiss neben einer Stehleuchte",
+              "sha1": "50abc9075b9e42d11ebb6f276c57d655264bf668"
+            }
+          ]
+        },
+        {
+          "area": "bad",
+          "name": "Blow",
+          "images": [
+            {
+              "pack": "katalog/bad/cordivari/blow-01",
+              "width": 1500,
+              "height": 725,
+              "alt": "Cordivari Blow: Heizkörper in Spiegeloptik im Wohnraum mit Sofa",
+              "sha1": "563275d53347d1e7c01e233163a075a3b6e43e08"
+            },
+            {
+              "pack": "katalog/bad/cordivari/blow-02",
+              "width": 1500,
+              "height": 725,
+              "alt": "Cordivari Blow: zwei senkrechte Heizkörper in Spiegeloptik neben dem Fenster",
+              "sha1": "61bcc71e2a998ef7e81626c7971a39787441244e"
+            },
+            {
+              "pack": "katalog/bad/cordivari/blow-03",
+              "width": 1500,
+              "height": 725,
+              "alt": "Cordivari Blow: zwei waagrechte Heizkörper in Spiegeloptik",
+              "sha1": "3293179c3e3f0f31ed1a50f2b3766734378f0d77"
+            },
+            {
+              "pack": "katalog/bad/cordivari/blow-04",
+              "width": 1500,
+              "height": 725,
+              "alt": "Cordivari Blow: Heizkörper in Spiegeloptik über einem Sideboard",
+              "sha1": "316ec911c1212d7a84fdd6940829b66262a7d522"
+            },
+            {
+              "pack": "katalog/bad/cordivari/blow-05",
+              "width": 1500,
+              "height": 725,
+              "alt": "Cordivari Blow: senkrechte Heizkörper in Spiegeloptik im Wohnraum",
+              "sha1": "adb1e6754ca961b76d0ddff66935c037b5847748"
+            }
+          ]
+        },
+        {
+          "area": "bad",
+          "name": "Frame Inox",
+          "images": [
+            {
+              "pack": "katalog/bad/cordivari/frame-inox-01",
+              "width": 1500,
+              "height": 725,
+              "alt": "Cordivari Frame Inox: Heizkörper aus Edelstahl im Wohnraum mit Sofa",
+              "sha1": "d28e63f9d1029fc1b2ea1d905e136818d9ba46f5"
+            },
+            {
+              "pack": "katalog/bad/cordivari/frame-inox-02",
+              "width": 1500,
+              "height": 725,
+              "alt": "Cordivari Frame Inox: senkrechter Heizkörper aus Edelstahl vor grosser Fensterfront",
+              "sha1": "2f221e0f671656253b6f0e4c8115e1d92db4c701"
+            },
+            {
+              "pack": "katalog/bad/cordivari/frame-inox-03",
+              "width": 1500,
+              "height": 725,
+              "alt": "Cordivari Frame Inox: Heizkörper aus Edelstahl neben Holzsideboard",
+              "sha1": "a5618ad1d5156a618cdafe9266a66165373a0597"
+            },
+            {
+              "pack": "katalog/bad/cordivari/frame-inox-04",
+              "width": 1500,
+              "height": 725,
+              "alt": "Cordivari Frame Inox: Heizkörper mit Lochmuster in Edelstahl",
+              "sha1": "c8077f718888b9ed6c5cfff7b1629fc420dabdbd"
+            },
+            {
+              "pack": "katalog/bad/cordivari/frame-inox-05",
+              "width": 1500,
+              "height": 725,
+              "alt": "Cordivari Frame Inox: Heizkörper aus Edelstahl vor Vorhang",
+              "sha1": "b08b2debd859b61a607b6af33eb46339b9b87550"
+            }
+          ]
+        },
+        {
+          "area": "bad",
+          "name": "Auswahl aus dem Medienpaket",
+          "images": [
+            {
+              "pack": "bad/bad-designheizkoerper-cordivari",
+              "width": 1552,
+              "height": 873,
+              "alt": "Cordivari Designheizkörper in Spiegeloptik über einer Holzkonsole"
+            }
+          ],
+          "extra": true
+        }
+      ]
+    },
+    "caleido": {
+      "name": "Caleido",
+      "url": "https://www.caleido.it/",
+      "series": [
+        {
+          "area": "bad",
+          "name": "Infinito",
+          "images": [
+            {
+              "pack": "katalog/bad/caleido/infinito-01",
+              "width": 1200,
+              "height": 1603,
+              "alt": "Caleido Infinito: senkrechter Handtuchheizkörper an einer Glasdusche",
+              "sha1": "25868f11547dc9ed6ed0b9043d522f83ded8d484"
+            },
+            {
+              "pack": "katalog/bad/caleido/infinito-02",
+              "width": 1200,
+              "height": 1603,
+              "alt": "Caleido Infinito: Handtuchheizkörper vor Wand in Terrazzooptik",
+              "sha1": "8987d8d23ea238a8b52257ba936ffdaa0b05959e"
+            },
+            {
+              "pack": "katalog/bad/caleido/infinito-03",
+              "width": 1200,
+              "height": 1603,
+              "alt": "Caleido Infinito: Handtuchheizkörper in Messing neben einem Waschtisch",
+              "sha1": "fbd60398a10c4adc9bf8f926c3e60314f853320a"
+            },
+            {
+              "pack": "katalog/bad/caleido/infinito-04",
+              "width": 2000,
+              "height": 1286,
+              "alt": "Caleido Infinito: Handtuchheizkörper in einem hellen Bad mit Dusche",
+              "sha1": "3cf8502b86a0a76c6865226cfb33f10005aaef9e"
+            }
+          ]
+        },
+        {
+          "area": "bad",
+          "name": "Dinamo",
+          "images": [
+            {
+              "pack": "katalog/bad/caleido/dinamo-01",
+              "width": 1490,
+              "height": 2000,
+              "alt": "Caleido Dinamo: Sprossenheizkörper in Chrom neben einer freistehenden Badewanne",
+              "sha1": "4c806de9f6c9333a2f01a436f01c2d749a1c60d0"
+            },
+            {
+              "pack": "katalog/bad/caleido/dinamo-02",
+              "width": 1490,
+              "height": 2000,
+              "alt": "Caleido Dinamo: Detail der Sprossen in Chrom vor Holzwand",
+              "sha1": "a69aca596fb6756ddbe404e9113b9d6c61c49bed"
+            },
+            {
+              "pack": "katalog/bad/caleido/dinamo-03",
+              "width": 1490,
+              "height": 2000,
+              "alt": "Caleido Dinamo: Sprossenheizkörper in Chrom neben einer Dusche",
+              "sha1": "ff2e64517b574b519039f7d07f40610a9b30b00a"
+            },
+            {
+              "pack": "katalog/bad/caleido/dinamo-04",
+              "width": 1555,
+              "height": 2000,
+              "alt": "Caleido Dinamo: zwei senkrechte Heizkörper in Chrom neben einem Waschtisch",
+              "sha1": "fd802a608df5fd9debc4f419e7ffdaecb330dbfa"
+            }
+          ]
+        }
+      ]
+    },
+    "febal": {
+      "name": "Febal Casa",
+      "url": "https://www.febalcasa.com/en/kind/kitchens/",
+      "series": [
+        {
+          "area": "kuechen",
+          "name": "Modula",
+          "images": [
+            {
+              "pack": "katalog/kuechen/febal/modula-01",
+              "width": 1200,
+              "height": 728,
+              "alt": "Febal Casa Modula: Küchenzeile in Anthrazit mit Hochschränken und Kochfeld",
+              "sha1": "767414ab5f5cd067e138c7398901ec52735e3c9e"
+            },
+            {
+              "pack": "katalog/kuechen/febal/modula-02",
+              "width": 1200,
+              "height": 715,
+              "alt": "Febal Casa Modula: offene Küche in Anthrazit mit Esstisch",
+              "sha1": "ca73c5df37ff18de0d06f847ab89a73585c8b478"
+            }
+          ]
+        },
+        {
+          "area": "kuechen",
+          "name": "Origina",
+          "images": [
+            {
+              "pack": "kuechen/kuechen-hero-febal-origina",
+              "width": 1600,
+              "height": 900,
+              "alt": "Offene Febal Casa Origina Küche mit Insel und raumhohen Schränken"
+            },
+            {
+              "pack": "kuechen/kuechen-card-febal-origina",
+              "width": 1008,
+              "height": 567,
+              "alt": "Febal Casa Origina Küche mit farbigem Inseltisch und Holzfronten"
+            },
+            {
+              "pack": "katalog/kuechen/febal/origina-03",
+              "width": 1920,
+              "height": 1278,
+              "alt": "Febal Casa Origina Küche mit Kochinsel in Steinoptik und Hochschränken in Holz",
+              "sha1": "c6f589ab3584218a852c85a414ff8230390a630e"
+            },
+            {
+              "pack": "katalog/kuechen/febal/origina-04",
+              "width": 2000,
+              "height": 1331,
+              "alt": "Febal Casa Origina: offene Küche mit Insel und Barhockern vor grossem Fenster",
+              "sha1": "f89d4da55f02e9fb159daceadee7b185c7d50b83"
+            },
+            {
+              "pack": "katalog/kuechen/febal/origina-05",
+              "width": 1015,
+              "height": 1323,
+              "alt": "Febal Casa Origina: Küche mit Inseltisch in Bordeaux und Holzfronten",
+              "sha1": "13977c9af7498a6ce7f23a02cf7941f8d42d0dfa"
+            },
+            {
+              "pack": "katalog/kuechen/febal/origina-06",
+              "width": 1014,
+              "height": 1333,
+              "alt": "Febal Casa Origina: Esstisch mit Glasleuchte vor Küchenschränken aus Holz",
+              "sha1": "e7a019bf06d639b25529d856465e4a67aaeadffc"
+            },
+            {
+              "pack": "katalog/kuechen/febal/origina-07",
+              "width": 1029,
+              "height": 1320,
+              "alt": "Febal Casa Origina: Hochschränke in Grau und Holz mit offenem Regal",
+              "sha1": "5aae2d307be60d0308c6c5edf9404fe8a8014672"
+            }
+          ]
+        }
+      ]
+    },
+    "energieker": {
+      "name": "Energieker",
+      "url": "https://www.energieker.it/en/collections/",
+      "series": [
+        {
+          "area": "platten",
+          "name": "Quarzi",
+          "images": [
+            {
+              "pack": "katalog/platten/energieker/quarzi-01",
+              "width": 1679,
+              "height": 2000,
+              "alt": "Energieker Quarzi: Terrasse mit Platten in Steinoptik und Pflanzen",
+              "sha1": "4ca36eb00fa56f0ab3bb47350220ab4815e4e5af"
+            },
+            {
+              "pack": "katalog/platten/energieker/quarzi-02",
+              "width": 834,
+              "height": 2000,
+              "alt": "Energieker Quarzi: Platte in beiger Quarzitoptik",
+              "sha1": "1a57bee6b52c39b7e4d8042ee9b2c1febf8d4b2e"
+            },
+            {
+              "pack": "katalog/platten/energieker/quarzi-03",
+              "width": 834,
+              "height": 2000,
+              "alt": "Energieker Quarzi: Platte in rotbrauner Quarzitoptik",
+              "sha1": "1945360552757ba392f7361f32033aa4f59b6503"
+            },
+            {
+              "pack": "katalog/platten/energieker/quarzi-04",
+              "width": 834,
+              "height": 2000,
+              "alt": "Energieker Quarzi: Platte in sandfarbener Quarzitoptik",
+              "sha1": "d515d83e7c74ecf2957032c816f1b18db8ccc0e3"
+            },
+            {
+              "pack": "katalog/platten/energieker/quarzi-05",
+              "width": 834,
+              "height": 2000,
+              "alt": "Energieker Quarzi: Platte in grauer Quarzitoptik",
+              "sha1": "507fef5d0848f7dcf0ee09ee838eec62ecc58735"
+            }
+          ]
+        },
+        {
+          "area": "platten",
+          "name": "Miro",
+          "images": [
+            {
+              "pack": "katalog/platten/energieker/miro-01",
+              "width": 2000,
+              "height": 1414,
+              "alt": "Energieker Miro: Terrasse mit Pool und Platten in heller Betonoptik",
+              "sha1": "4fdeec3723301b94b8ac2dfe17803d695f493049"
+            },
+            {
+              "pack": "katalog/platten/energieker/miro-02",
+              "width": 800,
+              "height": 800,
+              "alt": "Energieker Miro: Platte in Weiss mit Betonstruktur",
+              "sha1": "9e70c2caffbc0b0e845f1eea85a992923ad12aa9"
+            },
+            {
+              "pack": "katalog/platten/energieker/miro-03",
+              "width": 800,
+              "height": 800,
+              "alt": "Energieker Miro: Platte in Creme mit Betonstruktur",
+              "sha1": "d7869a4dc1564b3fd36c2a8790488d2840a882b3"
+            },
+            {
+              "pack": "katalog/platten/energieker/miro-04",
+              "width": 800,
+              "height": 800,
+              "alt": "Energieker Miro: Platte in Hellgrau mit Betonstruktur",
+              "sha1": "dabb53d2e7cdc032a6af87223d6aaeba52d9f3ea"
+            },
+            {
+              "pack": "katalog/platten/energieker/miro-05",
+              "width": 800,
+              "height": 800,
+              "alt": "Energieker Miro: Platte in Dunkelgrau mit Betonstruktur",
+              "sha1": "b82d496c148d31727cbb84f313d0273f4171472f"
+            }
+          ]
+        }
+      ]
+    },
+    "emilgroup": {
+      "name": "Emilgroup",
+      "url": "https://www.emilgroup.it/EN/",
+      "series": [
+        {
+          "area": "platten",
+          "name": "Fornace Provenza",
+          "images": [
+            {
+              "pack": "katalog/platten/emilgroup/fornace-provenza-01",
+              "width": 1240,
+              "height": 600,
+              "alt": "Emilgroup Fornace Provenza: Wohnraum mit Ledersofa und Wandverkleidung in Terracotta",
+              "sha1": "0f95af7e8a6436f74c56503c56f8e20f62ecee45"
+            },
+            {
+              "pack": "katalog/platten/emilgroup/fornace-provenza-02",
+              "width": 1240,
+              "height": 600,
+              "alt": "Emilgroup Fornace Provenza: Essbereich mit Holztisch und Wand in Terracotta",
+              "sha1": "b1a899735fc4c09cbbdf2b8ce2677938d48d15b5"
+            }
+          ]
+        },
+        {
+          "area": "platten",
+          "name": "W-Circles",
+          "images": [
+            {
+              "pack": "katalog/platten/emilgroup/w-circles-01",
+              "width": 1400,
+              "height": 800,
+              "alt": "Emilgroup W-Circles: Café mit Wandregal und Platten in Beige",
+              "sha1": "000a99092da5754d35d10947c683acc48232673b"
+            },
+            {
+              "pack": "katalog/platten/emilgroup/w-circles-02",
+              "width": 1240,
+              "height": 600,
+              "alt": "Emilgroup W-Circles: dreidimensionale Wandverkleidung mit Kreismotiv",
+              "sha1": "9ed47219f02324882644a5ec487bc6f40a9e11a8"
+            }
+          ]
+        },
+        {
+          "area": "platten",
+          "name": "Auswahl aus dem Medienpaket",
+          "images": [
+            {
+              "pack": "platten/platten-hero-emilgroup-feinsteinzeug",
+              "width": 1600,
+              "height": 900,
+              "alt": "Emilgroup Feinsteinzeug in Holzoptik in einem hellen Badezimmer"
+            }
+          ],
+          "extra": true
+        }
+      ]
+    },
+    "lafabbrica": {
+      "name": "La Fabbrica AVA",
+      "url": "https://www.lafabbrica.it/en/",
+      "series": [
+        {
+          "area": "platten",
+          "name": "Venezia",
+          "images": [
+            {
+              "pack": "platten/platten-grossformat-lafabbrica-venezia",
+              "width": 1600,
+              "height": 900,
+              "alt": "La Fabbrica AVA Venezia Platten in schwarzer Marmoroptik in einem eleganten Wohnraum"
+            },
+            {
+              "pack": "katalog/platten/lafabbrica/venezia-02",
+              "width": 1600,
+              "height": 773,
+              "alt": "La Fabbrica AVA Venezia: Platten in dunkler Marmoroptik neben Steinoptik",
+              "sha1": "a7b151b5343aacf9eba3545002f1bb0e3be75cd1"
+            },
+            {
+              "pack": "katalog/platten/lafabbrica/venezia-03",
+              "width": 2000,
+              "height": 1414,
+              "alt": "La Fabbrica AVA Venezia: Bad mit Wand und Boden in schwarzer Marmoroptik",
+              "sha1": "47745e97cfbe69e7297cc22a300bab09db0ffd13"
+            },
+            {
+              "pack": "katalog/platten/lafabbrica/venezia-04",
+              "width": 2000,
+              "height": 1414,
+              "alt": "La Fabbrica AVA Venezia: Wohnraum mit Boden in schwarzer Marmoroptik",
+              "sha1": "935c131b44d82d89e1d19c44652f82c74e0f083e"
+            }
+          ]
+        },
+        {
+          "area": "platten",
+          "name": "Wabi Sabi",
+          "images": [
+            {
+              "pack": "katalog/platten/lafabbrica/wabi-sabi-01",
+              "width": 2000,
+              "height": 966,
+              "alt": "La Fabbrica AVA Wabi Sabi: Bad mit grünen Wandplatten und Waschtisch aus Holz",
+              "sha1": "8f2d9c5cbda921d605f6801544dd95a8f7414bd6"
+            },
+            {
+              "pack": "katalog/platten/lafabbrica/wabi-sabi-02",
+              "width": 900,
+              "height": 900,
+              "alt": "La Fabbrica AVA Wabi Sabi: Dekorplatte mit Sternmuster in Terracotta",
+              "sha1": "c6c4d0d8515230d4eccf7a389a5c7e830fddc369"
+            },
+            {
+              "pack": "katalog/platten/lafabbrica/wabi-sabi-03",
+              "width": 900,
+              "height": 900,
+              "alt": "La Fabbrica AVA Wabi Sabi: Platte in Blau mit Reliefstruktur",
+              "sha1": "8293b78c626c30c78e85727fdf4150e51fc5c797"
+            },
+            {
+              "pack": "katalog/platten/lafabbrica/wabi-sabi-04",
+              "width": 900,
+              "height": 900,
+              "alt": "La Fabbrica AVA Wabi Sabi: Platte in Blau mit unregelmässiger Oberfläche",
+              "sha1": "d0c907a990a94099517a8f2ddc070a5e88bafb0c"
+            }
+          ]
+        }
+      ]
+    },
+    "supergres": {
+      "name": "Supergres",
+      "url": "https://www.supergres.com/en/",
+      "series": [
+        {
+          "area": "platten",
+          "name": "Lightstones",
+          "images": [
+            {
+              "pack": "katalog/platten/supergres/lightstones-01",
+              "width": 1650,
+              "height": 700,
+              "alt": "Supergres Lightstones: Wohnraum mit Boden in heller Steinoptik",
+              "sha1": "bc27c510dc2dbb0c44088374ac7e7802f07fc767"
+            },
+            {
+              "pack": "katalog/platten/supergres/lightstones-02",
+              "width": 1650,
+              "height": 700,
+              "alt": "Supergres Lightstones: Bad mit Waschtisch und Wand in heller Steinoptik",
+              "sha1": "e09310f2938b80d339a7736fa26437632bf36fb6"
+            },
+            {
+              "pack": "katalog/platten/supergres/lightstones-03",
+              "width": 1650,
+              "height": 700,
+              "alt": "Supergres Lightstones: Wohnraum mit Sofa und Boden in heller Steinoptik",
+              "sha1": "a9f1942c9aa08c5e796d977eb8d3d071006e8dc2"
+            },
+            {
+              "pack": "katalog/platten/supergres/lightstones-04",
+              "width": 1650,
+              "height": 700,
+              "alt": "Supergres Lightstones: Essbereich mit Boden in heller Steinoptik",
+              "sha1": "4b3931f538948843288e0cd793e78894bfd0ae16"
+            },
+            {
+              "pack": "katalog/platten/supergres/lightstones-05",
+              "width": 1650,
+              "height": 700,
+              "alt": "Supergres Lightstones: Terrasse mit Platten in heller Steinoptik",
+              "sha1": "d878129c70910b447a583918b2789953a23f9d3b"
+            }
+          ]
+        },
+        {
+          "area": "platten",
+          "name": "Whisper",
+          "images": [
+            {
+              "pack": "katalog/platten/supergres/whisper-01",
+              "width": 1650,
+              "height": 700,
+              "alt": "Supergres Whisper: Wohnraum mit Esstisch und Boden in Steinoptik",
+              "sha1": "85b74583348b7e2a6f6a171f7e9989304588bf48"
+            },
+            {
+              "pack": "katalog/platten/supergres/whisper-02",
+              "width": 1650,
+              "height": 700,
+              "alt": "Supergres Whisper: Küche mit Insel und Boden in Steinoptik",
+              "sha1": "ed2c219e29c3f27f008900516f7600fd41b2c2bf"
+            },
+            {
+              "pack": "katalog/platten/supergres/whisper-03",
+              "width": 1650,
+              "height": 700,
+              "alt": "Supergres Whisper: Ladenlokal mit Boden in Steinoptik",
+              "sha1": "e69a019bce6dd8037e1287eb3460f29bf0805a85"
+            },
+            {
+              "pack": "katalog/platten/supergres/whisper-04",
+              "width": 1650,
+              "height": 700,
+              "alt": "Supergres Whisper: Wohnraum mit Kamin und Boden in Steinoptik",
+              "sha1": "c9a71062d3f0d09073d00057c67dce20758df47f"
+            },
+            {
+              "pack": "katalog/platten/supergres/whisper-05",
+              "width": 1650,
+              "height": 700,
+              "alt": "Supergres Whisper: Terrasse mit Pool und Platten in Steinoptik",
+              "sha1": "6267a1be6c6c312f54e7a858f6b7c930bc6a4faf"
+            }
+          ]
+        }
+      ]
+    },
+    "ariana": {
+      "name": "Ariana Ceramiche / Gardenia&Ariana",
+      "url": "https://www.gardenia.it/en/collections",
+      "series": [
+        {
+          "area": "platten",
+          "name": "Hermione",
+          "images": [
+            {
+              "pack": "katalog/platten/ariana/hermione-01",
+              "width": 1920,
+              "height": 800,
+              "alt": "Ariana Hermione: Boden in Holzoptik mit Stühlen von oben",
+              "sha1": "749aaf0195dc2e121701b510eef074e40ae79a51"
+            },
+            {
+              "pack": "katalog/platten/ariana/hermione-02",
+              "width": 800,
+              "height": 800,
+              "alt": "Ariana Hermione: Terrasse mit Pool und Platten in Holz- und Steinoptik",
+              "sha1": "d19f7bd1a50ab03975a05273434c5978c637813b"
+            },
+            {
+              "pack": "katalog/platten/ariana/hermione-03",
+              "width": 1200,
+              "height": 1050,
+              "alt": "Ariana Hermione: Platten in Holzoptik mit Stühlen, Detail von oben",
+              "sha1": "2a2288dd448bb1937d3828a68ee1cc28b3f0a728"
+            },
+            {
+              "pack": "katalog/platten/ariana/hermione-04",
+              "width": 2000,
+              "height": 1334,
+              "alt": "Ariana Hermione: Bad mit Wand in Marmoroptik und Boden in Holzoptik",
+              "sha1": "28fe4d11f6168556dacb4be4f3bf65ebcef08db0"
+            }
+          ]
+        },
+        {
+          "area": "platten",
+          "name": "Gioia",
+          "images": [
+            {
+              "pack": "katalog/platten/ariana/gioia-01",
+              "width": 1920,
+              "height": 800,
+              "alt": "Ariana Gioia: Wohnraum mit Dekorwand in Blau und Blattmuster",
+              "sha1": "ff107021e77d1d50f554725dab442a39cece18e4"
+            },
+            {
+              "pack": "katalog/platten/ariana/gioia-02",
+              "width": 800,
+              "height": 1058,
+              "alt": "Ariana Gioia: Bad mit grünen Wandplatten und rundem Waschtisch",
+              "sha1": "7afcab9bc8fb79843db65ef7bacf95837fb24e04"
+            },
+            {
+              "pack": "katalog/platten/ariana/gioia-03",
+              "width": 1200,
+              "height": 1050,
+              "alt": "Ariana Gioia: Wohnraum mit blauer Wand, Dekorplatten und grünem Sofa",
+              "sha1": "0e09bbbb820797fde0effa8f7e37e94395f17eed"
+            },
+            {
+              "pack": "katalog/platten/ariana/gioia-04",
+              "width": 2000,
+              "height": 1000,
+              "alt": "Ariana Gioia: Schlafzimmer mit Boden in dunkler Holzoptik und Dekorwand",
+              "sha1": "8307b433f7e28b7ae1d394b279223cc369b4a684"
+            }
+          ]
+        }
+      ]
+    },
+    "acquario": {
+      "name": "Acquario Due",
+      "url": "https://en.acquariodue.com/collezioni",
+      "series": [
+        {
+          "area": "platten",
+          "name": "Calathea",
+          "images": [
+            {
+              "pack": "katalog/platten/acquario/calathea-01",
+              "width": 960,
+              "height": 1440,
+              "alt": "Acquario Due Calathea: Wandverkleidung mit Blattmotiv in Rot und Orange",
+              "sha1": "a12c820eb7781c26fa0f4cd1568fbefe356c5588"
+            },
+            {
+              "pack": "katalog/platten/acquario/calathea-02",
+              "width": 642,
+              "height": 488,
+              "alt": "Acquario Due Calathea: Keramikblatt in Gold",
+              "sha1": "6a0da33fd20fa7d4e92e19067a137a0b3d0416ad"
+            }
+          ]
+        },
+        {
+          "area": "platten",
+          "name": "Papillon",
+          "images": [
+            {
+              "pack": "katalog/platten/acquario/papillon-01",
+              "width": 980,
+              "height": 832,
+              "alt": "Acquario Due Papillon: Keramikelement in Weiss",
+              "sha1": "1252d0ebeb0a85ad2efe39d412ec93d5418d849d"
+            },
+            {
+              "pack": "katalog/platten/acquario/papillon-02",
+              "width": 2000,
+              "height": 1293,
+              "alt": "Acquario Due Papillon: Schlafzimmer mit Wand aus roten Keramikelementen",
+              "sha1": "7032eb7aebddc3eabbabd32976894afcf0af2924"
+            },
+            {
+              "pack": "katalog/platten/acquario/papillon-03",
+              "width": 1105,
+              "height": 1393,
+              "alt": "Acquario Due Papillon: Bad mit blauer Reliefwand unter einem Bogen",
+              "sha1": "6c470a688f3aba83f912c2a29e0f85c3190dde34"
+            },
+            {
+              "pack": "katalog/platten/acquario/papillon-04",
+              "width": 980,
+              "height": 832,
+              "alt": "Acquario Due Papillon: Keramikelement in Bordeaux",
+              "sha1": "d41ee5af1754148aa7a60ae686f6a167e3c030e5"
+            },
+            {
+              "pack": "katalog/platten/acquario/papillon-05",
+              "width": 1105,
+              "height": 1393,
+              "alt": "Acquario Due Papillon: Wand aus blauen Keramikelementen, Detail",
+              "sha1": "aa066116e3fe54b2929192f53a75316147392796"
+            }
+          ]
+        }
+      ]
+    },
+    "sicis": {
+      "name": "SICIS",
+      "url": "https://www.sicis.com/en/mosaic",
+      "series": [
+        {
+          "area": "platten",
+          "name": "Crystal",
+          "images": [
+            {
+              "pack": "katalog/platten/sicis/crystal-01",
+              "width": 1200,
+              "height": 1200,
+              "alt": "SICIS Crystal: Glasmosaik Blenda, sechseckige Steine in Grün-Gold, Musterblatt",
+              "sha1": "bc9b0d390b0f7bf2e7f99e6054f68f421e814a49"
+            },
+            {
+              "pack": "katalog/platten/sicis/crystal-02",
+              "width": 1200,
+              "height": 1200,
+              "alt": "SICIS Crystal: Glasmosaik Ametrino, sechseckige Steine mit irisierendem Farbverlauf, Musterblatt",
+              "sha1": "e35c80d9807abe6669186925a8ff67955051a28f"
+            },
+            {
+              "pack": "katalog/platten/sicis/crystal-03",
+              "width": 1200,
+              "height": 1200,
+              "alt": "SICIS Crystal: Glasmosaik Axin, sechseckige Steine in Perlmuttweiss, Musterblatt",
+              "sha1": "d53557d64fed717fe8f387e336833c0a5a46c7ad"
+            },
+            {
+              "pack": "katalog/platten/sicis/crystal-04",
+              "width": 1200,
+              "height": 1200,
+              "alt": "SICIS Crystal: Glasmosaik Beryl, sechseckige Steine in Hellgrün, Musterblatt",
+              "sha1": "967516daca2d8f105d7d2b8058b879f55e4d47e5"
+            }
+          ]
+        },
+        {
+          "area": "platten",
+          "name": "Colibrì",
+          "images": [
+            {
+              "pack": "katalog/platten/sicis/colibri-01",
+              "width": 1200,
+              "height": 1200,
+              "alt": "SICIS Colibrì: Glasmosaik Kori in Gold, Musterblatt",
+              "sha1": "cfb95a490ead12687152b5f105716c23303a316a"
+            },
+            {
+              "pack": "katalog/platten/sicis/colibri-02",
+              "width": 1200,
+              "height": 1200,
+              "alt": "SICIS Colibrì: Glasmosaik Felicia in Blau, Musterblatt",
+              "sha1": "0e3558c1b0e0b1ad29e7061fa47a9f7665d85dd0"
+            }
+          ]
+        },
+        {
+          "area": "platten",
+          "name": "Pixel",
+          "images": [
+            {
+              "pack": "katalog/platten/sicis/pixel-01",
+              "width": 579,
+              "height": 579,
+              "alt": "SICIS Pixel: Glasmosaik in Weiss und Blau, Detail",
+              "sha1": "e16c57f2eb40d4b641ab03580ad1136c1c1d8328"
+            }
+          ],
+          "extra": true
+        },
+        {
+          "area": "platten",
+          "name": "Elegance",
+          "images": [
+            {
+              "pack": "platten/platten-mosaik-sicis-elegance",
+              "width": 1600,
+              "height": 900,
+              "alt": "Künstlerische SICIS Mosaikwand mit abstrahiertem Gesicht in einem Wohnraum"
+            }
+          ],
+          "extra": true
+        }
+      ]
+    },
+    "mosavit": {
+      "name": "Mosavit / Trip by Mosavit",
+      "url": "https://mosavit.com/en/",
+      "series": [
+        {
+          "area": "platten",
+          "name": "NEXT",
+          "images": [
+            {
+              "pack": "katalog/platten/mosavit/next-01",
+              "width": 2000,
+              "height": 2000,
+              "alt": "Mosavit NEXT: Dusche mit Mosaikwand in Grau und Silber",
+              "sha1": "5a5afbefe3fc6c4d84043b6020e46c79bb90c4cb"
+            },
+            {
+              "pack": "katalog/platten/mosavit/next-02",
+              "width": 2000,
+              "height": 712,
+              "alt": "Mosavit NEXT: Pool mit Mosaik in Grau und Bronze",
+              "sha1": "487c63208510cf0329180585dfa86168fac2da77"
+            }
+          ]
+        },
+        {
+          "area": "platten",
+          "name": "Acquaris",
+          "images": [
+            {
+              "pack": "katalog/platten/mosavit/acquaris-01",
+              "width": 1536,
+              "height": 1152,
+              "alt": "Mosavit Acquaris: Glasmosaik in Türkis in einem privaten Pool mit Treppenstufen",
+              "sha1": "61b0177d6732d348ea534135711115de56863de8"
+            },
+            {
+              "pack": "katalog/platten/mosavit/acquaris-02",
+              "width": 1500,
+              "height": 2000,
+              "alt": "Mosavit Acquaris: Glasmosaik in Blau unter Wasser, Detail der Poolwand",
+              "sha1": "29524acc0bdceefb3a3015b229c11ebc9a478c39"
+            }
+          ]
+        },
+        {
+          "area": "platten",
+          "name": "Fachaleta Quartz Marfil",
+          "images": [
+            {
+              "pack": "platten/platten-naturstein-mosavit-fachaleta-quartz-marfil",
+              "width": 1520,
+              "height": 855,
+              "alt": "Mosavit Fachaleta Quartz Marfil Natursteinverkleidung an einer hellen Aussenwand"
+            }
+          ],
+          "extra": true
+        }
+      ]
+    },
+    "skema": {
+      "name": "Skema",
+      "url": "https://skema.eu/en/collections/wooden-floors/",
+      "series": [
+        {
+          "area": "platten",
+          "name": "Villa Spina",
+          "images": [
+            {
+              "pack": "katalog/platten/skema/villa-spina-01",
+              "width": 1414,
+              "height": 2000,
+              "alt": "Skema Villa Spina: Parkett aus Eiche mit Tischleuchte, Detail von oben",
+              "sha1": "419a91186f329bbd6053991b35367ac8fd4237ac"
+            },
+            {
+              "pack": "katalog/platten/skema/villa-spina-02",
+              "width": 1444,
+              "height": 2000,
+              "alt": "Skema Villa Spina: Ausstellungsraum mit Parkettmustern an der Wand",
+              "sha1": "bf210cbf355c5dbeca44495039e5baeb6c26e748"
+            },
+            {
+              "pack": "katalog/platten/skema/villa-spina-03",
+              "width": 1080,
+              "height": 1440,
+              "alt": "Skema Villa Spina: Terrasse mit Holzboden und Sideboard",
+              "sha1": "4ef694f3f8587c3c20392c51b42465e25b52f198"
+            }
+          ]
+        },
+        {
+          "area": "platten",
+          "name": "Palladio",
+          "images": [
+            {
+              "pack": "katalog/platten/skema/palladio-01",
+              "width": 1920,
+              "height": 1440,
+              "alt": "Skema Palladio: Schlafzimmer mit Parkett aus Eiche und Fensterfront",
+              "sha1": "4837e0c9bc5c5e8c85248576fc398bc084342369"
+            },
+            {
+              "pack": "katalog/platten/skema/palladio-02",
+              "width": 1379,
+              "height": 919,
+              "alt": "Skema Palladio: Wohnraum mit Parkett aus Eiche und schwarzer Küche",
+              "sha1": "757419fee756b27d491af61f82ba5d8b7e0e76a4"
+            },
+            {
+              "pack": "katalog/platten/skema/palladio-03",
+              "width": 1600,
+              "height": 1066,
+              "alt": "Skema Palladio: Parkett aus heller Eiche mit rosa Bank",
+              "sha1": "3f72d270ec129b4eb77908d123b643afc08bf2bb"
+            }
+          ]
+        },
+        {
+          "area": "platten",
+          "name": "Villa",
+          "images": [
+            {
+              "pack": "platten/platten-parkett-skema-villa",
+              "width": 1408,
+              "height": 792,
+              "alt": "Skema Villa Parkettboden aus heller Eiche in einem modernen Interieur"
+            }
+          ],
+          "extra": true
+        }
+      ]
+    },
+    "deco": {
+      "name": "Déco",
+      "url": "https://www.decodecking.it/it/indoor/clap/",
+      "series": [
+        {
+          "area": "platten",
+          "name": "Clap Zer0",
+          "images": [
+            {
+              "pack": "katalog/platten/deco/clap-zer0-01",
+              "width": 2000,
+              "height": 1333,
+              "alt": "Déco Clap Zer0: Designboden in Eichenoptik neben einem Sessel, von oben",
+              "sha1": "3118bc7033f7fb9479f656a731ea5c8b324596d9"
+            },
+            {
+              "pack": "katalog/platten/deco/clap-zer0-02",
+              "width": 2000,
+              "height": 1414,
+              "alt": "Déco Clap Zer0: Schlafzimmer mit Designboden und Wand aus Holzlamellen",
+              "sha1": "b43ce0222e141a9ee743ec9d91264bda0ee066d2"
+            }
+          ]
+        },
+        {
+          "area": "platten",
+          "name": "Clap Real",
+          "images": [
+            {
+              "pack": "katalog/platten/deco/clap-real-01",
+              "width": 1500,
+              "height": 1000,
+              "alt": "Déco Clap Real: Designboden in Eichenoptik mit Beistelltischen",
+              "sha1": "aaf06933ff658d367c4bd55ab625b7d67d2984be"
+            },
+            {
+              "pack": "katalog/platten/deco/clap-real-02",
+              "width": 1024,
+              "height": 719,
+              "alt": "Déco Clap Real: Essbereich mit Designboden und Wandverkleidung aus Holz",
+              "sha1": "586084db273ea440bdcca27724f8cfc48f7c3bb9"
+            }
+          ]
+        },
+        {
+          "area": "platten",
+          "name": "Clap 3D",
+          "images": [
+            {
+              "pack": "katalog/platten/deco/clap-3d-01",
+              "width": 1400,
+              "height": 1120,
+              "alt": "Déco Clap 3D: Essbereich mit Designboden in Eichenoptik",
+              "sha1": "66bf3a50f6952cf2aac6ae75bc8750cc50a118b9"
+            }
+          ],
+          "extra": true
+        },
+        {
+          "area": "platten",
+          "name": "Clap",
+          "images": [
+            {
+              "pack": "platten/platten-spc-deco-clap",
+              "width": 1600,
+              "height": 900,
+              "alt": "Déco Clap Designboden in Holzoptik in einem warm beleuchteten Interieur"
+            }
+          ],
+          "extra": true
+        }
+      ]
+    },
+    "zenon": {
+      "name": "Zenon Bath & SPC Surfaces",
+      "url": "https://zenonsurfaces.com/en/collections/Z_PD_FLOOR_PANELS_SPC_TEMPO/",
+      "series": [
+        {
+          "area": "platten",
+          "name": "Neo SPC Floor",
+          "images": [
+            {
+              "pack": "katalog/platten/zenon/neo-spc-floor-01",
+              "width": 1600,
+              "height": 900,
+              "alt": "Zenon Neo SPC Floor: SPC-Boden in Hellgrau neben einer Treppe",
+              "sha1": "4126b3f21b2bf758033a310d81b9d64e0c4ffcf5"
+            },
+            {
+              "pack": "katalog/platten/zenon/neo-spc-floor-02",
+              "width": 1600,
+              "height": 900,
+              "alt": "Zenon Neo SPC Floor: Bad mit Waschtisch und SPC-Boden in Hellgrau",
+              "sha1": "7e63a08525ea6fd4c342c9aeef083bf0bad89943"
+            }
+          ]
+        },
+        {
+          "area": "platten",
+          "name": "Sonor SPC Floor",
+          "images": [
+            {
+              "pack": "katalog/platten/zenon/sonor-spc-floor-01",
+              "width": 1600,
+              "height": 900,
+              "alt": "Zenon Sonor SPC Floor: helle Bodenplanken 60x120 cm in Steinoptik, Detail mit Möbelfuss",
+              "sha1": "6f7f86753f967ff20ee2acd89b783c6cb8ffd453"
+            },
+            {
+              "pack": "katalog/platten/zenon/sonor-spc-floor-02",
+              "width": 1600,
+              "height": 900,
+              "alt": "Zenon Sonor SPC Floor: Bodenplanken in Beige-Steinoptik mit Lederstuhl",
+              "sha1": "8dd4979452164730a58a7bd8ec62535992ca1b6c"
+            },
+            {
+              "pack": "katalog/platten/zenon/sonor-spc-floor-03",
+              "width": 1600,
+              "height": 900,
+              "alt": "Zenon Sonor SPC Floor: Badezimmer mit hellem SPC-Boden, Waschtischmöbel in Grau und ovalem Spiegel",
+              "sha1": "d9063066382c4ad502a7dcd253a8be6440a0e6c6"
+            },
+            {
+              "pack": "katalog/platten/zenon/sonor-spc-floor-04",
+              "width": 1599,
+              "height": 900,
+              "alt": "Zenon Sonor SPC Floor: heller SPC-Boden unter einem wandhängenden Waschtischmöbel",
+              "sha1": "ea9505d508c408d25ac567b35010ad29318146fb"
+            }
+          ]
+        },
+        {
+          "area": "platten",
+          "name": "Tempo SPC Floor",
+          "images": [
+            {
+              "pack": "katalog/platten/zenon/tempo-spc-floor-01",
+              "width": 1600,
+              "height": 900,
+              "alt": "Zenon Tempo SPC Floor: Schlafzimmer mit SPC-Boden in heller Holzoptik",
+              "sha1": "55e8a31021e7f907aeb9147b68cda4e36d2bd973"
+            }
+          ],
+          "extra": true
+        }
+      ]
+    },
+    "inkiostro": {
+      "name": "Inkiostro Bianco",
+      "url": "https://www.inkiostrobianco.com/en/",
+      "series": [
+        {
+          "area": "platten",
+          "name": "Monochrome",
+          "images": [
+            {
+              "pack": "katalog/platten/inkiostro/monochrome-01",
+              "width": 1920,
+              "height": 1080,
+              "alt": "Inkiostro Bianco Monochrome: Tapetenmotiv in Terracotta mit hellen Fragmenten",
+              "sha1": "862679fcdb42450ee364e650f708c35a5933b734"
+            },
+            {
+              "pack": "katalog/platten/inkiostro/monochrome-02",
+              "width": 1080,
+              "height": 1350,
+              "alt": "Inkiostro Bianco Monochrome: Essbereich mit Tapete in Grün und Kronleuchter",
+              "sha1": "0dca384284d7c3e3580a7b4ef3e793e6d75689bb"
+            }
+          ]
+        },
+        {
+          "area": "platten",
+          "name": "Light and Shadows",
+          "images": [
+            {
+              "pack": "katalog/platten/inkiostro/light-and-shadows-01",
+              "width": 1980,
+              "height": 940,
+              "alt": "Inkiostro Bianco Light and Shadows: Wohnraum mit grauer Tapete und Kamin",
+              "sha1": "47902db81cd88f6af536a2387f565e76434e3a7d"
+            },
+            {
+              "pack": "katalog/platten/inkiostro/light-and-shadows-02",
+              "width": 1080,
+              "height": 1350,
+              "alt": "Inkiostro Bianco Light and Shadows: Küche mit Tapete in Blaugrün und Blattmotiv",
+              "sha1": "ed59f523e7420fab6053559fa15c6a18054d9efb"
+            }
+          ]
+        },
+        {
+          "area": "platten",
+          "name": "White Paper",
+          "images": [
+            {
+              "pack": "platten/platten-wandbelag-inkiostro-white-paper",
+              "width": 1600,
+              "height": 900,
+              "alt": "Inkiostro Bianco Wandverkleidung mit geometrischem Muster und farbigen Sesseln"
+            }
+          ],
+          "extra": true
+        }
+      ]
+    },
+    "albatros": {
+      "name": "Albatros Wellness",
+      "url": "https://albatroswellness.it/en/",
+      "series": [
+        {
+          "area": "wellness",
+          "name": "Ethos Pool",
+          "images": [
+            {
+              "pack": "katalog/wellness/albatros/ethos-pool-01",
+              "width": 800,
+              "height": 800,
+              "alt": "Albatros Ethos Pool: Whirlpool in Beige vor bodentiefen Fenstern",
+              "sha1": "9f3a9dff11d23cff82feb1cd5036499a1cdaef07"
+            },
+            {
+              "pack": "katalog/wellness/albatros/ethos-pool-02",
+              "width": 1200,
+              "height": 1698,
+              "alt": "Albatros Ethos Pool: Whirlpool in einem Raum mit Marmorboden, von oben",
+              "sha1": "91543d31a5f22872b919039398fa8a781847e8bc"
+            },
+            {
+              "pack": "katalog/wellness/albatros/ethos-pool-03",
+              "width": 1200,
+              "height": 1200,
+              "alt": "Albatros Ethos Pool: Whirlpool von oben, freigestellt",
+              "sha1": "019fe70521d1bf2eca7fa335ce9cb84fb255b28a"
+            },
+            {
+              "pack": "katalog/wellness/albatros/ethos-pool-04",
+              "width": 1920,
+              "height": 1356,
+              "alt": "Albatros Ethos Pool: Detail Bedienfeld und Düsen",
+              "sha1": "48283c46e8394033b1163e022970b16edab5c838"
+            },
+            {
+              "pack": "katalog/wellness/albatros/ethos-pool-05",
+              "width": 1920,
+              "height": 1200,
+              "alt": "Albatros Ethos Pool: Whirlpool in einem klassischen Raum mit Kronleuchter",
+              "sha1": "ca6f520ddc6e821c83efc1fbab59bec616ea0f61"
+            }
+          ]
+        },
+        {
+          "area": "wellness",
+          "name": "Soreha Pool",
+          "images": [
+            {
+              "pack": "wellness/wellness-whirlpool-albatros-soreha",
+              "width": 1024,
+              "height": 576,
+              "alt": "Albatros Soreha Whirlpool mit Holzverkleidung und sprudelndem Wasser"
+            },
+            {
+              "pack": "katalog/wellness/albatros/soreha-pool-02",
+              "width": 800,
+              "height": 800,
+              "alt": "Albatros Soreha Pool: Whirlpool mit Holzverkleidung auf einer Terrasse",
+              "sha1": "b09dde64ec2ecff2298a6ab372607b1a72c75eb2"
+            },
+            {
+              "pack": "katalog/wellness/albatros/soreha-pool-03",
+              "width": 1200,
+              "height": 1698,
+              "alt": "Albatros Soreha Pool: Whirlpool mit Holzverkleidung von oben",
+              "sha1": "ab51a7e2e9dc43f4461dd9078ed45bcd86241442"
+            },
+            {
+              "pack": "katalog/wellness/albatros/soreha-pool-04",
+              "width": 1920,
+              "height": 1200,
+              "alt": "Albatros Soreha Pool: Whirlpool mit Holzverkleidung neben einer Lounge",
+              "sha1": "ea18f29fce7ddc2b98978d3d3dd2afefd4f21e60"
+            },
+            {
+              "pack": "katalog/wellness/albatros/soreha-pool-05",
+              "width": 1920,
+              "height": 1920,
+              "alt": "Albatros Soreha Pool: Whirlpool von oben, freigestellt",
+              "sha1": "ee347c26c1fc40216662d6cf322b95a049f65ac5"
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

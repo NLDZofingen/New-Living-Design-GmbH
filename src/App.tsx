@@ -4,6 +4,8 @@ import { Header, Footer, Home, Products, Services, About, Contact, Booking, Data
 import './App.css';
 import ScrollToTop from './components/scroll-helper/ScrollToTop';
 import Partners from './pages/partners/Partners';
+import CategoryPage from './pages/catalog/CategoryPage';
+import SupplierPage from './pages/catalog/SupplierPage';
 import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/react";
 import SEOHead from './components/seo/SEOHead';
@@ -43,6 +45,8 @@ function App() {
         <Route path="/blog" element={<Blog />} />
         <Route path="/blog/:slug" element={<BlogPost />} />
         <Route path="/produkte" element={<Products />} />
+        <Route path="/produkte/:area" element={<CategoryPage />} />
+        <Route path="/produkte/:area/:supplier" element={<SupplierPage />} />
         <Route path="/dienstleistungen" element={<Services />} />
         <Route path="/partner" element={<Partners />} />
         <Route path="/booking" element={<Booking />} />

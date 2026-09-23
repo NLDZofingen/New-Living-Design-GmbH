@@ -14,7 +14,7 @@ const whatsappHref = (title: string) =>
 
 /** Wird gezeigt, wenn es zum Slug keinen Artikel gibt (z. B. alter Link). */
 const NotFound: React.FC = () => (
-  <main className={styles.page}>
+  <main id="main-content" className={styles.page}>
     <SEOHead title="Artikel nicht gefunden | New Living Design" description="Diesen Blogartikel gibt es nicht (mehr)." url="/blog" noindex />
     <section className={styles.hero}>
       <div className={styles.heroInner}>
@@ -71,7 +71,7 @@ const BlogPost: React.FC = () => {
   ];
 
   return (
-    <main className={styles.page}>
+    <main id="main-content" className={styles.page}>
       <SEOHead
         title={`${post.seoTitle} | New Living Design`}
         description={post.description}

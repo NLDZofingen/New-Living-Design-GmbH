@@ -30,6 +30,61 @@ try {
 
 fs.mkdirSync(outDir, { recursive: true })
 
+/**
+ * Muster zeigen Farbe und Maserung, mehr nicht. Die Originale der Lieferanten sind
+ * teils über 2 MB: der Browser lädt sie im Schritt 2 alle, und dasselbe Bild geht
+ * bei jeder Anfrage nochmals an Gemini. Darum wird jede Datei über SWATCH_MAX_SIDE
+ * einmal verkleinert. Der Schritt ist idempotent (eine bereits kleine Datei bleibt
+ * unberührt) und bricht nie ab: ohne sharp oder bei einem Fehler bleibt das Original.
+ */
+const SWATCH_MAX_SIDE = 768
+const SWATCH_QUALITY = 80
+
+let sharp = null
+try {
+  sharp = (await import('sharp')).default
+} catch (err) {
+  console.warn('[swatches] sharp nicht verfügbar, Muster bleiben in Originalgrösse:', err && err.message ? err.message : err)
+}
+
+async function verkleinern(file) {
+  if (!sharp) return null
+  try {
+    const vorher = fs.statSync(file).size
+    const bild = sharp(file, { failOn: 'none' })
+    const meta = await bild.metadata()
+    if (!meta.width || !meta.height) return null
+    if (Math.max(meta.width, meta.height) <= SWATCH_MAX_SIDE) return null
+    let pipeline = bild.resize({ width: SWATCH_MAX_SIDE, height: SWATCH_MAX_SIDE, fit: 'inside', withoutEnlargement: true })
+    if (meta.format === 'png') pipeline = pipeline.png({ compressionLevel: 9 })
+    else if (meta.format === 'webp') pipeline = pipeline.webp({ quality: SWATCH_QUALITY })
+    else pipeline = pipeline.jpeg({ quality: SWATCH_QUALITY, mozjpeg: true })
+    const bytes = await pipeline.toBuffer()
+    if (bytes.length < 400 || bytes.length >= vorher) return null
+    const tmp = `${file}.small`
+    fs.writeFileSync(tmp, bytes)
+    fs.renameSync(tmp, file)
+    return { vorher, nachher: bytes.length, breite: meta.width, hoehe: meta.height }
+  } catch (err) {
+    console.warn(`[swatches] Verkleinern übersprungen ${path.basename(file)}: ${err && err.message ? err.message : err}`)
+    return null
+  }
+}
+
+// Erst alles, was schon da ist: Repo-Dateien und alles aus dem Build-Cache.
+let verkleinert = 0
+let gespart = 0
+for (const name of fs.readdirSync(outDir)) {
+  if (name.endsWith('.part') || name.endsWith('.small')) continue
+  const res = await verkleinern(path.join(outDir, name))
+  if (res) {
+    verkleinert++
+    gespart += res.vorher - res.nachher
+    console.log(`[swatches] klein ${name} ${Math.round(res.vorher / 1024)} KB -> ${Math.round(res.nachher / 1024)} KB (${res.breite}×${res.hoehe})`)
+  }
+}
+if (verkleinert > 0) console.log(`[swatches] ${verkleinert} Muster verkleinert, ${Math.round(gespart / 1024)} KB gespart.`)
+
 const missing = list.filter((s) => s.file && s.src && !fs.existsSync(path.join(outDir, s.file)))
 if (missing.length === 0) {
   console.log(`[swatches] alle ${list.length} Swatches vorhanden.`)
@@ -57,7 +112,8 @@ async function download(item) {
     const tmp = `${target}.part`
     fs.writeFileSync(tmp, bytes)
     fs.renameSync(tmp, target)
-    return bytes.length
+    const klein = await verkleinern(target)
+    return klein ? klein.nachher : bytes.length
   } finally {
     clearTimeout(timer)
   }

@@ -16,7 +16,7 @@ const Blog: React.FC = () => {
     name: BLOG_NAME,
     url: BLOG_URL,
     inLanguage: 'de-CH',
-    description: 'Badumbau, Kosten, Platten und Steuern: Erfahrungen aus den Baustellen von New Living Design in Zofingen und Umgebung.',
+    description: 'Praxiswissen von New Living Design zu Badumbau, Materialien, Kosten und Planung – verständlich erklärt für Eigentümerinnen und Eigentümer.',
     publisher: { '@id': `${business.siteUrl}/#organization` },
     blogPost: posts.map((p) => ({
       '@type': 'BlogPosting',
@@ -41,10 +41,10 @@ const Blog: React.FC = () => {
   ];
 
   return (
-    <main className={styles.page}>
+    <main id="main-content" className={styles.page}>
       <SEOHead
-        title="Blog: Badumbau, Kosten und Platten | New Living Design"
-        description="Was ein Badumbau im Aargau kostet, welche Platten sich bewähren, was steuerlich noch bis 2028 geht: Wissen aus den Baustellen von New Living Design in Zofingen."
+        title="Ratgeber zu Badumbau, Materialien & Kosten | NLD"
+        description="Praxiswissen von New Living Design zu Badumbau, Materialien, Kosten und Planung – verständlich erklärt für Eigentümerinnen und Eigentümer."
         keywords="Badumbau Blog, Badumbau Kosten Aargau, Badezimmer Tipps, Platten Bad, Steuerabzug Badumbau, New Living Design Zofingen"
         url="/blog"
         type="website"
@@ -54,18 +54,19 @@ const Blog: React.FC = () => {
 
       <section className={styles.intro}>
         <div className={styles.container}>
-          <span className={styles.sectionLabel}>Blog</span>
-          <h1 className={styles.title}>Badumbau, Kosten, Material: aus der Praxis in Zofingen</h1>
+          <span className={styles.sectionLabel}>Aus der Praxis</span>
+          <h1 className={styles.title}>Wissen, das Entscheidungen vor dem Umbau erleichtert.</h1>
           <p className={styles.lede}>
-            Was wir auf unseren Baustellen lernen, schreiben wir hier auf. Für Eigentümerinnen und Eigentümer
-            im Aargau und Umgebung, die ihr Bad erneuern wollen und vorher wissen möchten, was auf sie zukommt.
+            Was kostet eine Lösung wirklich? Welche Oberfläche passt zur Nutzung? Und was muss vor der Bestellung
+            geklärt sein? Hier teilen wir Erfahrungen aus Beratung, Planung und Ausführung – konkret und mit klarer
+            Datumsangabe, wenn Preise oder Regeln eine Rolle spielen.
           </p>
         </div>
       </section>
 
       <section className={styles.list}>
         <div className={styles.container}>
-          {!latest && <p className={styles.empty}>Die ersten Beiträge erscheinen in Kürze.</p>}
+          {!latest && <p className={styles.empty}>Noch keine Beiträge vorhanden. Bis der erste Artikel erscheint, beraten wir Sie gerne persönlich in Zofingen.</p>}
 
           {latest && (
             <Link to={latest.url} className={styles.featured}>
@@ -104,11 +105,11 @@ const Blog: React.FC = () => {
 
       <section className={styles.cta}>
         <div className={styles.container}>
-          <h2>Lieber direkt reden?</h2>
-          <p>Eine Stunde in der Ausstellung klärt mehr als zehn Artikel. Termin nach Vereinbarung, auch samstags.</p>
+          <h2>Ihre Frage betrifft schon ein konkretes Projekt?</h2>
+          <p>Bringen Sie Fotos, Masse oder einen Grundriss mit. In der Ausstellung lässt sich oft schneller klären, welche Information für Ihre Entscheidung fehlt.</p>
           <div className={styles.ctaRow}>
-            <Link to="/badumbau-zofingen" className={styles.ctaPrimary}>Badumbau und Preise</Link>
-            <a href={`tel:${business.phone.e164}`} className={styles.ctaSecondary}>{business.phone.display}</a>
+            <Link to="/kontakt" className={styles.ctaPrimary}>Beratung anfragen</Link>
+            <Link to="/badumbau-zofingen" className={styles.ctaSecondary}>Badumbau und Preise ansehen</Link>
           </div>
         </div>
       </section>

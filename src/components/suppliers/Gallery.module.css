@@ -1,0 +1,39 @@
+.gallery { min-width: 0; }
+.gallery :focus-visible { outline: 3px solid #a87b38; outline-offset: 4px; }
+
+.track {
+  display: flex;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+  scrollbar-width: none; /* Blättern über Pfeile, Tastatur und Wischen */
+}
+
+.track::-webkit-scrollbar { display: none; }
+
+.slide { flex: 0 0 100%; margin: 0; scroll-snap-align: start; }
+
+/* Herstellerbild vollständig im 16:9-Rahmen: nichts beschnitten, nie über die Originalgrösse vergrössert */
+.slide img { display: block; width: 100%; height: auto; aspect-ratio: 16 / 9; object-fit: scale-down; background: #1f2925; }
+
+.slide figcaption { margin-top: .7rem; color: #59645d; font-size: .8rem; line-height: 1.55; }
+
+.controls { display: flex; align-items: center; gap: 1rem; margin-top: .9rem; font-size: .8rem; font-variant-numeric: tabular-nums; }
+
+.controls button {
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 1px solid #23302b55;
+  border-radius: 0;
+  background: none;
+  color: #23302b;
+  font-size: 1.1rem;
+  cursor: pointer;
+}
+
+.controls button:hover { background: #23302b12; }
+
+@media (prefers-reduced-motion: reduce) {
+  .track { scroll-behavior: auto; }
+}
