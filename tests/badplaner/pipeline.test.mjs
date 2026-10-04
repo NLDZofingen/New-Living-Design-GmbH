@@ -2572,12 +2572,38 @@ test('Gegenpruefung des Codes vom 27.09.: Produktdurchgang mit zwei Bildern, ohn
   const noBasinPrompt = generations(noBasin)[1].body.contents[0].parts[0].text;
   assert.doesNotMatch(noBasinPrompt, /tap at each washbasin|mirror above the washbasin/);
   assert.match(noBasinPrompt, /\nImage 2, the toilet: .*\nImage 3, the flush plate of the toilet:/);
-  // Liess sich das Bild davor nicht pruefen, sagt es die Mail, auch wenn der Produktdurchgang die Pruefung bestand.
+  // Liess sich das Bild davor nicht pruefen und besteht der Produktdurchgang die Pruefung, urteilt die Mail seit der
+  // Revision vom 04.10. nach dem gezeigten Bild (eigener Test unten).
   const busy = () => response({ error: 'busy' }, 503);
   const unchecked = harness({ env: on, generations: [() => generated(PNG), () => generated(edited)], checks: [busy, busy, () => checked()] });
   const uncheckedRes = await unchecked.invoke();
   assert.equal(uncheckedRes.body.image.data, edited);
-  assert.match(mailOf(unchecked), /Fensterprüfung.{0,80}>Bild 1 ungeprüft \(HTTP 503\), Produktdurchgang ok</);
+  assert.match(mailOf(unchecked), /Fensterprüfung.{0,80}>ok, Produktdurchgang ok</);
+});
+
+test('Revision vom 04.10.: das Etikett in der Mail urteilt nur nach dem gezeigten Bild, auch wenn das Bild davor ungeprueft war', async () => {
+  const edited = 'iVBORw0KGgoAAAANSUhEUgAAAAIAAAABCAIAAAB7QOjdAAAACXBIWXMAAAPoAAAD6AG1e1JrAAAAD0lEQVQImWM4ISd3Qk4OAAh3Agn/2+PxAAAAAElFTkSuQmCC';
+  const on = { BADPLANER_PRODUCT_PASS: undefined };
+  const busy = () => response({ error: 'busy' }, 503);
+  const mailOf = (h) => JSON.stringify(h.calls.find((call) => call.url === 'https://api.resend.com/emails').body);
+  const run = (productCheck) => harness({ env: on, generations: [() => generated(PNG), () => generated(edited)], checks: [busy, busy, productCheck] });
+  // Bild 1 ungeprueft, der Produktdurchgang besteht ohne Hinweis: das Bild geht hinaus, und die Mail sagt nicht "ungeprüft".
+  const clean = run(() => checked());
+  const cleanRes = await clean.invoke();
+  assert.equal(cleanRes.statusCode, 200);
+  assert.equal(cleanRes.body.image.data, edited);
+  assert.match(mailOf(clean), /Fensterprüfung.{0,80}>ok, Produktdurchgang ok</);
+  assert.doesNotMatch(mailOf(clean), /ungeprüft/);
+  // Bild 1 ungeprueft, der Produktdurchgang mit einem schweren Hinweis: ohne Pruefung davor wird er gezeigt, darum haelt
+  // ihn erst der Schluss zurueck, und das Etikett nennt den Hinweis des gezeigten Bildes.
+  const kept = run(() => checkedInv({}, {}, { mirror_kept: true }));
+  const keptRes = await kept.invoke();
+  assert.equal(keptRes.statusCode, 502);
+  assert.equal(keptRes.body.code, 'RENDER_REJECTED');
+  assert.equal(keptRes.body.image, undefined);
+  assert.match(mailOf(kept), /Ideenbild zurückgehalten \(schwerer Hinweis\)/);
+  assert.match(mailOf(kept), /Fensterprüfung.{0,80}>Bild 1 mit schwerem Hinweis, Produktdurchgang ok, Hinweis: the mirror above the washbasin is still the old one of the photo/);
+  assert.doesNotMatch(mailOf(kept), /ungeprüft/);
 });
 
 test('Gegenpruefung des Codes vom 27.09.: Stirnwand und Laengsseite in Vorpruefung und Pruefung', async () => {

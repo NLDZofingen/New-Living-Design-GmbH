@@ -969,10 +969,10 @@ async function handleRender(req: any, res: any, body: RenderBody, ctx: RequestCo
     console.info('[badplaner]', productNote);
   }
   // Carla, 27.09.: ein gewaehltes Bild mit schwerem Hinweis hiess in der Mail "ok", obwohl der Hinweis dahinter seinen
-  // Fehler nannte (P2, P5: Armaturen an der Rueckwand). Es zaehlt die Pruefung des Bildes, das der Kunde bekaeme, also nach
-  // dem Produktdurchgang (Gegenpruefung vom 04.10.).
-  const chosenLabel = chosen.check.status === 'unavailable' ? `ungeprüft (${chosen.check.detail})`
-    : check.status === 'approved' && check.serious?.length ? 'mit schwerem Hinweis' : 'ok';
+  // Fehler nannte (P2, P5: Armaturen an der Rueckwand). Das Etikett urteilt nur nach der Pruefung des Bildes, das der Kunde
+  // bekaeme, also nach dem Produktdurchgang (Revision vom 04.10.): war das Bild davor ungeprueft und besteht der
+  // Produktdurchgang, heisst es nicht mehr "ungeprüft". Ist das gezeigte Bild selbst ungeprueft, sagt es der Zweig unten.
+  const chosenLabel = check.status === 'approved' && check.serious?.length ? 'mit schwerem Hinweis' : 'ok';
   if (check.status === 'approved' && (others.length || chosenLabel !== 'ok')) {
     checkNote = [...others, `Bild ${chosen.number} ${chosenLabel}`].join(', ');
   }
