@@ -585,18 +585,22 @@ test('der zweite Versuch bekommt die ganze Liste noch einmal mit', async () => {
   assert.match(retryPrompt, /Whatever is built in the immediate foreground at the edge of image 1/);
 });
 
-test('eine verschwundene Tuer im Vordergrund ist nur ein Hinweis, kein zweiter Versuch', async () => {
+test('eine verschwundene Tuer im Vordergrund zaehlt nicht: kein Hinweis, kein zweiter Versuch', async () => {
   // Probe vom 17.09.: im Foto steht links vorne der offene Tuerfluegel und nimmt ein
   // Viertel des Bildes ein. Im Ideenbild ist er weg, das Modell hat die Kamera gedreht.
   // Diego, 27.09.: die Tuer ist kein Grund fuer einen zweiten Versuch (fuenfte Probe: drei von sieben zweiten Versuchen).
+  // Diego, 04.10.: "la porta non è importante anche se scompare; importanti sono le finestre".
   const turned = () => checkedInv({}, {}, { foreground_object_before: true, foreground_object_after: false, view_changed: true, reason: 'camera turned to the right' });
   const h = harness({ checks: [turned] });
   const res = await h.invoke();
   assert.equal(res.statusCode, 200);
   assert.equal(h.counts().generation, 1);
   const mail = JSON.stringify(h.calls.find((call) => call.url === 'https://api.resend.com/emails').body);
-  assert.match(mail, /Fensterprüfung.{0,80}ok, Bildausschnitt verändert: camera turned to the right, Hinweis: the door leaf, door frame or wall edge in the foreground of image 1 is gone/);
-  assert.doesNotMatch(mail, /Mangel im gezeigten Bild/);
+  assert.match(mail, /Fensterprüfung.{0,80}ok, Bildausschnitt verändert: camera turned to the right</);
+  assert.doesNotMatch(mail, /Hinweis|door leaf|Mangel im gezeigten Bild/);
+  // Auch als Oeffnung zaehlt eine fehlende Tuer nicht; ein Fenster schon.
+  const question = h.calls.map((call) => call.body?.contents?.[0]?.parts?.[0]?.text || '').find((text) => text.includes('Set extra_openings'));
+  assert.match(question, /or lost one that image 1 has; a window that now stands on a different wall than in image 1 counts as lost and added; a door of image 1 that is gone in image 2 does not count\./);
 });
 
 test('die Wahl des Kunden wird abgelesen: ein leichter Unterschied steht als Hinweis in der Mail, ein schwerer kostet einen zweiten Durchgang', async () => {
@@ -1133,15 +1137,21 @@ test('zwei Bilder gleichzeitig: gezeigt wird das bessere, nicht das erste', asyn
   assert.equal((await plain.invoke()).statusCode, 200);
   assert.equal(plain.counts().generation, 2);
   // Beide ohne groben Fehler: das mit weniger Hinweisen.
-  const hinted = byImage({ [PNG]: () => checkedInv({}, {}, { foreground_object_before: true, foreground_object_after: false }), [other]: () => checked() });
+  const lowWall = () => checkedInv({}, {}, { toilet_on_low_wall_before: true, toilet_on_low_wall_after: false });
+  const hinted = byImage({ [PNG]: lowWall, [other]: () => checked() });
   const h = harness({ env: two, generations: pair, checks: [hinted, hinted] });
   const res = await h.invoke();
   assert.equal(res.statusCode, 200);
   assert.equal(h.counts().generation, 2);
   assert.equal(res.body.image.data, other);
   // Das andere Bild steht mit seinem Hinweis in der Mail, das gezeigte ohne.
-  assert.match(mailOf(h), /Bild 1 nicht gezeigt \(Hinweise: the door leaf, door frame or wall edge in the foreground of image 1 is gone\), Bild 2 ok/);
+  assert.match(mailOf(h), /Bild 1 nicht gezeigt \(Hinweise: the low wall the toilet stood against is gone\), Bild 2 ok/);
   assert.doesNotMatch(mailOf(h), /, Hinweis:/);
+  // Eine fehlende Tuer zaehlt nicht (Diego, 04.10.): das Bild ohne Tuer gilt als fehlerlos und wird gezeigt.
+  const doorless = byImage({ [PNG]: () => checkedInv({}, {}, { foreground_object_before: true, foreground_object_after: false }), [other]: lowWall });
+  const door = harness({ env: two, generations: pair, checks: [doorless, doorless] });
+  assert.equal((await door.invoke()).body.image.data, PNG);
+  assert.doesNotMatch(mailOf(door), /door leaf/);
   // Eines mit grobem Fehler: das andere, ohne zweiten Durchgang.
   const opening = byImage({ [PNG]: () => checked(true), [other]: () => checked() });
   const one = harness({ env: two, generations: pair, checks: [opening, opening] });
@@ -1189,11 +1199,11 @@ test('zwei Bilder: geprueft vor ungeprueft vor verworfen, im zweiten Durchgang d
   const mailOf = (h) => JSON.stringify(h.calls.find((call) => call.url === 'https://api.resend.com/emails').body);
   const busy = () => response({ error: 'busy' }, 503);
   // Ungeprueft gegen geprueft mit einem Hinweis: das gepruefte (ohne Hinweis waere es sofort gezeigt worden).
-  const door = () => checkedInv({}, {}, { foreground_object_before: true, foreground_object_after: false });
-  const unchecked = harness({ env: two, generations: pair, checks: [byImage({ [PNG]: busy, [other]: door }), byImage({ [PNG]: busy, [other]: door }), busy] });
+  const lowWall = () => checkedInv({}, {}, { toilet_on_low_wall_before: true, toilet_on_low_wall_after: false });
+  const unchecked = harness({ env: two, generations: pair, checks: [byImage({ [PNG]: busy, [other]: lowWall }), byImage({ [PNG]: busy, [other]: lowWall }), busy] });
   const uncheckedRes = await unchecked.invoke();
   assert.equal(uncheckedRes.body.image.data, other);
-  assert.match(mailOf(unchecked), /Bild 1 nicht gezeigt \(ungeprüft\), Bild 2 ok, Hinweis: the door leaf/);
+  assert.match(mailOf(unchecked), /Bild 1 nicht gezeigt \(ungeprüft\), Bild 2 ok, Hinweis: the low wall the toilet stood against is gone/);
   // Ungeprueft gegen verworfen: das ungepruefte, und die Mail sagt, welches gezeigt wird.
   const risky = harness({ env: two, generations: pair, checks: [byImage({ [PNG]: () => checked(true), [other]: busy }), byImage({ [PNG]: () => checked(true), [other]: busy }), busy] });
   const riskyRes = await risky.invoke();
@@ -1772,11 +1782,24 @@ test('Dusche: Rinne und Armaturen an der Stirnwand im Prompt, falsch gezeichnet 
   }
   // Die Duschwanne ist bodeneben, eine sichtbare Wanne mit eigenem Ablauf, ohne Rinne (Diego, 26.09.: P2 Wanne mit
   // Rinne, P3 gefliester Boden mit Rinne statt der Wanne). Die Armaturen stehen wie beim Walk-in an der Stirnwand.
+  // Diego, 04.10.: ihr Rand von 2 bis 3 cm ist normal; schwer ist nur eine Stufe oder ein Podest. Der Walk-in bleibt ganz eben.
+  const checkQuestion = (h) => h.calls.map((call) => call.body?.contents?.[0]?.parts?.[0]?.text || '').find((text) => text.includes('Set shower_step'));
+  assert.match(checkQuestion(h), /Set shower_step true if the floor of the shower in image 2 stands higher than the bathroom floor around it: a raised shower tray with a visible side face or step, a kerb or a platform; a shower tray level with the floor tiles is not raised/);
+  assert.doesNotMatch(checkQuestion(h), /2 to 3 cm/);
   const raised = () => checkedInv({ shower: 'back' }, { shower: 'back' }, { shower_step: true });
   const tray = harness({ checks: [raised, raised] });
   await tray.invoke(payload({ dusche: 'duschwanne', badewanne: 'keine' }));
   assert.equal(tray.counts().generation, 2);
-  assert.match(JSON.stringify(tray.calls.find((call) => call.url === 'https://api.resend.com/emails').body), /Hinweis: the shower floor is raised above the bathroom floor; the shower tray must lie level with the floor tiles/);
+  assert.match(checkQuestion(tray), /Set shower_step true only if the shower tray in image 2 stands on a step, kerb, plinth or platform, or rises clearly higher above the bathroom floor than the thin edge of a normal shower tray; that edge, about 2 to 3 cm, may show as a narrow side face and is not raised/);
+  assert.doesNotMatch(checkQuestion(tray), /a raised shower tray with a visible side face or step/);
+  assert.match(JSON.stringify(tray.calls.find((call) => call.url === 'https://api.resend.com/emails').body), /Hinweis: the shower tray stands on a step, kerb or platform; it must sit directly on the floor, with no more than its own low edge/);
+  assert.match(tray.calls.filter((call) => call.body?.generationConfig?.responseModalities)[1].body.contents[0].parts[0].text,
+    /A previous attempt was wrong because the shower tray stands on a step, kerb or platform/);
+  // Nur der Rand: kein Hinweis, kein zweiter Durchgang.
+  const edge = harness({ checks: [() => checkedInv({ shower: 'back' }, { shower: 'back' }, { shower_step: false, shower_floor_after: 'tray' })] });
+  assert.equal((await edge.invoke(payload({ dusche: 'duschwanne', badewanne: 'keine' }))).statusCode, 200);
+  assert.equal(edge.counts().generation, 1);
+  assert.doesNotMatch(JSON.stringify(edge.calls.find((call) => call.url === 'https://api.resend.com/emails').body), /Hinweis/);
   const trayPrompt = tray.calls.find((call) => call.body?.generationConfig?.responseModalities).body.contents[0].parts[0].text;
   assert.match(trayPrompt, /flat shower tray in the same colour as the toilet: one smooth piece without tile joints, set into the floor so that its surface is exactly level with the floor tiles around it, with no step/);
   assert.match(trayPrompt, /it covers the whole shower floor, its outline shows clearly against the floor tiles, and it has its own small round drain with a round cover in its surface, and no channel drain/);
@@ -2361,9 +2384,9 @@ test('Produktdurchgang: faellt das neue Bild durch, hat es einen schweren Hinwei
   assert.equal(old.res.body.image.data, first);
   assert.match(old.mail, /Produktdurchgang nicht gezeigt \(the toilet is still the old one of the photo\)/);
   // Ein leichter Hinweis mehr reicht nicht, um das neue Bild nicht zu zeigen; er steht in der Mail.
-  const light = await run({ checks: [() => checked(), () => checkedInv({}, {}, { foreground_object_before: true, foreground_object_after: false })] });
+  const light = await run({ checks: [() => checked(), () => checkedInv({}, {}, { toilet_on_low_wall_before: true, toilet_on_low_wall_after: false })] });
   assert.equal(light.res.body.image.data, edited);
-  assert.match(light.mail, /Produktdurchgang ok, Hinweis: the door leaf/);
+  assert.match(light.mail, /Produktdurchgang ok, Hinweis: the low wall the toilet stood against is gone/);
   // Ein schwerer Hinweis, den der Produktdurchgang behebt: das neue Bild.
   const mirror = () => checkedInv({}, {}, { mirror_kept: true });
   const fixed = await run({ checks: [mirror, mirror, () => checked()], product: undefined, extra: { generations: [() => generated(first), () => generated(first), () => generated(edited)] } });
@@ -2551,15 +2574,15 @@ test('Gegenpruefung des Codes vom 27.09.: Produktdurchgang mit zwei Bildern, ohn
   const generations = (h) => h.calls.filter((call) => call.body?.generationConfig?.responseModalities);
   // Wie auf der Seite: zwei Bilder, dann der Produktdurchgang auf dem besseren.
   const byImage = (answers) => (init) => answers[JSON.parse(init.body).contents[0].parts.filter((part) => part.inlineData)[1].inlineData.data]();
-  const door = () => checkedInv({}, {}, { foreground_object_before: true, foreground_object_after: false });
-  const answers = byImage({ [PNG]: door, [other]: () => checked(), [edited]: () => checked() });
+  const lowWall = () => checkedInv({}, {}, { toilet_on_low_wall_before: true, toilet_on_low_wall_after: false });
+  const answers = byImage({ [PNG]: lowWall, [other]: () => checked(), [edited]: () => checked() });
   const two = harness({ env: { ...on, BADPLANER_CANDIDATES: undefined }, generations: [() => generated(PNG), () => generated(other), () => generated(edited)], checks: [answers, answers, answers] });
   const twoRes = await two.invoke();
   assert.equal(twoRes.statusCode, 200);
   assert.equal(generations(two).length, 3);
   assert.equal(generations(two)[2].body.contents[0].parts.find((part) => part.inlineData).inlineData.data, other);
   assert.equal(twoRes.body.image.data, edited);
-  assert.match(mailOf(two), /Bild 1 nicht gezeigt \(Hinweise: the door leaf.*\), Bild 2 ok, Produktdurchgang ok</);
+  assert.match(mailOf(two), /Bild 1 nicht gezeigt \(Hinweise: the low wall the toilet stood against is gone\), Bild 2 ok, Produktdurchgang ok</);
   // Zeigt das Foto kein WC, nennt der Produktdurchgang weder WC noch Platte; ohne Waschtisch weder Armatur noch Spiegel.
   const layout = (walls) => () => photoChecked(true, JSON.stringify({ is_bathroom: true, reason: 'bathroom', walls: inv(walls), order: ['washbasin'], nearest: 'washbasin' }));
   const noToilet = harness({ env: on, photoChecks: [layout({ toilet: 'none' })] });

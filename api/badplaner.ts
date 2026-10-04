@@ -24,14 +24,15 @@
  *      pruefen (ein Bad? was steht wo?). Kein Bad: kein Bild, Lead mit Foto an NLD.
  *   4. Prompt bauen, zwei Ideenbilder gleichzeitig bei Gemini erzeugen und pruefen lassen (checkOpenings);
  *      gezeigt wird das bessere: ohne groben Fehler, mit den wenigsten Hinweisen.
- *      Grobe Fehler (mehr Fenster als angegeben, Oeffnung dazu oder weg, andere Decke,
- *      WC oder Waschtisch an anderer Wand oder Stelle oder weg, Dusche oder Wanne nicht wie
+ *      Grobe Fehler (mehr Fenster als angegeben, Oeffnung dazu oder weg, ausser einer fehlenden Tuer,
+ *      andere Decke, WC oder Waschtisch an anderer Wand oder Stelle oder weg, Dusche oder Wanne nicht wie
  *      bestellt, Bidet noch da) in beiden: zweiter Durchgang, wenn die Zeit reicht; ein grob falsches
  *      Bild sieht der Kunde nie, NLD bekommt es mit dem Lead. Schwere Hinweise, die der Kunde sofort
- *      sieht (alter Spiegel, altes WC, Wannenart, Kopfbrause ohne Dusche, Stufe oder falscher Boden in
- *      der Dusche, Armaturen auf zwei Waenden oder nicht an der Stirnwand der Vorpruefung), loesen ebenfalls
- *      einen zweiten Durchgang aus; gewaehlt wird dann das beste aller Bilder. Leichte Hinweise (Tuer vorne
- *      weg, Punktablauf, Muretto, Nische, Zahl und Art der Becken, Spiegelart) stehen nur in der Lead-Mail.
+ *      sieht (alter Spiegel, altes WC, Wannenart, Kopfbrause ohne Dusche, falscher Boden in der Dusche,
+ *      eine Stufe im Walk-in oder unter der Duschwanne mehr als ihr Rand von 2 bis 3 cm, Armaturen auf zwei
+ *      Waenden oder nicht an der Stirnwand der Vorpruefung), loesen ebenfalls einen zweiten Durchgang aus;
+ *      gewaehlt wird dann das beste aller Bilder. Leichte Hinweise (Punktablauf, Muretto, Nische, Zahl und
+ *      Art der Becken, Spiegelart) stehen nur in der Lead-Mail; eine fehlende Tuer zaehlt nicht.
  *      Ist die Pruefung nicht erreichbar, geht das Bild mit Vermerk hinaus.
  *   4b. Produktdurchgang: das gewaehlte Bild geht mit den Produktbildern (WC, Platte oder Modul,
  *      Armaturen, Dusche, Wanne, Spiegel) nochmals an Gemini, das nur die Produkte neu zeichnet. Besteht
@@ -1740,6 +1741,8 @@ async function checkOpenings(
 ): Promise<CheckResult> {
   const model = checkModel();
   if (!model) return { status: 'disabled' };
+  const tray = wanted.shower && wanted.showerType === 'duschwanne';
+  const walkIn = wanted.shower && !tray;
   const question =
     'Image 1 is a room before renovation. Image 2 is the edited result. Report only what you can see, do not judge whether it is good. ' +
     'For image 1 and for image 2, name the wall each sanitary fixture stands against, seen from the camera: "left", "right", "back", "front", or "none" when that fixture is not visible at all. ' +
@@ -1759,7 +1762,10 @@ async function checkOpenings(
     'Set wall_element_lost true if image 1 has a recess, alcove, niche, wall offset, corner step or wall projection anywhere in the room, in the shower area or elsewhere, that image 2 no longer has because it was filled in, closed or straightened into one flat wall. An old bathtub with its panel, an old shower tray or enclosure, a surface-mounted cistern with its casing, a bidet and loose furniture are not wall elements: removing them is no loss. ' +
     'Set point_drain true only if the shower in image 2 has a round or square point drain or grate in its floor, rather than a long narrow channel drain along one wall; false when there is no shower or no drain is visible. ' +
     // P2, P3 und P5 vom 25.09.: erhoehte Duschwanne, obwohl bodeneben verlangt war. Eine flache Wanne im Boden ist keine Stufe (26.09.).
-    'Set shower_step true if the floor of the shower in image 2 stands higher than the bathroom floor around it: a raised shower tray with a visible side face or step, a kerb or a platform; a shower tray level with the floor tiles is not raised, even though its outline shows; false when it is flush with the floor or there is no shower. ' +
+    // Diego, 04.10.: die Gefaelledusche (Walk-in) liegt ganz eben; bei der Duschwanne ist ein Rand von 2 bis 3 cm normal.
+    (tray
+      ? 'Set shower_step true only if the shower tray in image 2 stands on a step, kerb, plinth or platform, or rises clearly higher above the bathroom floor than the thin edge of a normal shower tray; that edge, about 2 to 3 cm, may show as a narrow side face and is not raised, and neither is a tray level with the floor tiles; false when there is no shower. '
+      : 'Set shower_step true if the floor of the shower in image 2 stands higher than the bathroom floor around it: a raised shower tray with a visible side face or step, a kerb or a platform; a shower tray level with the floor tiles is not raised, even though its outline shows; false when it is flush with the floor or there is no shower. ') +
     // P1 vom 26.09.: Walk-in gewaehlt, eine Wanne gezeichnet; P3: Wanne gewaehlt, ein gefliester Boden.
     // Am Aussehen, nicht an Fugen: grosse Platten (Atelier 120 x 278) haben im Walk-in kaum Fugen.
     'Set shower_floor_after to what the floor inside the shower of image 2 is: "tray" for a shower tray, raised or level with the floor: a separate smooth plate that looks different from the floor around it and has an outline of its own; "tiles" when the tiles or slabs of the room floor, or other tiles, run on across the shower floor; "none" when there is no shower or you cannot see its floor. ' +
@@ -1771,7 +1777,8 @@ async function checkOpenings(
     'Then set shower_fittings_walls to the list of walls, seen from the camera, on which any shower fitting of image 2 is mounted: a mixer lever or knob, a rosette or small wall plate, a hand shower, its holder or hose outlet, or the wall arm of the overhead shower; each wall at most once, for example ["left"] or ["back","left"]; [] when there is no shower or you cannot see its fittings. ' +
     'Then say whether something large stands in the immediate foreground of image 1 at the edge of the picture, cut off by the border — an open door leaf, a door frame or the near edge of a wall; loose furniture does not count, it is meant to be removed — taking up roughly a fifth of the picture or more; and whether that same object is still visible at the edge of image 2 at any size, even as a narrow strip (foreground_object_after is false only when it is gone completely). ' +
     'Set window_much_bigger true only if a window that is visible in both images takes up a clearly larger part of image 2 than of image 1, about half again as large or more. ' +
-    'Set extra_openings true only if image 2 has a window, roof window, door or outside opening that image 1 does not have, or lost one that image 1 has; a window that now stands on a different wall than in image 1 counts as lost and added. ' +
+    // Diego, 04.10.: "la porta non è importante anche se scompare; importanti sono le finestre".
+    'Set extra_openings true only if image 2 has a window, roof window, door or outside opening that image 1 does not have, or lost one that image 1 has; a window that now stands on a different wall than in image 1 counts as lost and added; a door of image 1 that is gone in image 2 does not count. ' +
     // P4 und P5 vom 25.09.: bei "keine Fenster" kam einmal ein Dachfenster, einmal ein Fenster links dazu,
     // und extra_openings blieb false. Gezaehlt wird zuverlaessiger als verglichen.
     'Count the windows in each image, roof windows and skylights included; a glass shower panel, a glass door, a mirror or a picture is not a window. Set windows_before and windows_after to those two numbers. ' +
@@ -1881,16 +1888,15 @@ async function checkOpenings(
     wanted.bathtubType === 'einbau' && parsed.bathtub_after === 'freestanding' && 'the bathtub stands free, but a built-in bathtub was chosen',
     !wanted.shower && parsed.overhead_shower_after === true && 'there is an overhead shower, but no shower was chosen',
   ].filter((hint): hint is string => !!hint);
-  // Die Dusche bodeneben, alle Armaturen an der Stirnwand; beim Walk-in die Rinne an ihrem Fuss, die Duschwanne
-  // hat ihren eigenen Ablauf (Diego, 26.09.). Welche Wand die Stirnwand ist, sagt die Vorpruefung im Foto; ohne sie
+  // Der Walk-in bodeneben, die Duschwanne ohne Stufe oder Podest darunter (Diego, 04.10.), alle Armaturen an der
+  // Stirnwand; beim Walk-in die Rinne an ihrem Fuss, die Duschwanne hat ihren eigenen Ablauf (Diego, 26.09.).
+  // Welche Wand die Stirnwand ist, sagt die Vorpruefung im Foto; ohne sie
   // gehoert die Rinne an den Fuss der Armaturenwand. Seit dem 26.09. nur ein Hinweis (Diego, Entscheidung A): der
   // zweite Versuch hatte 0 von 6 Duschen gerichtet und kostet je rund CHF 0.12 und 35 s.
   const drainWall: Wall | undefined = parsed.drain_wall;
   const fittingsWalls: Wall[] | undefined = parsed.shower_fittings_walls;
   const seen = (wall?: Wall): wall is Wall => !!wall && wall !== 'none';
   const endWall = wanted.showerWall;
-  const tray = wanted.shower && wanted.showerType === 'duschwanne';
-  const walkIn = wanted.shower && !tray;
   // Ein unbekannter Wert zaehlt nicht, wie bei der Wahl des Kunden; ein Objekt warf sonst im Log nach dem bezahlten Bild.
   const showerFloor = ['tray', 'tiles', 'none'].includes(parsed.shower_floor_after) ? parsed.shower_floor_after as string : undefined;
   // Fuer die Mail an NLD, wie die Vorpruefung: was die Pruefung an der Dusche sah.
@@ -1899,7 +1905,8 @@ async function checkOpenings(
     : undefined;
   if (showerSeen) console.info('[badplaner] Dusche:', `${tray ? 'Duschwanne' : 'Walk-in'}, ${showerSeen}, Stirnwand laut Foto ${endWall ?? '-'}`);
   serious.push(...[
-    wanted.shower && parsed.shower_step === true && `the shower floor is raised above the bathroom floor; ${tray ? 'the shower tray must lie level with the floor tiles, with no step or kerb' : 'it must be flush with the floor, with no step, kerb or tray edge'}`,
+    wanted.shower && parsed.shower_step === true && (tray ? 'the shower tray stands on a step, kerb or platform; it must sit directly on the floor, with no more than its own low edge'
+      : 'the shower floor is raised above the bathroom floor; it must be flush with the floor, with no step, kerb or tray edge'),
     walkIn && showerFloor === 'tray' && 'the shower has a shower tray, but a walk-in shower with the floor tiles continuing into it was chosen',
     tray && showerFloor === 'tiles' && 'the shower floor is tiled, but a shower with a shower tray was chosen',
     tray && seen(drainWall) && 'the shower has a channel drain; the shower tray needs its own small round drain',
@@ -1916,10 +1923,9 @@ async function checkOpenings(
     // Kein Hinweis mehr, an welcher Wand Rinne und Armaturen stehen: in P9 vom 26.09. waren beide falsch, Rinne und
     // Armaturen standen richtig (Diego). Die Waende stehen nur noch im Log.
   ].filter((hint): hint is string => !!hint));
-  // Diego, 27.09.: eine Tuer oder Mauerkante vorne, die fehlt, ist kein Grund fuer einen zweiten Versuch, nur ein Hinweis.
-  // In der fuenften Probe loeste sie drei von sieben zweiten Versuchen aus (je rund 35 s).
-  if (parsed.foreground_object_before && !parsed.foreground_object_after) hints.push('the door leaf, door frame or wall edge in the foreground of image 1 is gone');
-  // Ein anderer Bildausschnitt wird ebenso nur vermerkt.
+  // Eine Tuer oder Mauerkante vorne, die fehlt, zaehlt nicht mehr (Diego, 04.10.): seit dem 27.09. war sie nur ein Hinweis,
+  // wog aber in der Wahl des Bildes mit und hielt ein sonst fehlerloses Bild zurueck, bis das andere fertig war.
+  // Ein anderer Bildausschnitt wird nur vermerkt.
   const all = [...serious, ...hints];
   return flags.view_changed ? { status: 'approved', note: parsed.reason.slice(0, 200), hints: all, serious, shower: showerSeen } : { status: 'approved', hints: all, serious, shower: showerSeen };
 }
