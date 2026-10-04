@@ -601,6 +601,7 @@ async function handleRender(req: any, res: any, body: RenderBody, ctx: RequestCo
     basinIsCeramic: !!basinType && basinType.id !== 'integriert',
     topPrompt: top.prompt,
     basePrompt: base.prompt,
+    vanityTone: base.tone && base.tone === top.tone ? base.tone : undefined,
     mirrorPrompt: mirror.prompt,
     // Gaeste-WC: dieselbe Serie ohne den Teil zur Dusche. Bis zum 25.09. stand hier nur "washbasin tap" (P4: kein Up+).
     tapPrompt,
@@ -1426,6 +1427,7 @@ function buildPrompt(v: {
   basinIsCeramic: boolean;
   topPrompt: string;
   basePrompt: string;
+  vanityTone?: string;
   mirrorPrompt: string;
   tapPrompt: string;
   tileImageNumber: number;
@@ -1459,8 +1461,12 @@ function buildPrompt(v: {
   sample(v.tileImageNumber, v.tileIsMosaicSample ? `a sample of the wall tile material${mosaic}` : 'a close-up sample of the wall tile: take its colour, texture and finish');
   sample(v.floorImageNumber, v.floorIsMosaicSample ? `a sample of the floor tile material${mosaic}` : 'a close-up sample of the floor tile');
   sample(v.accentImageNumber, 'a close-up sample of the accent material');
+  // Diego, 04.10. (farbe-p5: Waschtisch Diamante 3 von 3 weiss, vorher 0 von 4): bei farbiger Keramik nahm der helle
+  // Waschtisch ihre Farbe an. Dann nennt der Prompt seine Farbe in Worten und die Teile, die die Keramikfarbe tragen.
+  const tone = v.vanityTone && v.topImageNumber && v.topImageNumber === v.baseImageNumber && !/\bwhite\b/.test(v.sanitaryPrompt) ? v.vanityTone : undefined;
   if (v.topImageNumber && v.topImageNumber === v.baseImageNumber) {
-    sample(v.topImageNumber, 'a colour sample for the whole vanity unit: its front, its body and its countertop');
+    sample(v.topImageNumber, tone ? `a colour sample for the whole vanity unit, a ${tone}: its front, its body and its countertop all take this ${tone}`
+      : 'a colour sample for the whole vanity unit: its front, its body and its countertop');
   } else {
     sample(v.topImageNumber, 'a sample of the countertop material');
     sample(v.baseImageNumber, 'a colour sample for the front and body of the vanity unit');
@@ -1482,7 +1488,9 @@ function buildPrompt(v: {
   // Rueckwand. Darum so beschrieben, wie man es von der Tuer aus sieht (Diego, 27.09.), und neben dem Waschtisch, wenn er dort steht.
   const sideEnd = v.showerWall === 'left' || v.showerWall === 'right';
   const besideBasin = sideEnd && v.layout?.walls.washbasin === v.showerWall ? ', next to the washbasin cabinet' : '';
-  const colourOf = (n: number) => (n ? ` in the colour and finish of image ${n}` : '');
+  const colourOf = (n: number, same = false) => (n ? ` in the ${same && tone ? 'same ' : ''}${tone ? `${tone} ` : ''}colour and finish of image ${n}` : '');
+  const ceramicParts = ['the toilet with its seat and lid', v.basinIsCeramic && 'the washbasin bowl', v.trayShower && 'the shower tray'].filter(Boolean).join(', ').replace(/, ([^,]*)$/, ' and $1');
+  const colours = tone ? ` Colours per object: ${v.sanitaryPrompt} only for ${ceramicParts}; the vanity front, body and countertop are ${tone} like image ${v.topImageNumber}, never ${v.sanitaryPrompt.replace(/ matte ceramic$/, '')}, grey or beige.` : '';
 
   // Fenster und Decke im Wortlaut der Website: mit der kurzen Fassung kam in P4 und P5 vom 25.09.
   // bei "keine Fenster" je ein Fenster dazu, die Website blieb bei denselben Fotos richtig.
@@ -1527,7 +1535,7 @@ function buildPrompt(v: {
   // Die gewaehlte Sanitaerkeramik gilt fuer WC und Waschbecken. Ohne das hier
   // blieb das Becken weiss, waehrend das WC farbig war: zwei Farben in einem Bad.
   const basinColour = v.basinIsCeramic ? `, the basin in the same ${v.sanitaryPrompt} as the toilet` : '';
-  const vanity = `if a washbasin is visible in image 1, ${v.basinPrompt} at its existing place on a wall-hung vanity: front and body in ${v.basePrompt}${colourOf(v.baseImageNumber)}, countertop in ${v.topPrompt}${colourOf(v.topImageNumber)}${v.basinTypePrompt ? `, ${v.basinTypePrompt}` : ''}${basinColour}, and above the vanity a ${v.mirrorPrompt}${asIn(v.mirrorImageNumber ?? 0)}; this mirror replaces the old mirror or mirror cabinet and its lamp completely: nothing of their shape, frame or light is kept, and no lamp or light bar above the mirror; the countertop is its own material, not cut from the wall or floor tiles`;
+  const vanity = `if a washbasin is visible in image 1, ${v.basinPrompt} at its existing place on a wall-hung vanity: front and body in ${v.basePrompt}${colourOf(v.baseImageNumber)}, countertop in ${v.topPrompt}${colourOf(v.topImageNumber, true)}${v.basinTypePrompt ? `, ${v.basinTypePrompt}` : ''}${basinColour}, and above the vanity a ${v.mirrorPrompt}${asIn(v.mirrorImageNumber ?? 0)}; this mirror replaces the old mirror or mirror cabinet and its lamp completely: nothing of their shape, frame or light is kept, and no lamp or light bar above the mirror; the countertop is its own material, not cut from the wall or floor tiles`;
 
   return [
     // Am 19.09. zeichnete das Modell aus Diegos engem Bad ein Ausstellungsbad: darum steht zuerst, was das
@@ -1538,7 +1546,7 @@ function buildPrompt(v: {
     v.layout ? layoutPrompt(v.layout) : '',
     `This is an edit of image 1, not a new picture. Keep image 1 and change only what the CHANGE list names. Everything else stays exactly as it is: the camera position, angle, lens and framing, the same crop and the same aspect ratio, the walls and where they stand, with every niche, ledge, projection and step they have in image 1 and no others, the ceiling and the room height, the room proportions, every window, roof window and door at its exact size and position, and a radiator only where image 1 has one. ${ceilingRule} Never zoom out, never widen the view, never show floor, wall or ceiling beyond the edges of image 1, never create extra floor area. Whatever is built in the immediate foreground at the edge of image 1 belongs to the picture and stays: an open door leaf, a door frame, the edge of a wall. It keeps its place and takes up the same part of the picture as before, and is never removed to show more of the room. A loose piece of furniture at the edge is removed like all loose furniture: the floor and the walls behind it continue, and the camera stays exactly where it is. Every window keeps the same share of the picture it has in image 1; do not move closer to it and do not make it larger. ${windowRule}${glassRule}`,
     `KEEP THE POSITIONS. A half-height wall, a low built wall or a boxed pre-wall that a fixture stands against is part of the room, not furniture: it keeps its place, its length, its height and its depth, and the fixture stays mounted on it. Every fixture keeps the wall or low wall it stands against in image 1 and its place along it, measured against the corners, the door and the window next to it. The toilet keeps its wall and its place because its drain cannot be moved${v.ceiling === 'sloped' ? ': under the sloping ceiling it stays under that sloping ceiling and is never moved to a straight or rear wall to gain headroom' : ''}. The washbasin keeps its wall and its place. ${v.layout?.walls.bathtub === 'none' ? 'An old shower tray, its kerb or platform is removed down to the floor.' : "A bathtub that becomes a shower uses only the bathtub's own footprint, on the same wall and in the same direction as the bathtub; the bathtub and any raised base under it are removed down to the floor. So is an old shower tray, its kerb or platform."}${v.showerWall && sideEnd ? ` The short end wall of the shower is the ${v.showerWall} wall seen from the camera. Seen from the door, the mixer, the overhead shower and the hand shower are on this ${v.showerWall} wall${besideBasin}${endView}${v.trayShower ? '' : ', and the channel drain lies along its foot'}. The ${v.showerLongWall ?? 'back'} wall of the shower stays empty: only tiles, no mixer, no hand shower and no shower head.` : v.showerWall ? ` The short end wall of the shower is the ${v.showerWall} wall seen from the camera: the mixer, the overhead shower and the hand shower sit on it${endView}${v.trayShower ? '' : ', and the channel drain lies along its foot'}; ${v.showerLongWall ? `its long side runs along the ${v.showerLongWall} wall, which carries` : v.showerWall === 'back' ? 'the side walls of the shower carry' : 'the back wall of the shower carries'} no fitting, only tiles.` : ''} NO NEW WALLS: never add a wall, a partition, a half-height wall, a boxed pre-wall, a ledge, a shelf or a niche that image 1 does not show, not behind the toilet, not behind the washbasin and not in the shower. Where image 1 shows one flat wall, the result shows that same flat wall with new tiles: it never steps forward and never gets a flat top at mid-height. NOTHING IS FILLED IN EITHER: every recess, alcove, niche, wall offset, corner step and wall projection that image 1 shows stays exactly where it is, with the same width, depth and height, above all in the shower area. A shower or bathtub that stands in a recess or alcove stays inside it, and the new tiles follow the wall into the recess and around its corners. Never fill a recess, never close an alcove, never tile a niche over flush and never straighten a stepped wall into one flat wall. Only surfaces, sanitary fixtures, taps, furniture and lights change.`,
-    `CHANGE this, and only this, in this ${roomName} (style "${v.packageName}"):${look} ${surfaces}; ${fixtures}; if a toilet is visible in image 1, ${toilet}; ${vanity}; ${v.tapPrompt}.${accent}`,
+    `CHANGE this, and only this, in this ${roomName} (style "${v.packageName}"):${look} ${surfaces}; ${fixtures}; if a toilet is visible in image 1, ${toilet}; ${vanity}; ${v.tapPrompt}.${colours}${accent}`,
     // P7 vom 26.09.: der alte Spiegel blieb, darum steht er auch hier.
     `REMOVE: the bidet, if image 1 has one: its place is finished like the rest of the room, with nothing standing there;${v.mirrorImageNumber ? ' the old mirror or mirror cabinet with its lamp;' : ''} the old shower curtain and its rail; the old shower fittings and their slide rail; towels, bottles, rugs and loose furniture, also a cabinet or shelf cut off at the edge of the picture. The vanity unit is not loose furniture and stays, even when cut off at the edge of the picture.${v.wantsShower ? ' All shower fittings sit together on one wall inside the shower area, never next to the toilet or the washbasin.' : ''}`,
     // Tageslicht in einem Raum ohne Fenster verlangt nach einem Fenster (P4 und P5 vom 25.09.).

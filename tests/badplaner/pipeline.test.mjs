@@ -919,8 +919,45 @@ test('Waschtischplatte und Unterbau gehen als Muster mit, die Platte nimmt nie d
   assert.ok(prompt.includes(`countertop in ${top.prompt} in the colour and finish of image 3`), 'Platte ohne Verweis auf ihr Muster');
   assert.ok(prompt.includes(`front and body in ${base.prompt} in the colour and finish of image 3`), 'Unterbau ohne Verweis auf sein Muster');
   assert.match(prompt, /the countertop is its own material, not cut from the wall or floor tiles/);
+  // Weisse Keramik: keine Farbregel, der Waschtisch bleibt beim Muster (Diego, 04.10.).
+  assert.equal(options.sanitary[0].id, 'weiss');
+  assert.doesNotMatch(prompt, /Colours per object|warm white|petrol/);
   const leadMail = h.calls.find((call) => call.url === 'https://api.resend.com/emails');
   assert.match(JSON.stringify(leadMail.body), /Platte geladen, Waschtisch geladen/);
+});
+
+test('P5: bei farbiger Keramik ist der Waschtisch Diamante warm white, die Keramikfarbe tragen nur WC, Becken und Duschwanne', async () => {
+  // farbe-p5 vom 04.10.: mit diesen drei Saetzen 3 von 3 Waschtischen weiss, vorher 0 von 4 (petrol, grau-taupe); Diego, 04.10.
+  const options = optionsForPackage('colore');
+  const image = () => new Response(Buffer.from(PNG, 'base64'), { status: 200, headers: { 'content-type': 'image/png' } });
+  const p5 = { paket: 'colore', format: '60x120', platte: 'energieker-calacatta-viola-calacatta-viola', unterbau: 'edone-laccato-diamante',
+    top: 'edone-stone-color-diamante', becken: 'aufsatz', armaturenserie: 'treemme-up', finish: 'treemme-cromo', keramik: 'scarabeo-ocean',
+    wall: 'halbhoch', dusche: 'duschwanne', badewanne: 'keine', waschtisch: options.basins[0].id, spiegel: options.mirrors[0].id, cistern: 'aufputz' };
+  const shower = () => checkedInv({ shower: 'back' }, { shower: 'back' });
+  const run = async (changes = {}, env = {}) => {
+    const h = harness({ swatch: () => image(), env, checks: [shower, shower, shower] });
+    assert.equal((await h.invoke(payload({ ...p5, ...changes }))).statusCode, 200);
+    return h.calls.filter((call) => call.body?.generationConfig?.responseModalities).map((call) => call.body.contents[0].parts[0].text);
+  };
+  const [prompt] = await run();
+  assert.ok(prompt.includes('Image 3 is only a colour sample for the whole vanity unit, a warm white: its front, its body and its countertop all take this warm white.'));
+  assert.ok(prompt.includes('front and body in matte lacquered vanity unit (Diamante) in the warm white colour and finish of image 3, countertop in matte mineral stone-resin washbasin top (Diamante) in the same warm white colour and finish of image 3,'));
+  assert.ok(prompt.includes('in the same polished chrome finish. Colours per object: petrol blue matte ceramic only for the toilet with its seat and lid, the washbasin bowl and the shower tray; the vanity front, body and countertop are warm white like image 3, never petrol blue, grey or beige.'));
+  // Die Regel folgt der Wahl: eine andere farbige Keramik, ohne Duschwanne.
+  const [slate] = await run({ keramik: 'scarabeo-ardesia', dusche: 'walk-in' });
+  assert.ok(slate.includes('Colours per object: slate grey matte ceramic only for the toilet with its seat and lid and the washbasin bowl; the vanity front, body and countertop are warm white like image 3, never slate grey, grey or beige.'));
+  assert.doesNotMatch(slate, /petrol|shower tray;/);
+  // Weisse Keramik oder ein anderer Waschtisch: der Prompt bleibt wie bisher.
+  for (const changes of [{ keramik: 'weiss' }, { unterbau: 'edone-laccato-panna', top: 'edone-stone-color-panna' }]) {
+    const [unchanged] = await run(changes);
+    assert.doesNotMatch(unchanged, /Colours per object|warm white/, JSON.stringify(changes));
+    assert.match(unchanged, /Image 3 is only a colour sample for the whole vanity unit: its front, its body and its countertop\./);
+  }
+  // Nur der erste Auftrag: der Produktdurchgang bleibt unveraendert.
+  const prompts = await run({}, { BADPLANER_PRODUCT_PASS: undefined });
+  const product = prompts.find((text) => text.startsWith('PRODUCT EDIT'));
+  assert.ok(product, 'Produktdurchgang lief nicht');
+  assert.doesNotMatch(product, /Colours per object|warm white/);
 });
 
 test('ohne ladbares Muster bleibt es bei der Beschreibung, ohne Bildnummer', async () => {
@@ -932,6 +969,8 @@ test('ohne ladbares Muster bleibt es bei der Beschreibung, ohne Bildnummer', asy
   assert.equal(generation.body.contents[0].parts.filter((part) => part.inlineData).length, 4);
   const prompt = generation.body.contents[0].parts[0].text;
   assert.doesNotMatch(prompt, /colour sample for|sample of the countertop/);
+  // Essenza mit weisser Keramik: keine Farbregel.
+  assert.doesNotMatch(prompt, /Colours per object|warm white|petrol/);
   assert.match(prompt, /not cut from the wall or floor tiles/);
 });
 

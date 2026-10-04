@@ -82,6 +82,7 @@ export interface TopOption {
   src?: string | null;
   url: string;
   prompt: string;
+  tone?: string;         // Farbe des Musters in Worten, nur wo das Bildmodell sie sonst verliert (Diamante, 04.10.)
 }
 
 /** Unterbau (Möbelkorpus und Front). */
@@ -97,6 +98,7 @@ export interface BaseOption {
   src?: string | null;
   url: string;
   prompt: string;
+  tone?: string;         // wie bei TopOption
 }
 
 /** Waschbeckenart: Aufsatz-, Einbau- oder integriertes Becken. */
@@ -479,7 +481,7 @@ export const bases: BaseOption[] = [
   { id: 'gbgroup-freestyle-418-ponente', label: '418 Ponente', supplier: 'GB Group', collection: 'Freestyle', family: 'Laccato opaco', packages: ['essenza'], image: '/badplaner/swatches/gbgroup-418-ponente.jpg', src: 'https://gbgroupe.com/wp-content/uploads/2024/04/418.jpg', url: 'https://gbgroupe.com/arredo-bagno/catalogo/freeestyle/', prompt: 'matte lacquered vanity unit (Ponente)' },
   { id: 'gbgroup-freestyle-419-acqua', label: '419 Acqua (Wasser)', supplier: 'GB Group', collection: 'Freestyle', family: 'Laccato opaco', packages: ['essenza'], image: '/badplaner/swatches/gbgroup-419-acqua.jpg', src: 'https://gbgroupe.com/wp-content/uploads/2024/04/419.jpg', url: 'https://gbgroupe.com/arredo-bagno/catalogo/freeestyle/', prompt: 'matte lacquered vanity unit (Acqua)' },
   { id: 'gbgroup-freestyle-433-nero', label: '433 Nero (Schwarz)', supplier: 'GB Group', collection: 'Freestyle', family: 'Laccato opaco', packages: ['essenza'], image: '/badplaner/swatches/gbgroup-433-nero.jpg', src: 'https://gbgroupe.com/wp-content/uploads/2024/04/433.jpg', url: 'https://gbgroupe.com/arredo-bagno/catalogo/freeestyle/', prompt: 'matte lacquered vanity unit (Nero)' },
-  { id: 'edone-laccato-diamante', label: 'Diamante', supplier: 'Edonè', collection: 'Laccato opaco', family: 'Laccato opaco', packages: ['colore'], image: '/badplaner/swatches/edone-diamante.jpg', url: 'https://www.edonedesign.it/it/universo-edone/finiture-e-materiali', prompt: 'matte lacquered vanity unit (Diamante)' },
+  { id: 'edone-laccato-diamante', label: 'Diamante', supplier: 'Edonè', collection: 'Laccato opaco', family: 'Laccato opaco', packages: ['colore'], image: '/badplaner/swatches/edone-diamante.jpg', url: 'https://www.edonedesign.it/it/universo-edone/finiture-e-materiali', prompt: 'matte lacquered vanity unit (Diamante)', tone: 'warm white' },
   { id: 'edone-laccato-panna', label: 'Panna (Creme)', supplier: 'Edonè', collection: 'Laccato opaco', family: 'Laccato opaco', packages: ['colore'], image: '/badplaner/swatches/edone-panna.jpg', url: 'https://www.edonedesign.it/it/universo-edone/finiture-e-materiali', prompt: 'matte lacquered vanity unit (Panna)' },
   { id: 'edone-laccato-platino', label: 'Platino (Platin)', supplier: 'Edonè', collection: 'Laccato opaco', family: 'Laccato opaco', packages: ['colore'], image: '/badplaner/swatches/edone-platino.jpg', url: 'https://www.edonedesign.it/it/universo-edone/finiture-e-materiali', prompt: 'matte lacquered vanity unit (Platino)' },
   { id: 'edone-laccato-cocco', label: 'Cocco (Kokos)', supplier: 'Edonè', collection: 'Laccato opaco', family: 'Laccato opaco', packages: ['colore'], image: '/badplaner/swatches/edone-cocco.jpg', url: 'https://www.edonedesign.it/it/universo-edone/finiture-e-materiali', prompt: 'matte lacquered vanity unit (Cocco)' },
@@ -614,7 +616,7 @@ export const tops: TopOption[] = [
   { id: 'gbgroup-tecnomood-418-ponente', label: 'Tecnomood 418 Ponente', supplier: 'GB Group', material: 'Tecnomood', color: '418 Ponente', packages: ['essenza'], image: '/badplaner/swatches/gbgroup-418-ponente.jpg', src: 'https://gbgroupe.com/wp-content/uploads/2024/04/418.jpg', url: 'https://gbgroupe.com/arredo-bagno/top/tecnomood/', prompt: 'mineral composite washbasin top (Ponente)' },
   { id: 'gbgroup-tecnomood-419-acqua', label: 'Tecnomood 419 Acqua (Wasser)', supplier: 'GB Group', material: 'Tecnomood', color: '419 Acqua', packages: ['essenza'], image: '/badplaner/swatches/gbgroup-419-acqua.jpg', src: 'https://gbgroupe.com/wp-content/uploads/2024/04/419.jpg', url: 'https://gbgroupe.com/arredo-bagno/top/tecnomood/', prompt: 'mineral composite washbasin top (Acqua)' },
   { id: 'gbgroup-tecnomood-433-nero', label: 'Tecnomood 433 Nero (Schwarz)', supplier: 'GB Group', material: 'Tecnomood', color: '433 Nero', packages: ['essenza'], image: '/badplaner/swatches/gbgroup-433-nero.jpg', src: 'https://gbgroupe.com/wp-content/uploads/2024/04/433.jpg', url: 'https://gbgroupe.com/arredo-bagno/top/tecnomood/', prompt: 'mineral composite washbasin top (Nero)' },
-  { id: 'edone-stone-color-diamante', label: 'Stone Color Diamante', supplier: 'Edonè', material: 'Stone Color', color: 'Diamante', packages: ['colore'], image: '/badplaner/swatches/edone-diamante.jpg', url: 'https://www.edonedesign.it/it/universo-edone/finiture-e-materiali', prompt: 'matte mineral stone-resin washbasin top (Diamante)' },
+  { id: 'edone-stone-color-diamante', label: 'Stone Color Diamante', supplier: 'Edonè', material: 'Stone Color', color: 'Diamante', packages: ['colore'], image: '/badplaner/swatches/edone-diamante.jpg', url: 'https://www.edonedesign.it/it/universo-edone/finiture-e-materiali', prompt: 'matte mineral stone-resin washbasin top (Diamante)', tone: 'warm white' },
   { id: 'edone-stone-color-panna', label: 'Stone Color Panna (Creme)', supplier: 'Edonè', material: 'Stone Color', color: 'Panna', packages: ['colore'], image: '/badplaner/swatches/edone-panna.jpg', url: 'https://www.edonedesign.it/it/universo-edone/finiture-e-materiali', prompt: 'matte mineral stone-resin washbasin top (Panna)' },
   { id: 'edone-stone-color-platino', label: 'Stone Color Platino (Platin)', supplier: 'Edonè', material: 'Stone Color', color: 'Platino', packages: ['colore'], image: '/badplaner/swatches/edone-platino.jpg', url: 'https://www.edonedesign.it/it/universo-edone/finiture-e-materiali', prompt: 'matte mineral stone-resin washbasin top (Platino)' },
   { id: 'edone-stone-color-cocco', label: 'Stone Color Cocco (Kokos)', supplier: 'Edonè', material: 'Stone Color', color: 'Cocco', packages: ['colore'], image: '/badplaner/swatches/edone-cocco.jpg', url: 'https://www.edonedesign.it/it/universo-edone/finiture-e-materiali', prompt: 'matte mineral stone-resin washbasin top (Cocco)' },
