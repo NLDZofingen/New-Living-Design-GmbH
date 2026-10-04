@@ -960,6 +960,38 @@ test('P5: bei farbiger Keramik ist der Waschtisch Diamante warm white, die Keram
   assert.doesNotMatch(product, /Colours per object|warm white/);
 });
 
+test('Disposition: nur wo die Vorpruefung die Anordnung von P5 liest, nennt der erste Auftrag Waschtisch und WC an der rechten Wand', async () => {
+  // A/B blind 6+6 vom 04.10.: P5 (Wanne hinten, Waschtisch und WC rechts, Modul) Raum richtig 5 von 6 mit dem Satz, 3 von 6
+  // ohne; an der linken Wand (P3) machte ein Satz es schlechter. Lesungen wie am Pruefstand; P2 und P5 haben dasselbe Foto.
+  const reading = (walls, order, nearest, extra) => () => photoChecked(true, JSON.stringify({ is_bathroom: true, reason: 'bathroom', walls: inv(walls), order, nearest, ...extra }));
+  const first = async (photo, cistern, dusche = 'duschwanne') => {
+    const h = harness({ photoChecks: [photo] });
+    await h.invoke(payload({ cistern, dusche, badewanne: 'keine' }));
+    return h.calls.find((call) => call.body?.generationConfig?.responseModalities).body.contents[0].parts[0].text;
+  };
+  const p5 = { toilet: 'right', washbasin: 'right', bathtub: 'back' };
+  const across = { shower_back: 'along', shower_left: true, shower_right: true, basin_beside_end: true };
+  const tubLeft = { ...p5, bathtub: 'left' };
+  const end = { shower_back: 'end', shower_left: true, basin_beside_end: false };
+  // P5: der Satz der Variante B, Zeichen fuer Zeichen, an seinem Platz.
+  assert.ok((await first(reading(p5, ['bathtub', 'washbasin', 'toilet'], 'toilet', across), 'aufputz')).includes('The washbasin keeps its wall and its place. On the right wall, from the back corner towards the camera: first the washbasin, then the toilet; they never change places, and the toilet stays at the front where image 1 has it, even where the edge of the picture cuts it and its sanitary module off. A bathtub'));
+  // Kein Satz: P5 mit Gefaelledusche statt Duschwanne (nicht im Bild geprueft); P2 (dasselbe Foto ohne Modul); P7 (Wanne
+  // links, gelesen mit der Wanne oder dem WC vorne); P3 (linke Wand); ein Bidet an der Wand; das WC hinten, der Waschtisch vorne.
+  for (const [photo, cistern, dusche] of [
+    [reading(p5, ['bathtub', 'washbasin', 'toilet'], 'toilet', across), 'aufputz', 'walk-in'],
+    [reading(p5, ['bathtub', 'washbasin', 'toilet'], 'toilet', across), 'unterputz'],
+    [reading(tubLeft, ['bathtub', 'washbasin', 'toilet'], 'bathtub', end), 'aufputz'],
+    [reading(tubLeft, ['bathtub', 'washbasin', 'toilet'], 'toilet', end), 'aufputz'],
+    [reading({ shower: 'back' }, ['washbasin', 'toilet', 'shower'], 'washbasin', { ...across, basin_beside_end: false }), 'aufputz'],
+    [reading({ ...p5, bidet: 'right' }, ['bathtub', 'washbasin', 'bidet', 'toilet'], 'toilet', across), 'aufputz'],
+    [reading(p5, ['bathtub', 'toilet', 'washbasin'], 'washbasin', across), 'aufputz'],
+  ]) {
+    const prompt = await first(photo, cistern, dusche);
+    assert.ok(prompt.includes('The washbasin keeps its wall and its place. A'), cistern);
+    assert.doesNotMatch(prompt, /from the back corner/);
+  }
+});
+
 test('ohne ladbares Muster bleibt es bei der Beschreibung, ohne Bildnummer', async () => {
   const h = harness();
   const res = await h.invoke();
