@@ -24,7 +24,7 @@
  *      pruefen (ein Bad? was steht wo?). Kein Bad: kein Bild, Lead mit Foto an NLD.
  *   4. Prompt bauen, zwei Ideenbilder gleichzeitig bei Gemini erzeugen und pruefen lassen (checkOpenings);
  *      gezeigt wird das bessere: ohne groben Fehler, mit den wenigsten Hinweisen.
- *      Grobe Fehler (mehr Fenster als angegeben, Oeffnung dazu oder weg, ausser einer fehlenden Tuer,
+ *      Grobe Fehler (ein Fenster mehr oder weniger, Oeffnung dazu oder weg, ausser einer fehlenden Tuer,
  *      andere Decke, WC oder Waschtisch an anderer Wand oder Stelle oder weg, Dusche oder Wanne nicht wie
  *      bestellt, Bidet noch da) in beiden: zweiter Durchgang, wenn die Zeit reicht; ein grob falsches
  *      Bild sieht der Kunde nie, NLD bekommt es mit dem Lead. Schwere Hinweise, die der Kunde sofort
@@ -1783,7 +1783,8 @@ async function checkOpenings(
     // und extra_openings blieb false. Gezaehlt wird zuverlaessiger als verglichen.
     'Count the windows in each image, roof windows and skylights included; a glass shower panel, a glass door, a mirror or a picture is not a window. Set windows_before and windows_after to those two numbers. ' +
     'Set ceiling_changed true if the ceiling of image 2 has another shape than the ceiling of image 1: a slope, an attic, beams or a roof window that image 1 does not have, or a slope of image 1 that is gone. ' +
-    'Set view_changed true if camera position, angle, lens or framing changed, or if image 2 shows floor, wall or ceiling area that lies outside image 1. ' +
+    // Diego, 04.10.: fehlt nur die Tuer und sind Kamera und Waende gleich, kostet das Bild nichts (sonst ein Vermerk und ein Punkt).
+    'Set view_changed true if camera position, angle, lens or framing changed, or if image 2 shows floor, wall or ceiling area that lies outside image 1. A door leaf or door frame of image 1 that is missing or smaller in image 2 does not count, nor does the floor or wall it covered in image 1: if that is the only difference and the camera, the walls and the edges of the picture are the same, view_changed stays false. ' +
     // Diego, 25.09. (Punkt c): die Wahl des Kunden wird nur abgelesen, ein Unterschied steht als Hinweis in der Mail,
     // nie als Ablehnung, damit wir sehen, wie oft es vorkommt. Proben vom 25.09.: Einbau- statt freistehender Wanne,
     // Kopfbrause ohne Dusche, ein Becken statt zwei, Aufsatz- statt Einbaubecken, der alte Spiegel.
@@ -1840,8 +1841,8 @@ async function checkOpenings(
   const wallAnswers = Object.fromEntries(['toilet_on_low_wall_before', 'toilet_on_low_wall_after', 'new_wall_element', 'wall_element_lost',
     'foreground_object_before', 'foreground_object_after', 'window_much_bigger'].map((key) => [key, parsed[key] as boolean]));
   const flags: CheckFlags = { extra_openings: parsed.extra_openings, view_changed: parsed.view_changed, before, after, orderBefore, orderAfter, nearestBefore, nearestAfter, wallAnswers };
-  // Verworfen wird, was den Raum falsch zeigt: eine Oeffnung mehr oder weniger, mehr Fenster als
-  // der Kunde angegeben hat, eine andere Decke, ein Sanitaerstueck an einer anderen Wand oder an
+  // Verworfen wird, was den Raum falsch zeigt: eine Oeffnung mehr oder weniger, ein Fenster mehr
+  // oder weniger, eine andere Decke, ein Sanitaerstueck an einer anderen Wand oder an
   // einem anderen Platz in der Reihe, Dusche oder Wanne nicht wie bestellt, das Bidet noch da.
   if (flags.extra_openings) return { status: 'rejected', reason: `an opening was added or lost (${parsed.reason.slice(0, 120)})`, flags };
   // Erlaubt ist die groessere Zahl: die des Kunden ("3" heisst drei oder mehr) oder die im Foto gezaehlte.
@@ -1851,6 +1852,14 @@ async function checkOpenings(
   const allowedWindows = wanted.windows === '3' && typeof parsed.windows_before !== 'number' ? undefined : counts.length ? Math.max(...counts) : undefined;
   if (typeof parsed.windows_after === 'number' && allowedWindows !== undefined && parsed.windows_after > allowedWindows) {
     return { status: 'rejected', reason: `a window was added: the result shows ${parsed.windows_after} window(s) including roof windows, the photo ${allowedWindows === 0 ? 'none' : allowedWindows}`, flags };
+  }
+  // Diego, 04.10.: die Fenster zuerst. Ein Fenster weniger verwirft das Bild auch dann, wenn extra_openings es nicht sieht.
+  // Verlangt ist die kleinere Zahl ("3" heisst mindestens drei): ein Spiegel, den die Pruefung im Foto als Fenster zaehlt,
+  // verwirft nichts, und ein Fenster, das sie im Foto nicht sieht, wird nicht verlangt. Ein Fenster an einer anderen Wand
+  // hat dieselbe Zahl: das bleibt bei extra_openings (weg und dazu).
+  const requiredWindows = counts.length ? Math.min(...counts) : undefined;
+  if (typeof parsed.windows_after === 'number' && requiredWindows !== undefined && parsed.windows_after < requiredWindows) {
+    return { status: 'rejected', reason: `a window was lost: the result shows ${parsed.windows_after} window(s) including roof windows, the photo ${requiredWindows}`, flags };
   }
   if (parsed.ceiling_changed === true) return { status: 'rejected', reason: 'the ceiling changed its shape: a slope, attic, beams or roof window that the photo does not have, or a slope that is gone', flags };
   const fault = compareInventory(before, after, wanted) || compareOrder(orderBefore, orderAfter);

@@ -601,6 +601,14 @@ test('eine verschwundene Tuer im Vordergrund zaehlt nicht: kein Hinweis, kein zw
   // Auch als Oeffnung zaehlt eine fehlende Tuer nicht; ein Fenster schon.
   const question = h.calls.map((call) => call.body?.contents?.[0]?.parts?.[0]?.text || '').find((text) => text.includes('Set extra_openings'));
   assert.match(question, /or lost one that image 1 has; a window that now stands on a different wall than in image 1 counts as lost and added; a door of image 1 that is gone in image 2 does not count\./);
+  // Fehlt nur die Tuer, Kamera und Waende gleich, ist es kein anderer Bildausschnitt; ein echter bleibt einer.
+  assert.match(question, /Set view_changed true if camera position, angle, lens or framing changed, or if image 2 shows floor, wall or ceiling area that lies outside image 1\. A door leaf or door frame of image 1 that is missing or smaller in image 2 does not count, nor does the floor or wall it covered in image 1: if that is the only difference and the camera, the walls and the edges of the picture are the same, view_changed stays false\./);
+  const onlyDoor = harness({ checks: [() => checkedInv({}, {}, { foreground_object_before: true, foreground_object_after: false, view_changed: false })] });
+  assert.equal((await onlyDoor.invoke()).statusCode, 200);
+  assert.equal(onlyDoor.counts().generation, 1);
+  const onlyDoorMail = JSON.stringify(onlyDoor.calls.find((call) => call.url === 'https://api.resend.com/emails').body);
+  assert.match(onlyDoorMail, /Fensterprüfung.{0,80}>ok</);
+  assert.doesNotMatch(onlyDoorMail, /Bildausschnitt|Hinweis|door/);
 });
 
 test('die Wahl des Kunden wird abgelesen: ein leichter Unterschied steht als Hinweis in der Mail, ein schwerer kostet einen zweiten Durchgang', async () => {
@@ -1152,6 +1160,12 @@ test('zwei Bilder gleichzeitig: gezeigt wird das bessere, nicht das erste', asyn
   const door = harness({ env: two, generations: pair, checks: [doorless, doorless] });
   assert.equal((await door.invoke()).body.image.data, PNG);
   assert.doesNotMatch(mailOf(door), /door leaf/);
+  // Gegen einen echten anderen Bildausschnitt gewinnt das Bild, dem nur die Tuer fehlt.
+  const framed = byImage({ [PNG]: () => checkedInv({}, {}, { view_changed: true, reason: 'camera moved back' }),
+    [other]: () => checkedInv({}, {}, { foreground_object_before: true, foreground_object_after: false, view_changed: false }) });
+  const frame = harness({ env: two, generations: pair, checks: [framed, framed] });
+  assert.equal((await frame.invoke()).body.image.data, other);
+  assert.doesNotMatch(mailOf(frame), /Bildausschnitt verändert/);
   // Eines mit grobem Fehler: das andere, ohne zweiten Durchgang.
   const opening = byImage({ [PNG]: () => checked(true), [other]: () => checked() });
   const one = harness({ env: two, generations: pair, checks: [opening, opening] });
@@ -2243,9 +2257,35 @@ test('der Prompt bleibt kurz, und jede genannte Bildnummer hat ihr Bild', async 
   assert.deepEqual(named, Array.from({ length: images }, (_, index) => index + 1));
 });
 
-test('mehr Fenster als der Kunde angegeben hat, oder eine andere Decke, loest den zweiten Versuch aus', async () => {
+test('ein Fenster mehr oder weniger, an einer anderen Wand oder eine andere Decke loest den zweiten Versuch aus', async () => {
   // P4 und P5 vom 25.09.: "keine Fenster", im Ideenbild einmal ein Dachfenster, einmal ein Fenster links.
   const good = () => checkedInv({}, {}, { windows_before: 0, windows_after: 0 });
+  const mailOf = (h) => JSON.stringify(h.calls.find((call) => call.url === 'https://api.resend.com/emails').body);
+  // Diego, 04.10.: die Fenster zuerst. Ein Fenster weniger verwirft das Bild, auch ohne extra_openings (1 -> 0).
+  const lost = harness({ checks: [() => checkedInv({}, {}, { windows_before: 1, windows_after: 0 }), () => checkedInv({}, {}, { windows_before: 1, windows_after: 1 })] });
+  assert.equal((await lost.invoke(payload({ windows: '1' }))).statusCode, 200);
+  assert.equal(lost.counts().generation, 2);
+  assert.match(lost.calls.filter((call) => call.body?.generationConfig?.responseModalities)[1].body.contents[0].parts[0].text,
+    /failed the check because a window was lost: the result shows 0 window\(s\) including roof windows, the photo 1/);
+  // Bleibt es weg, sieht der Kunde kein Bild.
+  const gone = () => checkedInv({}, {}, { windows_before: 1, windows_after: 0 });
+  const goneRes = await harness({ checks: [gone, gone] }).invoke(payload({ windows: '1' }));
+  assert.equal(goneRes.body.code, 'RENDER_REJECTED');
+  // Verlangt ist die kleinere Zahl aus Angabe und Foto: ein Spiegel, den die Pruefung im Foto als Fenster zaehlt, verwirft
+  // nichts, ein Fenster, das sie im Foto nicht sieht, wird nicht verlangt. "3 oder mehr" heisst mindestens drei.
+  for (const [windows, before, after, rejected] of [['0', 1, 0, false], ['1', 2, 1, false], ['1', 0, 0, false], ['2', 2, 1, true],
+    ['3', 5, 3, false], ['3', 3, 2, true], ['3', undefined, 2, true], ['3', undefined, 3, false]]) {
+    const h = harness({ checks: [() => checkedInv({}, {}, { windows_before: before, windows_after: after }), good] });
+    await h.invoke(payload({ windows }));
+    assert.equal(h.counts().generation, rejected ? 2 : 1, `Angabe ${windows}, Foto ${before}, Bild ${after}`);
+    if (rejected) assert.match(mailOf(h), /Bild 1 verworfen \(a window was lost/);
+  }
+  // Ein Fenster an einer anderen Wand hat dieselbe Zahl: das sieht extra_openings (weg und dazu).
+  const moved = harness({ checks: [() => checkedInv({}, {}, { windows_before: 1, windows_after: 1, extra_openings: true, reason: 'the window moved from the left wall to the back wall' }),
+    () => checkedInv({}, {}, { windows_before: 1, windows_after: 1 })] });
+  assert.equal((await moved.invoke(payload({ windows: '1' }))).statusCode, 200);
+  assert.equal(moved.counts().generation, 2);
+  assert.match(mailOf(moved), /Bild 1 verworfen \(an opening was added or lost \(the window moved from the left wall to the back wall\)\)/);
   const added = harness({ checks: [() => checkedInv({}, {}, { windows_before: 0, windows_after: 1 }), good] });
   assert.equal((await added.invoke(payload({ windows: '0' }))).statusCode, 200);
   assert.equal(added.counts().generation, 2);
