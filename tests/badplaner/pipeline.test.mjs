@@ -1801,7 +1801,11 @@ test('Dusche: Rinne und Armaturen an der Stirnwand im Prompt, falsch gezeichnet 
   assert.equal(edge.counts().generation, 1);
   assert.doesNotMatch(JSON.stringify(edge.calls.find((call) => call.url === 'https://api.resend.com/emails').body), /Hinweis/);
   const trayPrompt = tray.calls.find((call) => call.body?.generationConfig?.responseModalities).body.contents[0].parts[0].text;
-  assert.match(trayPrompt, /flat shower tray in the same colour as the toilet: one smooth piece without tile joints, set into the floor so that its surface is exactly level with the floor tiles around it, with no step/);
+  // Diego, 04.10.: eben oder mit ihrem Rand von 2 bis 3 cm, nie auf einem Podest; ganz eben bleibt nur die Gefaelledusche.
+  assert.match(trayPrompt, /flat shower tray in the same colour as the toilet: one smooth piece without tile joints, set into the floor so that its surface is level with the floor tiles around it or at most about 2 to 3 cm above them, showing only its own thin edge, never standing on a step, a kerb, a plinth or a platform;/);
+  assert.doesNotMatch(trayPrompt, /no rim|no raised edge|exactly level/);
+  assert.match(prompt, /walk-in shower without a tray: the bathroom floor tiles continue into it, with no step, no kerb and no raised platform/);
+  assert.doesNotMatch(prompt, /2 to 3 cm|thin edge/);
   assert.match(trayPrompt, /it covers the whole shower floor, its outline shows clearly against the floor tiles, and it has its own small round drain with a round cover in its surface, and no channel drain/);
   assert.match(trayPrompt, /ALL shower fittings sit together on that short end wall/);
   // P2 vom 26.09.: die alte erhoehte Wanne blieb; bisher ging nur die Badewanne bis zum Boden weg (Gegenpruefung).
