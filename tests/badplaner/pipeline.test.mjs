@@ -610,15 +610,17 @@ test('die Wahl des Kunden wird abgelesen: ein leichter Unterschied steht als Hin
     keramik: atelier.sanitary[0].id, wall: atelier.walls[0].id, dusche: 'keine', badewanne: 'freistehend',
     waschtisch: 'doppel', spiegel: 'spiegelschrank' });
   let retryPrompt = '';
-  const mailOf = async (answers, generations = 1) => {
+  const mailOf = async (answers, generations = 1, status = 200) => {
     const h = harness({ checks: [() => checkedInv({ bathtub: 'back' }, { bathtub: 'back' }, answers)] });
-    assert.equal((await h.invoke(choice)).statusCode, 200);
+    assert.equal((await h.invoke(choice)).statusCode, status);
     assert.equal(h.counts().generation, generations);
     retryPrompt = h.calls.filter((call) => call.body?.generationConfig?.responseModalities)[1]?.body.contents[0].parts[0].text ?? '';
     return JSON.stringify(h.calls.find((call) => call.url === 'https://api.resend.com/emails').body);
   };
+  // Bleibt ein schwerer Hinweis auch im zweiten Durchgang, sieht der Kunde das Bild seit dem 04.10. nicht (502); NLD
+  // bekommt es mit allen Hinweisen.
   const wrong = await mailOf({ washbasins_after: 1, basin_on_top_after: true, mirror_after: 'mirror', mirror_kept: true,
-    bathtub_after: 'built_in', overhead_shower_after: true }, 2);
+    bathtub_after: 'built_in', overhead_shower_after: true }, 2, 502);
   assert.match(retryPrompt, /A previous attempt was wrong because the mirror above the washbasin is still the old one of the photo; and because the bathtub is built in, but a freestanding bathtub was chosen; and because there is an overhead shower, but no shower was chosen\. Start again from image 1/);
   assert.doesNotMatch(retryPrompt, /washbasin bowl\(s\)|a flat mirror hangs/);
   // Nur Leichtes: kein zweiter Durchgang.
@@ -1748,14 +1750,14 @@ test('Dusche: Rinne und Armaturen an der Stirnwand im Prompt, falsch gezeichnet 
   assert.match(JSON.stringify(h.calls.find((call) => call.url === 'https://api.resend.com/emails').body),
     /Fensterprüfung.*ok, Hinweis: the shower has a point drain; it needs a linear channel drain at the foot of the wall with the fittings/);
   // Armaturen an zwei Waenden (P2 der sechsten Probe), Stufe (P1): das sieht der Kunde sofort, darum ein zweiter
-  // Durchgang (Diego, 27.09.); bleibt es, steht es als Hinweis in der Mail.
+  // Durchgang (Diego, 27.09.); bleibt es, sieht der Kunde das Bild nicht, und NLD bekommt es mit dem Hinweis (04.10.).
   for (const [flags, reason] of [
     [{ shower_fittings_walls: ['back', 'left'] }, /the shower fittings are spread over two walls/],
     [{ shower_step: true }, /the shower floor is raised above the bathroom floor/],
   ]) {
     const wrong = () => checkedInv({ shower: 'back' }, { shower: 'back' }, flags);
     const w = harness({ checks: [wrong, wrong] });
-    assert.equal((await w.invoke(payload({ dusche: 'walk-in', badewanne: 'keine' }))).statusCode, 200);
+    assert.equal((await w.invoke(payload({ dusche: 'walk-in', badewanne: 'keine' }))).statusCode, 502);
     assert.equal(w.counts().generation, 2, JSON.stringify(flags));
     assert.match(w.calls.filter((call) => call.body?.generationConfig?.responseModalities)[1].body.contents[0].parts[0].text,
       new RegExp(`A previous attempt was wrong because ${reason.source}`));
@@ -1783,14 +1785,14 @@ test('Dusche: Rinne und Armaturen an der Stirnwand im Prompt, falsch gezeichnet 
   assert.match(trayPrompt, /removed down to the floor\. So is an old shower tray, its kerb or platform\./);
   assert.doesNotMatch(trayPrompt, /Duschrinne|slopes towards it|very slightly towards it|sloped|like one large floor tile/);
   // Wanne gefliest oder mit Rinne gezeichnet: schwere Hinweise, ein zweiter Durchgang. Ein runder Ablauf ist bei der Wanne richtig.
-  const trayMail = async (flags, generations = 1) => {
+  const trayMail = async (flags, generations = 1, status = 200) => {
     const answer = () => checkedInv({ shower: 'back' }, { shower: 'back' }, flags);
     const w = harness({ checks: [answer, answer] });
-    assert.equal((await w.invoke(payload({ dusche: 'duschwanne', badewanne: 'keine' }))).statusCode, 200);
+    assert.equal((await w.invoke(payload({ dusche: 'duschwanne', badewanne: 'keine' }))).statusCode, status);
     assert.equal(w.counts().generation, generations);
     return JSON.stringify(w.calls.find((call) => call.url === 'https://api.resend.com/emails').body);
   };
-  const tiled = await trayMail({ shower_floor_after: 'tiles', drain_wall: 'back', shower_fittings_walls: ['left'] }, 2);
+  const tiled = await trayMail({ shower_floor_after: 'tiles', drain_wall: 'back', shower_fittings_walls: ['left'] }, 2, 502);
   assert.match(tiled, /Hinweis: the shower floor is tiled, but a shower with a shower tray was chosen/);
   assert.match(tiled, /Hinweis: the shower has a channel drain; the shower tray needs its own small round drain/);
   assert.doesNotMatch(tiled, /belongs at the foot of/);
@@ -1863,14 +1865,17 @@ test('Dusche: die Stirnwand sagt die Vorpruefung im Foto, der Prompt nennt sie',
   assert.match(showerPrompt, /The short end wall of the shower is the back wall/);
 });
 
-test('eine Stufe in der Dusche kostet einen zweiten Durchgang; bleibt sie, sieht der Kunde das beste Bild und NLD den Hinweis', async () => {
+test('eine Stufe in der Dusche kostet einen zweiten Durchgang; bleibt sie, sieht der Kunde kein Bild und NLD Bild und Hinweis', async () => {
   // Diego, 26.09. (Entscheidung A): in zwei Proben richtete der zweite Versuch 0 von 6 Duschen, je CHF 0.12 und 35 s.
   // Seit dem 27.09. laufen zwei Bilder je Durchgang, und in P1 der sechsten Probe ging der erhoehte Walk-in mit dem
   // Hinweis an den Kunden: eine Stufe loest wieder einen zweiten Durchgang aus.
   const step = () => checkedInv({ shower: 'back' }, { shower: 'back' }, { shower_step: true });
+  // Bleibt sie auch im zweiten Durchgang, sieht der Kunde das Bild seit dem 04.10. nicht.
   const h = harness({ checks: [step, step] });
   const res = await h.invoke(payload({ dusche: 'walk-in', badewanne: 'keine' }));
-  assert.equal(res.statusCode, 200);
+  assert.equal(res.statusCode, 502);
+  assert.equal(res.body.code, 'RENDER_REJECTED');
+  assert.equal(res.body.image, undefined);
   assert.equal(h.counts().generation, 2);
   assert.match(JSON.stringify(h.calls.find((call) => call.url === 'https://api.resend.com/emails').body),
     /Fensterprüfung.*Bild 2 nicht gezeigt \(Hinweise: the shower floor is raised.*\), Bild 1 mit schwerem Hinweis, Hinweis: the shower floor is raised/);
@@ -2364,7 +2369,8 @@ test('Produktdurchgang: faellt das neue Bild durch, hat es einen schweren Hinwei
   const fixed = await run({ checks: [mirror, mirror, () => checked()], product: undefined, extra: { generations: [() => generated(first), () => generated(first), () => generated(edited)] } });
   assert.equal(fixed.res.body.image.data, edited);
   assert.equal(fixed.h.counts().generation, 3);
-  assert.match(fixed.mail, /Bild 2 nicht gezeigt \(Hinweise: the mirror above the washbasin is still the old one of the photo\), Bild 1 mit schwerem Hinweis, Produktdurchgang ok</);
+  // Die Mail urteilt nach dem Bild, das der Kunde bekommt, also nach dem Produktdurchgang (04.10.).
+  assert.match(fixed.mail, /Bild 2 nicht gezeigt \(Hinweise: the mirror above the washbasin is still the old one of the photo\), Bild 1 ok, Produktdurchgang ok</);
   // Der Bilddienst liefert nicht: das erste, ohne weiteres Bild in der Mail.
   const down = await run({ checks: [() => checked()], product: () => response({ error: 'boom' }, 500) });
   assert.equal(down.res.body.image.data, first);
@@ -2522,10 +2528,11 @@ test('Vorpruefung: die beruehrten Waende sagen die Enden der Wanne, die Armature
 });
 
 test('die Pruefung fragt, ob das WC noch das alte ist; das ist ein schwerer Hinweis', async () => {
-  // P3 der sechsten Probe: das WC war nicht das neue, und das Bild ging an den Kunden.
+  // P3 der sechsten Probe: das WC war nicht das neue, und das Bild ging an den Kunden. Seit dem 04.10. geht es nicht
+  // mehr hinaus, wenn auch der zweite Durchgang das alte WC zeigt.
   const old = () => checkedInv({}, {}, { toilet_kept: true });
   const h = harness({ checks: [old, old] });
-  assert.equal((await h.invoke()).statusCode, 200);
+  assert.equal((await h.invoke()).statusCode, 502);
   assert.equal(h.counts().generation, 2);
   const question = h.calls.find((call) => call.url.includes('generativelanguage') && !call.body.generationConfig.responseModalities
     && call.body.contents[0].parts.filter((part) => part.inlineData).length === 2).body.contents[0].parts[0].text;
@@ -2639,9 +2646,61 @@ test('Problem 1 der siebten Probe: die Armaturen an der Stirnwand, die Vorpruefu
     assert.doesNotMatch(promptOf(odd), /The short end wall/, JSON.stringify(extra));
     assert.match(mailOf(odd), /Stirnwand –; Decke flach</, JSON.stringify(extra));
   }
-  // Laengs an der linken Wand, Ende hinten: die Armaturen an der Rueckwand, von vorne gesehen.
+  // Laengs an der linken Wand, Ende hinten: die Armaturen an der Rueckwand, von vorne gesehen. Die Pruefung sieht sie
+  // links, ein Widerspruch zur Vorpruefung: das Bild geht nicht hinaus (04.10.).
   const deep = harness({ photoChecks: [photo({ shower_back: 'end', shower_left: true })], checks: [right] });
-  assert.equal((await deep.invoke(body)).statusCode, 200);
+  assert.equal((await deep.invoke(body)).statusCode, 502);
+  assert.match(mailOf(deep), /Ideenbild zurückgehalten \(schwerer Hinweis\)/);
   assert.match(promptOf(deep), /The short end wall of the shower is the back wall seen from the camera: the mixer, the overhead shower and the hand shower sit on it, facing the camera, and the channel drain lies along its foot; its long side runs along the left wall, which carries no fitting, only tiles\./);
   assert.match(mailOf(deep), /Wanne\/Dusche berührt links, hinten mit einem Ende; Längsseite links, Stirnwand hinten;/);
+});
+
+test('ein Bild mit schwerem Hinweis nach allen Durchgaengen geht nicht hinaus; es zaehlt das Bild nach dem Produktdurchgang', async () => {
+  // Carla und Diego, 04.10.: in P2 und P5 sagte die Vorpruefung "Stirnwand rechts", "Dusche im Bild" "Armaturen: hinten",
+  // und das Bild ging trotzdem an den Kunden. Jetzt bekommt er die Antwort eines verworfenen Bildes mit dem Weg zur
+  // Beratung, NLD Foto, Bild und Grund. Eine Vorschau ist anonym: kein Versprechen, das Bild nachzuschicken.
+  const photo = () => photoChecked(true, JSON.stringify({ is_bathroom: true, reason: 'bathroom', walls: inv({ toilet: 'right', washbasin: 'right', bathtub: 'back' }),
+    order: ['bathtub', 'washbasin', 'toilet'], nearest: 'toilet', ceiling: 'flat', shower_back: 'along', shower_left: true, shower_right: true, basin_beside_end: true }));
+  const at = (walls) => () => checkedInv({ bathtub: 'back' }, { shower: 'back' }, { shower_fittings_walls: walls, shower_floor_after: 'tray', shower_step: false });
+  const choice = { dusche: 'duschwanne', badewanne: 'keine' };
+  const mails = (h) => h.calls.filter((call) => call.url === 'https://api.resend.com/emails').map((call) => call.body);
+
+  // Vorschau ohne Kontaktdaten: zwei Durchgaenge, beide mit den Armaturen an der Rueckwand.
+  const anonymous = harness({ photoChecks: [photo], checks: [at(['back']), at(['back'])] });
+  const res = await anonymous.invoke(previewPayload(choice));
+  assert.equal(res.statusCode, 502);
+  assert.equal(res.body.code, 'RENDER_REJECTED');
+  assert.equal(res.body.image, undefined);
+  assert.equal(res.body.ticket, undefined);
+  assert.equal(res.headers['Set-Cookie'], undefined);
+  assert.equal(res.body.error, 'Ihr Ideenbild hat unsere Qualitätsprüfung nicht bestanden und wird deshalb nicht angezeigt. Sie können ein anderes Foto verwenden oder eine persönliche Beratung anfragen.');
+  assert.equal(anonymous.counts().generation, 2);
+  assert.equal(mails(anonymous).length, 1);
+  const [held] = mails(anonymous);
+  assert.match(held.subject, /^Badplaner-Fehler ohne Kontakt – .+ – Ideenbild zurückgehalten \(schwerer Hinweis\)$/);
+  assert.deepEqual(held.attachments.map((attachment) => attachment.filename), ['foto.png', 'zurueckgehalten.png']);
+  const text = JSON.stringify(held);
+  assert.match(text, /ohne Kontaktdaten können wir es nicht nachschicken/);
+  assert.match(text, /Stirnwand rechts \(Waschtisch am Ende\)/);
+  assert.match(text, /Dusche im Bild<\/td><td[^>]*>Armaturen: hinten;/);
+  assert.match(text, /Bild 1 mit schwerem Hinweis, Hinweis: the shower fittings are on the back wall; seen from the door they all belong on the right wall/);
+  assert.match(text, /Ideenbild<\/td><td[^>]*>zurückgehalten \(schwerer Hinweis\), nicht angezeigt</);
+
+  // Mit Kontaktdaten (Formular vor dem Bild): keine Kundenmail mit dem Bild, nur die Mail an NLD.
+  const contact = harness({ photoChecks: [photo], checks: [at(['back']), at(['back'])] });
+  const withContact = await contact.invoke(payload(choice));
+  assert.equal(withContact.statusCode, 502);
+  assert.equal(withContact.body.image, undefined);
+  assert.equal(withContact.body.error, 'Ihr Ideenbild hat unsere Qualitätsprüfung nicht bestanden und wird deshalb nicht angezeigt. Ihre Angaben und Ihr Foto sind bei uns. Wir melden uns persönlich bei Ihnen.');
+  assert.equal(mails(contact).length, 1);
+  assert.match(mails(contact)[0].subject, /^Badplaner-Lead: Fixture Person – .+ – Ideenbild zurückgehalten \(schwerer Hinweis\)$/);
+  assert.match(JSON.stringify(mails(contact)[0]), /dem Kunden weder angezeigt noch geschickt/);
+
+  // Behebt der Produktdurchgang den Hinweis, zaehlt sein Bild: es geht hinaus, und die Mail sagt "ok".
+  const fixed = harness({ env: { BADPLANER_PRODUCT_PASS: undefined }, photoChecks: [photo], checks: [at(['back']), at(['back']), at(['right'])] });
+  const fixedRes = await fixed.invoke(previewPayload(choice));
+  assert.equal(fixedRes.statusCode, 200);
+  assert.ok(fixedRes.body.image?.data);
+  assert.equal(fixed.counts().generation, 3);
+  assert.match(JSON.stringify(mails(fixed)[0]), /Bild 1 ok, Produktdurchgang ok/);
 });

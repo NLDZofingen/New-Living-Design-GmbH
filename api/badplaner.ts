@@ -29,14 +29,16 @@
  *      bestellt, Bidet noch da) in beiden: zweiter Durchgang, wenn die Zeit reicht; ein grob falsches
  *      Bild sieht der Kunde nie, NLD bekommt es mit dem Lead. Schwere Hinweise, die der Kunde sofort
  *      sieht (alter Spiegel, altes WC, Wannenart, Kopfbrause ohne Dusche, Stufe oder falscher Boden in
- *      der Dusche, Armaturen auf zwei Waenden), loesen ebenfalls einen zweiten Durchgang aus; gezeigt wird
- *      dann das beste aller Bilder. Leichte Hinweise (Tuer vorne weg, Punktablauf, Muretto, Nische, Zahl
- *      und Art der Becken, Spiegelart) stehen nur in der Lead-Mail. Ist die Pruefung nicht erreichbar,
- *      geht das Bild mit Vermerk hinaus.
+ *      der Dusche, Armaturen auf zwei Waenden oder nicht an der Stirnwand der Vorpruefung), loesen ebenfalls
+ *      einen zweiten Durchgang aus; gewaehlt wird dann das beste aller Bilder. Leichte Hinweise (Tuer vorne
+ *      weg, Punktablauf, Muretto, Nische, Zahl und Art der Becken, Spiegelart) stehen nur in der Lead-Mail.
+ *      Ist die Pruefung nicht erreichbar, geht das Bild mit Vermerk hinaus.
  *   4b. Produktdurchgang: das gewaehlte Bild geht mit den Produktbildern (WC, Platte oder Modul,
  *      Armaturen, Dusche, Wanne, Spiegel) nochmals an Gemini, das nur die Produkte neu zeichnet. Besteht
  *      das neue Bild die Pruefung ohne mehr schwere Hinweise, sieht es der Kunde, sonst das erste; NLD
  *      bekommt beide.
+ *   4c. Hat das Bild danach noch einen schweren Hinweis, sieht der Kunde es nicht (04.10.): er bekommt die
+ *      Antwort eines verworfenen Bildes mit dem Weg zur Beratung, NLD Foto, Bild und Grund in der Mail.
  *   5. Lead-Mail an NLD (Resend mit Anhaengen; bei eindeutigem Fehler Formspree ohne
  *      Bilder). Ohne bestaetigte Annahme kein Erfolg; unklare Zustellung wird nicht
  *      blind wiederholt.
@@ -869,7 +871,8 @@ async function handleRender(req: any, res: any, body: RenderBody, ctx: RequestCo
   const secondPassMs = Math.round(firstPassMs * 1.15) + DELIVERY_RESERVE_MS;
   const secondCheckReserveMs = Math.round((firstPassMs - firstGenerationMs) * 1.15) + DELIVERY_RESERVE_MS;
   // Ein zweiter Durchgang, wenn alle Bilder einen groben Fehler haben oder das beste einen schweren Hinweis (Diego, 27.09.).
-  // Gezeigt wird danach das beste aller Bilder: ein schwerer Hinweis allein laesst niemanden ohne Bild.
+  // Gewaehlt wird danach das beste aller Bilder; hat es nach dem Produktdurchgang noch einen schweren Hinweis, sieht
+  // der Kunde es nicht (unten, seit dem 04.10.).
   const seriousFaults = chosen.check.status === 'approved' ? chosen.check.serious ?? [] : [];
   if ((chosen.check.status === 'rejected' || seriousFaults.length) && ctx.budget.remaining() >= secondPassMs) {
     // Der ganze Prompt geht nochmals mit; dazu nur die Gruende, nicht eine zweite Liste aller Regeln.
@@ -895,22 +898,29 @@ async function handleRender(req: any, res: any, body: RenderBody, ctx: RequestCo
       : attempt.check.status === 'approved' && attempt.check.hints?.length ? ` (Hinweise: ${attempt.check.hints.join('; ')})` : ''}`);
   const byNumber = (a: string, b: string) => parseInt(a.replace(/^Bild /, ''), 10) - parseInt(b.replace(/^Bild /, ''), 10);
   const others = [...discarded, ...notShown].sort(byNumber);
-  if (check.status === 'rejected') {
-    const rejectedNote = `abgelehnt – ${tries.join(' | ')}`;
+  // Ein Bild, das der Kunde nicht sehen soll: NLD bekommt Foto, Bild und Grund, der Besucher die Antwort eines verworfenen
+  // Bildes mit dem Weg zur Beratung (RENDER_REJECTED). Eine Vorschau ist anonym: NLD kann dort kein Bild nachschicken,
+  // Kontaktdaten kommen erst mit einer Beratungsanfrage.
+  const withhold = async (note: string, image: { mime: string; data: string }, held: boolean, extra: { filename: string; content: string }[] = []) => {
+    const outcome = held ? 'Ideenbild zurückgehalten (schwerer Hinweis)' : 'Ideenbild abgelehnt';
     const leadDelivery = await sendLeadMail({
       subject: preview
-        ? `Badplaner-Fehler ohne Kontakt – ${isGuestWc ? 'Gäste-WC' : pkg.name} – Ideenbild abgelehnt`
-        : `Badplaner-Lead: ${name} – ${isGuestWc ? 'Gäste-WC' : pkg.name} – Ideenbild abgelehnt`,
+        ? `Badplaner-Fehler ohne Kontakt – ${isGuestWc ? 'Gäste-WC' : pkg.name} – ${outcome}`
+        : `Badplaner-Lead: ${name} – ${isGuestWc ? 'Gäste-WC' : pkg.name} – ${outcome}`,
       replyTo: email || undefined,
-      intro: preview
-        ? 'Anonymer Badplaner-Versuch ohne Kontaktdaten. Das Ideenbild wurde von der Qualitätsprüfung abgelehnt und nicht angezeigt. Originalfoto, Auswahl und verworfenes Bild liegen bei.'
-        : 'Das Ideenbild wurde von der Qualitätsprüfung abgelehnt und dem Kunden nicht angezeigt. Originalfoto, Auswahl und verworfenes Bild liegen bei.',
-      details: leadDetails(rejectedNote, preview ? RENDER_FAILURE_LABELS.RENDER_REJECTED : 'abgelehnt (Prüfung), nicht angezeigt'),
-      // Das verworfene Bild geht mit: ohne es können wir nicht beurteilen, ob die
-      // Prüfung recht hatte oder ein brauchbares Bild unnötig verworfen wurde.
+      intro: held
+        ? `${preview ? 'Anonymer Badplaner-Versuch ohne Kontaktdaten. ' : ''}Das Ideenbild hat einen schweren Hinweis der Prüfung (siehe Fensterprüfung) und wurde ${preview ? 'nicht angezeigt; ohne Kontaktdaten können wir es nicht nachschicken' : 'dem Kunden weder angezeigt noch geschickt'}. Originalfoto, Auswahl und Bild liegen bei.`
+        : preview
+          ? 'Anonymer Badplaner-Versuch ohne Kontaktdaten. Das Ideenbild wurde von der Qualitätsprüfung abgelehnt und nicht angezeigt. Originalfoto, Auswahl und verworfenes Bild liegen bei.'
+          : 'Das Ideenbild wurde von der Qualitätsprüfung abgelehnt und dem Kunden nicht angezeigt. Originalfoto, Auswahl und verworfenes Bild liegen bei.',
+      details: leadDetails(note, held ? 'zurückgehalten (schwerer Hinweis), nicht angezeigt'
+        : preview ? RENDER_FAILURE_LABELS.RENDER_REJECTED : 'abgelehnt (Prüfung), nicht angezeigt'),
+      // Das Bild geht mit: ohne es können wir nicht beurteilen, ob die
+      // Prüfung recht hatte oder ein brauchbares Bild unnötig zurückblieb.
       attachments: [
         { filename: photoName, content: photo.data },
-        { filename: 'verworfen.jpg', content: gen.data },
+        { filename: held ? `zurueckgehalten.${image.mime === 'image/png' ? 'png' : 'jpg'}` : 'verworfen.jpg', content: image.data },
+        ...extra,
       ],
     }, ctx);
     // Ein abgelehntes Ideenbild ist für den Kunden kein Versuch: sein Tageslimit
@@ -926,7 +936,9 @@ async function handleRender(req: any, res: any, body: RenderBody, ctx: RequestCo
         ? 'Ihr Ideenbild hat unsere Qualitätsprüfung nicht bestanden und wird deshalb nicht angezeigt. Sie können ein anderes Foto verwenden oder eine persönliche Beratung anfragen.'
         : 'Ihr Ideenbild hat unsere Qualitätsprüfung nicht bestanden und wird deshalb nicht angezeigt. Ihre Angaben und Ihr Foto sind bei uns. Wir melden uns persönlich bei Ihnen.',
     });
-  }
+  };
+  // Mit await: sonst laeuft das finally unten vor der Mail, und das IP-Limit wuerde zurueckgedreht.
+  if (check.status === 'rejected') return await withhold(`abgelehnt – ${tries.join(' | ')}`, gen, false);
   // Produktdurchgang (Diego, 27.09.: "sistemare una volta per sempre, anche con immagini, il costo non conta"): das
   // gepruefte Bild bleibt, und ein zweiter, kurzer Auftrag ersetzt nur die Produkte nach ihren Vorlagen. Im ersten
   // Durchgang, mit Raum, Platten und allen Produkten zugleich, blieben sie in sechs Proben oft falsch: die Platte wie von
@@ -957,9 +969,10 @@ async function handleRender(req: any, res: any, body: RenderBody, ctx: RequestCo
     console.info('[badplaner]', productNote);
   }
   // Carla, 27.09.: ein gewaehltes Bild mit schwerem Hinweis hiess in der Mail "ok", obwohl der Hinweis dahinter seinen
-  // Fehler nannte (P2, P5: Armaturen an der Rueckwand).
+  // Fehler nannte (P2, P5: Armaturen an der Rueckwand). Es zaehlt die Pruefung des Bildes, das der Kunde bekaeme, also nach
+  // dem Produktdurchgang (Gegenpruefung vom 04.10.).
   const chosenLabel = chosen.check.status === 'unavailable' ? `ungeprüft (${chosen.check.detail})`
-    : chosen.check.status === 'approved' && chosen.check.serious?.length ? 'mit schwerem Hinweis' : 'ok';
+    : check.status === 'approved' && check.serious?.length ? 'mit schwerem Hinweis' : 'ok';
   if (check.status === 'approved' && (others.length || chosenLabel !== 'ok')) {
     checkNote = [...others, `Bild ${chosen.number} ${chosenLabel}`].join(', ');
   }
@@ -985,6 +998,14 @@ async function handleRender(req: any, res: any, body: RenderBody, ctx: RequestCo
   // Das zweite Bild des Produktdurchgangs geht mit, gezeigt oder nicht: so sieht NLD, was er geaendert hat.
   const baseAttachment = productOther ? [{ filename: `${productOther.name}.${productOther.image.mime === 'image/png' ? 'png' : 'jpg'}`, content: productOther.image.data }] : [];
   const details = leadDetails(checkNote);
+  // Carla und Diego, 04.10.: in P2 und P5 ging ein Bild mit schwerem Hinweis an den Kunden, weil alle Durchgaenge einen
+  // hatten ("Dusche im Bild" mit den Armaturen hinten, die Vorpruefung mit der Stirnwand rechts: dieser Widerspruch ist
+  // einer der schweren Hinweise). Es zaehlt die Pruefung des Bildes nach dem Produktdurchgang. Ein ungeprueftes Bild geht
+  // wie bisher mit Vermerk hinaus.
+  if (check.status === 'approved' && check.serious?.length) {
+    console.warn('[badplaner] Ideenbild zurückgehalten, schwerer Hinweis:', check.serious.join('; '));
+    return await withhold(checkNote, gen, true, baseAttachment);
+  }
   if (preview) {
     // Foto und Bild gehen jetzt an NLD: nur hier liegt das Foto, die Anfrage bringt
     // spaeter nur noch Kontakt und Bild. Scheitert diese Mail, sieht der Besucher sein
@@ -1851,7 +1872,7 @@ async function checkOpenings(
     wanted.mirror === 'spiegel' && parsed.mirror_after === 'cabinet' && 'a mirror cabinet hangs above the washbasin, but a flat mirror was chosen',
   ].filter((hint): hint is string => !!hint);
   // Schwere Hinweise (Diego, 27.09.): sie sieht der Kunde sofort. Hat das beste Bild einen davon, laufen zwei Bilder mehr,
-  // und gezeigt wird das beste aller Bilder; ohne Bild bleibt deshalb niemand. In der sechsten Probe P1 (Walk-in erhoeht),
+  // und gewaehlt wird das beste aller Bilder; hat auch das einen, sieht der Kunde keines (04.10.). In der sechsten Probe P1 (Walk-in erhoeht),
   // P7 (alter Spiegel), in der fuenften P3 (altes WC).
   const serious = [
     parsed.mirror_kept === true && 'the mirror above the washbasin is still the old one of the photo',
