@@ -193,6 +193,7 @@ interface BeratungBody {
   budget?: string;
   imageWanted?: boolean;
   renderFailure?: string;
+  renderLeadId?: string;
   auswahl?: unknown;
   file?: { name: string; mime: string; data: string };
   name?: string;
@@ -930,7 +931,8 @@ async function handleRender(req: any, res: any, body: RenderBody, ctx: RequestCo
     // Wiederholen bleibt das IP-Limit stehen, darum wird es nicht zurückgedreht.
     delivered = true;
     return res.status(502).json({
-      ok: false, code: 'RENDER_REJECTED',
+      // Die Lead-ID dieser Mail: die Seite schickt sie mit der Beratung zurueck, damit NLD beide Mails zusammenfindet.
+      ok: false, code: 'RENDER_REJECTED', leadId,
       delivery: { lead: leadDelivery.status, leadProvider: leadDelivery.provider, leadAttachments: leadDelivery.attachments },
       // "Später erneut versuchen" war der falsche Rat: mit demselben Foto scheitert
       // es wieder. Ein weiter gefasstes Foto hilft dem Modell, den Grundriss zu halten.
@@ -1194,6 +1196,10 @@ async function handleBeratung(req: any, res: any, body: BeratungBody, ctx: Reque
     ? body.renderFailure as RenderFailureCode
     : null;
   if (body.renderFailure !== undefined && !renderFailure) return bad(res, 'Ungültiger Grund für die Beratungsanfrage.');
+  // Lead-ID der Mail mit dem nicht gezeigten Bild (RENDER_REJECTED), im Format von newId(): nur ein Verweis fuer NLD,
+  // kein Nachweis. Foto und Auswahl bleiben massgebend, der Server merkt sich nichts.
+  const renderLeadId = typeof body.renderLeadId === 'string' && /^bp-[0-9a-z]{1,20}-[0-9a-z]{0,10}$/.test(body.renderLeadId) ? body.renderLeadId : '';
+  if (body.renderLeadId !== undefined && (!renderLeadId || renderFailure !== 'RENDER_REJECTED')) return bad(res, 'Ungültige Lead-ID des Ideenbilds.');
   const auswahl: [string, string][] = [];
   if (body.auswahl !== undefined) {
     if (!Array.isArray(body.auswahl) || body.auswahl.length > 40) return bad(res, 'Die Auswahl ist ungültig.');
@@ -1237,6 +1243,7 @@ async function handleBeratung(req: any, res: any, body: BeratungBody, ctx: Reque
     ['E-Mail', email],
     ['Raum', room === 'gaeste-wc' ? 'Gäste-WC' : 'Badezimmer'],
     ...(renderFailure ? [['Grund ohne Ideenbild', RENDER_FAILURE_LABELS[renderFailure]] as [string, string]] : []),
+    ...(renderLeadId ? [['Lead-ID Ideenbild zurückgehalten', renderLeadId] as [string, string]] : []),
     ...auswahl,
     ['Wünsche und Prioritäten', priorities],
     ['Masse oder Angaben zum Raum', measurements || 'nicht angegeben'],

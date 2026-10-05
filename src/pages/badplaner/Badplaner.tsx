@@ -284,6 +284,12 @@ const Badplaner: React.FC = () => {
   const [beratungRetry, setBeratungRetry] = useState<File | null>(null);
   const [renderFailure, setRenderFailure] = useState<RenderFailureCode | null>(null);
   const [showFailureConsultation, setShowFailureConsultation] = useState(false);
+  // Lead-ID des nicht gezeigten Ideenbilds (502 RENDER_REJECTED) fuer die Beratung: gilt nur fuer diesen Fehler. Jeder
+  // Neubeginn (Foto, Raum, Paket, neuer Versuch) loescht sie und zaehlt renderLeadRef hoch, damit eine spaete Antwort
+  // eines alten Versuchs keine Lead-ID mehr setzt.
+  const [renderLeadId, setRenderLeadId] = useState('');
+  const renderLeadRef = useRef(0);
+  const clearRenderLeadId = () => { renderLeadRef.current += 1; setRenderLeadId(''); };
 
   const [photo, setPhoto] = useState<ResizedImage | null>(null);
   const [photoSource, setPhotoSource] = useState(''); // kamera, galerie oder datei: steht in der Mail an NLD
@@ -291,6 +297,7 @@ const Badplaner: React.FC = () => {
   const removePhoto = () => {
     setPhoto(null);
     setPhotoError('');
+    clearRenderLeadId();
     // Sonst meldet der Browser beim gleichen Foto kein change-Ereignis mehr.
     for (const id of PHOTO_INPUTS) {
       const input = document.getElementById(id) as HTMLInputElement | null;
@@ -387,6 +394,7 @@ const Badplaner: React.FC = () => {
     setSel(defaultSelection(id, room));
     setOpenPanel(null);
     setRenderFailure(null);
+    clearRenderLeadId();
     setShowFailureConsultation(false);
     setStatus('idle');
     setErrorMsg('');
@@ -406,6 +414,7 @@ const Badplaner: React.FC = () => {
     setOpenPanel(null);
     setStep(1);
     setRenderFailure(null);
+    clearRenderLeadId();
     setShowFailureConsultation(false);
     setStatus('idle');
     setErrorMsg('');
@@ -424,6 +433,7 @@ const Badplaner: React.FC = () => {
     setStatus('idle');
     setErrorMsg('');
     setRenderFailure(null);
+    clearRenderLeadId();
     setShowFailureConsultation(false);
   };
 
@@ -444,6 +454,7 @@ const Badplaner: React.FC = () => {
   };
 
   const loadPhoto = async (file: File) => {
+    clearRenderLeadId();
     setPhotoError('');
     setRetryPhoto(null);
     setPhotoBusy(true);
@@ -468,6 +479,8 @@ const Badplaner: React.FC = () => {
       setPhotoError(own || 'Dieses Foto konnte nicht geöffnet werden. Bitte ein anderes wählen oder es mit «Foto aufnehmen» neu aufnehmen.');
     } finally {
       setPhotoBusy(false);
+      // Auch nach einem Fehler: ein Versuch, der waehrend des Ladens lief, gehoerte zum vorigen Foto.
+      clearRenderLeadId();
     }
   };
 
@@ -480,8 +493,9 @@ const Badplaner: React.FC = () => {
     input.value = ''; // gleiche Datei darf erneut gewählt werden
   };
 
-  const prepareFailureConsultation = (failure: RenderFailureCode | null) => {
+  const prepareFailureConsultation = (failure: RenderFailureCode | null, leadId?: unknown) => {
     setRenderFailure(failure);
+    setRenderLeadId(failure === 'RENDER_REJECTED' && typeof leadId === 'string' ? leadId : '');
     setShowFailureConsultation(false);
     if (!failure) return;
     setBeratung((current) => ({
@@ -510,6 +524,7 @@ const Badplaner: React.FC = () => {
     setStatus('sending');
     setErrorMsg('');
     prepareFailureConsultation(null);
+    const leadToken = ++renderLeadRef.current;
     const kombination = isAtelier && sel.accentMode === 'kombination';
     const controller = new AbortController();
     const timeout = window.setTimeout(() => controller.abort(), RENDER_TIMEOUT_MS);
@@ -568,7 +583,8 @@ const Badplaner: React.FC = () => {
       } else {
         setStatus('error');
         setErrorMsg(json?.error || friendlyHttpError(res.status));
-        prepareFailureConsultation(renderFailureCode(json?.code, res.status));
+        // Die Lead-ID nur, wenn seit dem Absenden nichts neu begonnen hat (Foto, Raum, Paket, neuer Versuch).
+        prepareFailureConsultation(renderFailureCode(json?.code, res.status), leadToken === renderLeadRef.current ? json?.leadId : undefined);
       }
     } catch (error) {
       setStatus('error');
@@ -676,6 +692,7 @@ const Badplaner: React.FC = () => {
           budget: beratung.budget.trim(),
           imageWanted: renderFailure ? false : beratung.imageWanted,
           renderFailure: renderFailure || undefined,
+          renderLeadId: renderFailure === 'RENDER_REJECTED' && renderLeadId ? renderLeadId : undefined,
           auswahl: renderFailure ? summaryRows.map((row) => [row.label, row.value]) : undefined,
           file,
           name: contact.name.trim(),
@@ -812,6 +829,7 @@ const Badplaner: React.FC = () => {
     setResult(null);
     setStatus('idle');
     setRenderFailure(null);
+    clearRenderLeadId();
     setShowFailureConsultation(false);
     setPlanStatus('idle');
     setPlanFile(null);

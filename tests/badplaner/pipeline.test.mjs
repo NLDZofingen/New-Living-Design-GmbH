@@ -1636,6 +1636,7 @@ test('Vorschau: falsches Foto verspricht keinen Rueckruf und meldet den Grund in
   const res = await h.invoke(previewPayload());
   assert.equal(res.statusCode, 422);
   assert.equal(res.body.code, 'PHOTO_NOT_A_BATHROOM');
+  assert.equal(res.body.leadId, undefined, 'nur ein nicht gezeigtes Bild bringt seine Lead-ID mit');
   assert.doesNotMatch(res.body.error, /Ihre Angaben sind bei uns|wir melden uns/i);
   assert.match(res.body.error, /kein Bad und kein WC/);
   assert.deepEqual(h.counts(), { generation: 0, checks: 0, mail: 1 });
@@ -1651,6 +1652,7 @@ test('Vorschau: Bildfehler nutzt den verbindlichen Text und verspricht keinen Ru
   const res = await h.invoke(previewPayload());
   assert.equal(res.statusCode, 502);
   assert.equal(res.body.code, 'RENDER_FAILED');
+  assert.equal(res.body.leadId, undefined, 'nur ein nicht gezeigtes Bild bringt seine Lead-ID mit');
   assert.equal(res.body.error, 'Ihr Ideenbild konnte leider nicht erstellt werden. Hinterlassen Sie uns Ihre Kontaktdaten – wir besprechen Ihre Badideen gerne persönlich mit Ihnen.');
   assert.doesNotMatch(res.body.error, /Ihre Angaben sind bei uns|wir melden uns|schicken es Ihnen nach/i);
   assert.deepEqual(h.counts(), { generation: 1, checks: 0, mail: 1 });
@@ -1674,6 +1676,8 @@ test('Vorschau: verworfenes Bild verspricht keinen Rueckruf und bleibt intern si
   assert.match(JSON.stringify(mail.body), /Qualitätsprüfung abgelehnt/);
   assert.match(JSON.stringify(mail.body), /Paket.*Essenza/);
   assert.deepEqual(mail.body.attachments.map(({ filename }) => filename), ['foto.png', 'verworfen.jpg']);
+  // Auch das verworfene Bild laeuft ueber withhold: die Antwort traegt die Lead-ID seiner Mail.
+  assert.match(JSON.stringify(mail.body), new RegExp(`>Lead-ID</td><td[^>]*>${res.body.leadId}<`));
 });
 
 test('Beratung nach Bildfehler uebermittelt Foto und Auswahl ohne Gemini', async () => {
@@ -1698,11 +1702,15 @@ test('Beratung nach Bildfehler uebermittelt Foto und Auswahl ohne Gemini', async
   assert.match(JSON.stringify(mail.body), /Bildgenerierung fehlgeschlagen/);
   assert.match(JSON.stringify(mail.body), /Paket.*Essenza/);
   assert.match(JSON.stringify(mail.body), /Dusche.*Walk-in/);
+  assert.doesNotMatch(JSON.stringify(mail.body), /Lead-ID Ideenbild zurückgehalten/);
   assert.deepEqual(mail.body.attachments.map(({ filename }) => filename), ['beratung.png']);
 });
 
 test('Beratung lehnt manipulierten Fehlerkontext vor jedem Provideraufruf ab', async () => {
-  for (const change of [{ renderFailure: 'toString' }, { renderFailure: 'RENDER_FAILED', auswahl: [['Paket']] }]) {
+  for (const change of [{ renderFailure: 'toString' }, { renderFailure: 'RENDER_FAILED', auswahl: [['Paket']] },
+    // Lead-ID des nicht gezeigten Bildes: nur im Format von newId() und nur zu RENDER_REJECTED.
+    ...['', 'Lead 42', 'bp-<b>1</b>-x', `bp-${'a'.repeat(21)}-1`, 'BP-FIXTURE-1', 42, null].map((renderLeadId) => ({ renderFailure: 'RENDER_REJECTED', renderLeadId })),
+    { renderFailure: 'RENDER_FAILED', renderLeadId: 'bp-fixture-1' }, { renderLeadId: 'bp-fixture-1' }]) {
     const h = harness();
     const res = await h.invoke({
       kind: 'beratung', raum: 'badezimmer', priorities: 'Persönliche Beratung',
@@ -2867,4 +2875,51 @@ test('ein Bild mit schwerem Hinweis nach allen Durchgaengen geht nicht hinaus; e
   assert.ok(fixedRes.body.image?.data);
   assert.equal(fixed.counts().generation, 3);
   assert.match(JSON.stringify(mails(fixed)[0]), /Bild 1 ok, Produktdurchgang ok/);
+});
+
+test('Beratung nach einem zurueckgehaltenen Bild nennt dessen Lead-ID in eigener Zeile; Foto und Auswahl bleiben dabei', async () => {
+  // Diego, 05.10.: NLD soll die Beratung sicher der Mail mit dem nicht gezeigten Bild zuordnen. Die Lead-ID ist nur ein
+  // Verweis; der Server merkt sich nichts, und jeder neue Versuch hat seine eigene.
+  const photo = () => photoChecked(true, JSON.stringify({ is_bathroom: true, reason: 'bathroom', walls: inv({ toilet: 'right', washbasin: 'right', bathtub: 'back' }),
+    order: ['bathtub', 'washbasin', 'toilet'], nearest: 'toilet', ceiling: 'flat', shower_back: 'along', shower_left: true, shower_right: true, basin_beside_end: true }));
+  const back = () => checkedInv({ bathtub: 'back' }, { shower: 'back' }, { shower_fittings_walls: ['back'], shower_floor_after: 'tray', shower_step: false });
+  const h = harness({ photoChecks: [photo, photo], checks: [back, back, back, back] });
+  const mails = () => h.calls.filter((call) => call.url === 'https://api.resend.com/emails').map((call) => call.body);
+  const row = (label, value) => new RegExp(`>${label}</td><td[^>]*>${value}<`);
+
+  const first = await h.invoke(previewPayload({ dusche: 'duschwanne', badewanne: 'keine' }));
+  const second = await h.invoke(previewPayload({ dusche: 'duschwanne', badewanne: 'keine' }));
+  for (const [index, held] of [first, second].entries()) {
+    assert.equal(held.statusCode, 502);
+    assert.equal(held.body.code, 'RENDER_REJECTED');
+    assert.match(mails()[index].subject, /Ideenbild zurückgehalten \(schwerer Hinweis\)$/);
+    assert.match(JSON.stringify(mails()[index]), row('Lead-ID', held.body.leadId));
+  }
+  assert.notEqual(second.body.leadId, first.body.leadId);
+
+  const consultation = {
+    kind: 'beratung', raum: 'badezimmer', priorities: 'Ich wünsche eine persönliche Beratung zu meiner Auswahl im Badplaner.',
+    renderFailure: 'RENDER_REJECTED', auswahl: [['Paket', 'Essenza'], ['Dusche', 'Duschwanne']],
+    file: { name: 'badfoto.png', mime: 'image/png', data: PNG },
+    name: 'Fixture Person', email: 'fixture@example.invalid', telefon: '+41 00 000 00 00', consent: true,
+  };
+  const res = await h.invoke({ ...consultation, renderLeadId: second.body.leadId });
+  assert.equal(res.statusCode, 200);
+  const mail = mails().at(-1);
+  const text = JSON.stringify(mail);
+  assert.match(mail.subject, /^Badplaner-Beratung:/);
+  assert.match(text, row('Lead-ID Ideenbild zurückgehalten', second.body.leadId));
+  assert.match(text, row('Lead-ID', res.body.leadId));
+  assert.ok(![first.body.leadId, second.body.leadId].includes(res.body.leadId));
+  assert.doesNotMatch(text, new RegExp(`${first.body.leadId}<`));
+  assert.match(text, /Paket.*Essenza/);
+  assert.deepEqual(mail.attachments.map(({ filename }) => filename), ['beratung.png']);
+  assert.equal(h.counts().generation, 4, 'die Beratung erzeugt kein Bild');
+
+  // Das Format von newId() in Produktion, auch mit kurzem Zufallsteil.
+  for (const leadId of [`bp-${(1790000000000).toString(36)}-${(0.123456789).toString(36).slice(2, 8)}`, `bp-${(1790000000000).toString(36)}-${(0.5).toString(36).slice(2, 8)}`]) {
+    const accepted = await h.invoke({ ...consultation, renderLeadId: leadId });
+    assert.equal(accepted.statusCode, 200);
+    assert.match(JSON.stringify(mails().at(-1)), row('Lead-ID Ideenbild zurückgehalten', leadId));
+  }
 });
