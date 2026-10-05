@@ -144,10 +144,16 @@ function groupBy<T>(items: T[], key: (item: T) => string): { key: string; items:
   return out;
 }
 
+// Versuch "persoenliche Pruefung" (05.10.): nur wo VITE_BADPLANER_PRUEFUNG=1 beim Build gesetzt ist, also nur in der
+// Umgebung Preview von Vercel; der Server prueft zusaetzlich VERCEL_ENV. Dann sagen die Texte, dass ein Bad mit Dusche
+// zuerst persoenlich geprueft wird.
+const REVIEW_TRIAL = import.meta.env.VITE_BADPLANER_PRUEFUNG === '1';
+
 const howSteps = [
   { n: '1', title: 'Raum, Stil und Ausstattung wählen', text: 'Badezimmer oder Gäste-WC wählen. Danach Stil, Materialien und die passenden Positionen bestimmen oder direkt eine individuelle Beratung anfragen.' },
   { n: '2', title: 'Foto vom Raum machen', text: 'Am Handy neu aufnehmen oder ein Foto aus der Galerie wählen. Von der Tür aus, den ganzen Raum im Bild, Licht an. Das Foto wird vor dem Senden verkleinert.' },
-  { n: '3', title: 'Ideenbild ansehen, dann in voller Qualität erhalten', text: 'Nach ein bis zwei Minuten sehen Sie Ihr Bad mit den gewählten Materialien als Vorschau. Mit Ihren Kontaktangaben erhalten Sie es in voller Qualität per E-Mail, dazu den Fixpreis des Pakets und eine kostenlose Beratung.' },
+  { n: '3', title: 'Ideenbild ansehen, dann in voller Qualität erhalten', text: 'Nach ein bis zwei Minuten sehen Sie Ihr Bad mit den gewählten Materialien als Vorschau. Mit Ihren Kontaktangaben erhalten Sie es in voller Qualität per E-Mail, dazu den Fixpreis des Pakets und eine kostenlose Beratung.'
+    + (REVIEW_TRIAL ? ' Bei einem Bad mit Dusche prüfen wir das Ideenbild zuerst persönlich: Sie hinterlassen Ihre Kontaktdaten, und wir rufen Sie an Arbeitstagen so rasch wie möglich an.' : '') },
 ];
 
 /** Musterbild; fehlt es (noch nicht geladen), zeigt es eine farbige Fläche. */
@@ -288,6 +294,8 @@ const Badplaner: React.FC = () => {
   // Neubeginn (Foto, Raum, Paket, neuer Versuch) loescht sie und zaehlt renderLeadRef hoch, damit eine spaete Antwort
   // eines alten Versuchs keine Lead-ID mehr setzt.
   const [renderLeadId, setRenderLeadId] = useState('');
+  // Versuch "persoenliche Pruefung": 'form' nach der Antwort PERSONAL_REVIEW, 'sent' nach dem Kontakt.
+  const [reviewStep, setReviewStep] = useState<'' | 'form' | 'sent'>('');
   const renderLeadRef = useRef(0);
   const clearRenderLeadId = () => { renderLeadRef.current += 1; setRenderLeadId(''); };
 
@@ -507,8 +515,11 @@ const Badplaner: React.FC = () => {
     setBeratungError('');
   };
 
-  /** Schritt 3: das Ideenbild VOR den Kontaktangaben. Die Anfrage folgt im Ergebnis. */
-  const submitRender = async () => {
+  /**
+   * Schritt 3: das Ideenbild VOR den Kontaktangaben. Die Anfrage folgt im Ergebnis. Im Versuch "persoenliche Pruefung"
+   * (review) mit den Kontaktangaben und ohne Vorschau: das Bild geht nur an NLD, die Seite bekommt keines.
+   */
+  const submitRender = async (review = false) => {
     if (renderSubmittingRef.current) return;
     if (!room || !pkg || !sel || !photo || !canOpenStep4) {
       setStatus('error');
@@ -520,10 +531,16 @@ const Badplaner: React.FC = () => {
       setErrorMsg('Bitte bestätigen Sie die Datenschutzerklärung.');
       return;
     }
+    if (review && contact.phone.replace(/\D/g, '').length < 7) {
+      setStatus('error');
+      setErrorMsg('Bitte eine gültige Telefonnummer angeben.');
+      return;
+    }
     renderSubmittingRef.current = true;
     setStatus('sending');
     setErrorMsg('');
     prepareFailureConsultation(null);
+    if (!review) setReviewStep('');
     const leadToken = ++renderLeadRef.current;
     const kombination = isAtelier && sel.accentMode === 'kombination';
     const controller = new AbortController();
@@ -536,7 +553,9 @@ const Badplaner: React.FC = () => {
         // Feldnamen nach Kapitel 10 der Spezifikation (Vertrag mit api/badplaner.ts)
         body: JSON.stringify({
           kind: 'render',
-          stage: 'vorschau',
+          ...(review
+            ? { pruefung: true, name: contact.name.trim(), email: contact.email.trim(), telefon: contact.phone.trim(), place: contact.place.trim() }
+            : { stage: 'vorschau' }),
           raum: room,
           paket: pkg,
           individuell,
@@ -567,7 +586,15 @@ const Badplaner: React.FC = () => {
         }),
       });
       const json = await res.json().catch(() => null);
-      if (res.ok && json?.ok && json.vorschau && json.image?.data && json.ticket) {
+      if (review && res.ok && json?.ok && json.pruefung) {
+        setStatus('idle');
+        setReviewStep('sent');
+        trackLead('form', 'badplaner-pruefung');
+      } else if (!review && res.status === 409 && json?.code === 'PERSONAL_REVIEW') {
+        // Versuch "persoenliche Pruefung": kein Bild, zuerst der Kontakt.
+        setStatus('idle');
+        setReviewStep('form');
+      } else if (res.ok && json?.ok && json.vorschau && json.image?.data && json.ticket) {
         const mime = json.image.mime || 'image/png';
         const bytes = Uint8Array.from(atob(json.image.data), (c) => c.charCodeAt(0));
         setResult({
@@ -584,7 +611,8 @@ const Badplaner: React.FC = () => {
         setStatus('error');
         setErrorMsg(json?.error || friendlyHttpError(res.status));
         // Die Lead-ID nur, wenn seit dem Absenden nichts neu begonnen hat (Foto, Raum, Paket, neuer Versuch).
-        prepareFailureConsultation(renderFailureCode(json?.code, res.status), leadToken === renderLeadRef.current ? json?.leadId : undefined);
+        // Im Versuch hat NLD den Kontakt schon: keine zweite Beratungsanfrage.
+        prepareFailureConsultation(review ? null : renderFailureCode(json?.code, res.status), leadToken === renderLeadRef.current ? json?.leadId : undefined);
       }
     } catch (error) {
       setStatus('error');
@@ -593,7 +621,7 @@ const Badplaner: React.FC = () => {
           ? 'Die Erstellung hat zu lange gedauert und wurde abgebrochen. Bitte versuchen Sie es noch einmal.'
           : 'Keine Verbindung. Bitte prüfen Sie Ihr Netz und versuchen Sie es noch einmal.',
       );
-      prepareFailureConsultation('RENDER_FAILED');
+      prepareFailureConsultation(review ? null : 'RENDER_FAILED');
     } finally {
       window.clearTimeout(timeout);
       renderSubmittingRef.current = false;
@@ -1025,7 +1053,7 @@ const Badplaner: React.FC = () => {
             <a href="#planer" className={styles.ctaPrimary} onClick={() => trackBadplaner('badplaner_start')}>Jetzt starten</a>
             <a href="#ablauf" className={styles.ctaSecondary}>So funktioniert's</a>
           </div>
-          <p className={styles.heroText}>Materialien wählen, Foto vom Bad hochladen: nach ein bis zwei Minuten sehen Sie Ihr Bad neu. Kostenlos und unverbindlich, aus Zofingen.</p>
+          <p className={styles.heroText}>Materialien wählen, Foto vom Bad hochladen: nach ein bis zwei Minuten sehen Sie Ihr Bad neu.{REVIEW_TRIAL && ' Bei einem Bad mit Dusche prüfen wir das Ideenbild zuerst persönlich.'} Kostenlos und unverbindlich, aus Zofingen.</p>
           <p className={styles.heroNote}>
             Ideenbild, kein Plan: Das Bild zeigt eine Stimmung mit den gewählten Materialien. Masse, Leitungen und Details klären wir vor Ort.
           </p>
@@ -1273,7 +1301,7 @@ const Badplaner: React.FC = () => {
                         </span>
                       </label>
                       <div className={styles.stepActions}>
-                        <button type="button" className={styles.ctaDark} onClick={submitRender} disabled={!windows || !cistern || !contact.consent || status === 'sending'}>
+                        <button type="button" className={styles.ctaDark} onClick={() => submitRender()} disabled={!windows || !cistern || !contact.consent || status === 'sending'}>
                           {status === 'sending' ? 'Wird erstellt…' : 'Ideenbild erstellen'}
                         </button>
                         {(!windows || !cistern) && <span className={styles.hint}>Bitte Fenster und Spülkasten angeben.</span>}
@@ -1281,7 +1309,7 @@ const Badplaner: React.FC = () => {
                       {status === 'sending' && (
                         <div className={styles.progress} role="status" aria-live="polite">
                           <div className={styles.progressBar}><span /></div>
-                          <p className={styles.progressText}>Wir gestalten Ihr Bad und prüfen das Bild. Das dauert meist ein bis zwei Minuten, bei einem zweiten Anlauf bis zu vier; bitte lassen Sie die Seite offen.</p>
+                          <p className={styles.progressText}>{reviewStep === 'form' ? 'Wir erstellen das Ideenbild für unsere persönliche Prüfung.' : 'Wir gestalten Ihr Bad und prüfen das Bild.'} Das dauert meist ein bis zwei Minuten, bei einem zweiten Anlauf bis zu vier; bitte lassen Sie die Seite offen.</p>
                         </div>
                       )}
                       {status === 'error' && !result && (
@@ -1316,6 +1344,24 @@ const Badplaner: React.FC = () => {
                           {beratungStatus === 'error' && <p className={styles.error} role="alert">{beratungError}</p>}
                         </form>
                       )}
+                      {reviewStep === 'form' && (
+                        <form className={styles.consultationForm} onSubmit={(e) => { e.preventDefault(); submitRender(true); }}>
+                          <div className={styles.processNote}>
+                            <strong>Ihr Ideenbild wird persönlich geprüft</strong>
+                            <span>Bei diesem Badtyp schauen wir jedes Ideenbild selbst an, bevor Sie es erhalten. Wir prüfen, ob Fenster, Raumform und Armaturen zu Ihrem Bad passen. Hinterlassen Sie uns Ihre Kontaktdaten. Wir rufen Sie an Arbeitstagen so rasch wie möglich an. Wenn das Bild unsere Prüfung besteht, senden wir es Ihnen nach dem Gespräch per E-Mail. Besteht ein Bild unsere Prüfung nicht, sagen wir Ihnen das offen und besprechen mit Ihnen, wie es weitergeht. Das Ideenbild ist ein Vorschlag und keine Ausführungsplanung.</span>
+                          </div>
+                          <div className={styles.formRow}>
+                            <label className={styles.field} htmlFor="bp-review-name"><span>Vorname und Name</span><input id="bp-review-name" required autoComplete="name" value={contact.name} onChange={(e) => setContact({ ...contact, name: e.target.value })} /></label>
+                            <label className={styles.field} htmlFor="bp-review-email"><span>E-Mail</span><input id="bp-review-email" type="email" required autoComplete="email" value={contact.email} onChange={(e) => setContact({ ...contact, email: e.target.value })} /></label>
+                          </div>
+                          <div className={styles.formRow}>
+                            <label className={styles.field} htmlFor="bp-review-phone"><span>Telefon oder WhatsApp</span><input id="bp-review-phone" type="tel" required autoComplete="tel" value={contact.phone} onChange={(e) => setContact({ ...contact, phone: e.target.value })} /></label>
+                            <label className={styles.field} htmlFor="bp-review-place"><span>PLZ / Ort</span><input id="bp-review-place" required autoComplete="postal-code" placeholder="z. B. 4800 Zofingen" value={contact.place} onChange={(e) => setContact({ ...contact, place: e.target.value })} /></label>
+                          </div>
+                          <button type="submit" className={styles.ctaDark} disabled={status === 'sending'}>{status === 'sending' ? 'Wird gesendet…' : 'Ideenbild persönlich prüfen lassen'}</button>
+                        </form>
+                      )}
+                      {reviewStep === 'sent' && <p className={styles.success} role="status">Vielen Dank. Ihre Angaben sind bei uns. Wir rufen Sie an Arbeitstagen so rasch wie möglich an.</p>}
                       <div className={`${styles.uploadActions} ${styles.changePhoto}`}>
                         <span className={styles.uploadAction}>
                           <input

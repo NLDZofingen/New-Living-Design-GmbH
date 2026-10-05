@@ -177,7 +177,8 @@ const DataSecurity: React.FC = () => {
                 Google verwendet Daten aus der bezahlten API gemäss seinen Nutzungsbedingungen nicht zum Training seiner Modelle. Übermittlung in die USA auf Basis
                 des Data Privacy Framework bzw. von Standardvertragsklauseln.</li>
               <li><strong>Keine Speicherung auf unseren Servern:</strong> Foto und Ideenbild werden nicht auf unseren Servern gespeichert. Sie werden uns per E-Mail zugestellt,
-                sobald das Ideenbild erstellt ist, auch wenn Sie danach keine Kontaktangaben hinterlassen; Ihre Kontaktangaben folgen mit einer zweiten E-Mail; als Versanddienst nutzen wir <strong>Resend Inc.</strong> (USA). Fällt dieser aus, gehen die Angaben ohne Bilder über <strong>Formspree Inc.</strong> (USA) an uns.</li>
+                sobald das Ideenbild erstellt ist, auch wenn Sie danach keine Kontaktangaben hinterlassen; Ihre Kontaktangaben folgen mit einer zweiten E-Mail. Prüfen wir ein Ideenbild
+                vor der Zustellung persönlich, geben Sie Ihre Kontaktangaben vorher an, und wir erhalten Foto, Ideenbild und Kontaktangaben in einer E-Mail. Als Versanddienst nutzen wir <strong>Resend Inc.</strong> (USA). Fällt dieser aus, gehen die Angaben ohne Bilder über <strong>Formspree Inc.</strong> (USA) an uns.</li>
               <li><strong>Löschung:</strong> Fotos und Ideenbilder löschen wir spätestens 30 Tage nach Abschluss der Anfrage, sofern kein Auftrag zustande kommt.</li>
               <li><strong>Rechtsgrundlage:</strong> Ihre Einwilligung (Checkbox vor dem Erstellen des Ideenbilds). Sie können die Einwilligung jederzeit mit Wirkung für die Zukunft
                 per E-Mail an die oben genannte Adresse widerrufen; wir löschen die Daten dann umgehend.</li>

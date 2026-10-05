@@ -14,6 +14,10 @@
  *                      Lead- und Kundenmail mit demselben, vom Ticket bestaetigten Bild.
  *   kind: 'beratung'   persoenliche Beratung ohne Ideenbild, auf Wunsch mit Foto oder Plan.
  *   kind: 'grundriss'  Grundriss, m² oder Bemerkung zu einem bestehenden Lead.
+ *   Versuch "persoenliche Pruefung" (05.10.), nur mit VITE_BADPLANER_PRUEFUNG=1 auf einem Vorschau-Deployment
+ *                      (VERCEL_ENV=preview): die Vorschau fuer ein Badezimmer mit Dusche endet ohne Modellaufruf mit
+ *                      409 PERSONAL_REVIEW; die Seite fragt den Kontakt ab und schickt kind 'render' mit Kontakt und
+ *                      pruefung: true. Das Bild geht dann nur an NLD, weder an den Browser noch per Mail an den Kunden.
  *
  * Ablauf bei kind: 'render'
  *   1. Pflichtfelder, alle Ausstattungs-IDs und Bildheader streng pruefen
@@ -69,6 +73,9 @@
  *                        gemini-3.1-pro-preview)
  *   BADPLANER_CANDIDATES Ideenbilder pro Durchgang, 1 bis 4 (Default 2)
  *   BADPLANER_PRODUCT_PASS 0 = ohne Produktdurchgang (Default: mit, ein Bild mehr pro Anfrage)
+ *   VITE_BADPLANER_PRUEFUNG 1 = Versuch "persoenliche Pruefung", nur fuer die Umgebung Preview setzen; der Server
+ *                        prueft zusaetzlich VERCEL_ENV=preview, in Produktion bleibt der Versuch aus. Die Seite liest
+ *                        dieselbe Variable beim Build fuer ihre Texte.
  *
  * Fotos und Ideenbilder werden NICHT gespeichert (kein Blob, kein KV): sie gehen
  * nur an Google zur Bilderzeugung und per E-Mail an uns und an den Kunden. Es gibt
@@ -182,6 +189,7 @@ interface RenderBody {
   consent?: boolean;
   website?: string;             // Honeypot, muss leer sein
   stage?: string;               // 'vorschau': Bild vor den Kontaktangaben
+  pruefung?: boolean;           // Versuch: Kontakt vor dem Bild, das nur NLD bekommt (siehe Kopf)
 }
 
 interface BeratungBody {
@@ -399,16 +407,21 @@ async function handleRender(req: any, res: any, body: RenderBody, ctx: RequestCo
   if (!/^[0-3]$/.test(windows)) return bad(res, 'Bitte geben Sie an, wie viele Fenster auf dem Foto zu sehen sind.');
   // Vorschau: das Bild kommt vor den Kontaktangaben, die folgen mit kind 'anfrage'.
   const preview = body.stage === 'vorschau';
+  // Versuch "persoenliche Pruefung" (Diego, 05.10.): bei einem Badezimmer mit Dusche zuerst der Kontakt, dann das Bild,
+  // das nur NLD bekommt. Nur auf Vorschau-Deployments mit VITE_BADPLANER_PRUEFUNG=1; sonst gibt es den Weg nicht.
+  const reviewTrial = env.VITE_BADPLANER_PRUEFUNG === '1' && env.VERCEL_ENV === 'preview';
+  const review = !preview && body.pruefung === true;
   const name = preview ? '(noch ohne Kontakt)' : text(body.name, 120);
   const phone = preview ? '–' : text(body.telefon ?? body.phone, 60);
   const email = preview ? '' : text(body.email, 120);
   const place = preview ? '' : text(body.place, 120);
-  const newsletter = !preview && body.newsletter === true;
+  const newsletter = !preview && !review && body.newsletter === true;
   if (!preview) {
     const contactError = contactProblem(name, phone, email, place);
     if (contactError) return bad(res, contactError);
   }
   if (body.consent !== true) return bad(res, 'Bitte bestätigen Sie die Datenschutzerklärung.');
+  if (review && !reviewTrial) return bad(res, 'Die persönliche Prüfung ist im Moment nicht verfügbar. Bitte laden Sie die Seite neu.');
 
   // Foto: neu als data-URL im Feld `foto`, alt als { mime, data } im Feld `photo`
   const photo = readPhoto(body);
@@ -424,6 +437,12 @@ async function handleRender(req: any, res: any, body: RenderBody, ctx: RequestCo
   if (!env.GEMINI_API_KEY) {
     console.error('[badplaner] Bilddienst nicht konfiguriert');
     return res.status(503).json({ ok: false, code: 'SERVICE_UNAVAILABLE', error: 'Der Badplaner ist im Moment nicht verfügbar. Rufen Sie uns an: ' + business.phone.display });
+  }
+  // Im Versuch keine Vorschau fuer ein Badezimmer mit Dusche: die Seite fragt jetzt den Kontakt ab. Ohne Modellaufruf,
+  // und das Tageslimit zaehlt nicht.
+  if (reviewTrial && preview && room === 'badezimmer' && shower && shower.id !== 'keine') {
+    return res.status(409).json({ ok: false, code: 'PERSONAL_REVIEW',
+      error: 'Bei diesem Badtyp prüfen wir jedes Ideenbild persönlich, bevor Sie es erhalten. Bitte laden Sie die Seite neu.' });
   }
 
   // Limits. Auf den Vorschau-Deployments von Vercel gelten die Limits pro Geraet und pro IP nicht (Carla, 27.09.: nach
@@ -901,6 +920,16 @@ async function handleRender(req: any, res: any, body: RenderBody, ctx: RequestCo
       : attempt.check.status === 'approved' && attempt.check.hints?.length ? ` (Hinweise: ${attempt.check.hints.join('; ')})` : ''}`);
   const byNumber = (a: string, b: string) => parseInt(a.replace(/^Bild /, ''), 10) - parseInt(b.replace(/^Bild /, ''), 10);
   const others = [...discarded, ...notShown].sort(byNumber);
+  // Versuch "persoenliche Pruefung": NLD bekommt das Bild mit dem Auftrag zu pruefen, der Kunde nur die Bestaetigung,
+  // weder Bild noch Mail (Carla, 05.10.).
+  const reviewIntro = 'Persönliche Prüfung (Versuch): Der Kunde hat das Ideenbild weder gesehen noch per Mail erhalten. '
+    + 'Vor dem Senden: Foto und Bild in voller Auflösung im Anhang, Lead-ID, Foto und Auswahl abgleichen; Fenster, Raumform, '
+    + 'alle Armaturen, Glas und Produkte prüfen. Zeigt das Bild eine Duschsäule statt Up+, bleibt es zurück. Zuerst anrufen, '
+    + 'das Bild erst danach per E-Mail senden und nur, wenn es die Prüfung besteht.';
+  const reviewAnswer = (delivery: MailResult) => delivery.status === 'accepted'
+    ? res.status(200).json({ ok: true, pruefung: true, leadId, delivery: { lead: delivery.status, leadProvider: delivery.provider, leadAttachments: delivery.attachments } })
+    : res.status(502).json({ ok: false, code: 'LEAD_DELIVERY_FAILED', delivery: { lead: delivery.status },
+      error: 'Ihre Anfrage konnte nicht bestätigt werden. Bitte kontaktieren Sie uns telefonisch; die Zustellung ist möglicherweise unklar.' });
   // Ein Bild, das der Kunde nicht sehen soll: NLD bekommt Foto, Bild und Grund, der Besucher die Antwort eines verworfenen
   // Bildes mit dem Weg zur Beratung (RENDER_REJECTED). Eine Vorschau ist anonym: NLD kann dort kein Bild nachschicken,
   // Kontaktdaten kommen erst mit einer Beratungsanfrage.
@@ -911,7 +940,8 @@ async function handleRender(req: any, res: any, body: RenderBody, ctx: RequestCo
         ? `Badplaner-Fehler ohne Kontakt – ${isGuestWc ? 'Gäste-WC' : pkg.name} – ${outcome}`
         : `Badplaner-Lead: ${name} – ${isGuestWc ? 'Gäste-WC' : pkg.name} – ${outcome}`,
       replyTo: email || undefined,
-      intro: held
+      intro: review ? `${reviewIntro} ${held ? 'Die automatische Prüfung meldet einen schweren Hinweis (siehe Fensterprüfung).'
+        : 'Die automatische Prüfung hat das Bild verworfen (siehe Fensterprüfung): nicht senden, den Kunden anrufen.'}` : held
         ? `${preview ? 'Anonymer Badplaner-Versuch ohne Kontaktdaten. ' : ''}Das Ideenbild hat einen schweren Hinweis der Prüfung (siehe Fensterprüfung) und wurde ${preview ? 'nicht angezeigt; ohne Kontaktdaten können wir es nicht nachschicken' : 'dem Kunden weder angezeigt noch geschickt'}. Originalfoto, Auswahl und Bild liegen bei.`
         : preview
           ? 'Anonymer Badplaner-Versuch ohne Kontaktdaten. Das Ideenbild wurde von der Qualitätsprüfung abgelehnt und nicht angezeigt. Originalfoto, Auswahl und verworfenes Bild liegen bei.'
@@ -930,6 +960,7 @@ async function handleRender(req: any, res: any, body: RenderBody, ctx: RequestCo
     // bleibt unberührt, er darf es gleich nochmals probieren. Gegen endloses
     // Wiederholen bleibt das IP-Limit stehen, darum wird es nicht zurückgedreht.
     delivered = true;
+    if (review) return reviewAnswer(leadDelivery);
     return res.status(502).json({
       // Die Lead-ID dieser Mail: die Seite schickt sie mit der Beratung zurueck, damit NLD beide Mails zusammenfindet.
       ok: false, code: 'RENDER_REJECTED', leadId,
@@ -1001,7 +1032,7 @@ async function handleRender(req: any, res: any, body: RenderBody, ctx: RequestCo
   const imageName = gen.mime === 'image/png' ? 'ideenbild.png' : 'ideenbild.jpg';
   // Das zweite Bild des Produktdurchgangs geht mit, gezeigt oder nicht: so sieht NLD, was er geaendert hat.
   const baseAttachment = productOther ? [{ filename: `${productOther.name}.${productOther.image.mime === 'image/png' ? 'png' : 'jpg'}`, content: productOther.image.data }] : [];
-  const details = leadDetails(checkNote);
+  const details = leadDetails(checkNote, review ? 'nicht angezeigt, persönliche Prüfung' : undefined);
   // Carla und Diego, 04.10.: in P2 und P5 ging ein Bild mit schwerem Hinweis an den Kunden, weil alle Durchgaenge einen
   // hatten ("Dusche im Bild" mit den Armaturen hinten, die Vorpruefung mit der Stirnwand rechts: dieser Widerspruch ist
   // einer der schweren Hinweise). Es zaehlt die Pruefung des Bildes nach dem Produktdurchgang. Ein ungeprueftes Bild geht
@@ -1034,9 +1065,9 @@ async function handleRender(req: any, res: any, body: RenderBody, ctx: RequestCo
       ticket, exp, auswahl, paket, delivery: { draft: draftDelivery.status } });
   }
   const leadDelivery = await sendLeadMail({
-    subject: `Badplaner-Lead: ${name} – ${isGuestWc ? 'Gäste-WC' : pkg.name}`,
+    subject: `Badplaner-Lead: ${name} – ${isGuestWc ? 'Gäste-WC' : pkg.name}${review ? ' – Ideenbild persönlich prüfen' : ''}`,
     replyTo: email,
-    intro: 'Neuer Lead aus dem Badplaner. Foto und Ideenbild im Anhang.',
+    intro: review ? reviewIntro : 'Neuer Lead aus dem Badplaner. Foto und Ideenbild im Anhang.',
     details,
     attachments: [
       { filename: photoName, content: photo.data },
@@ -1048,6 +1079,12 @@ async function handleRender(req: any, res: any, body: RenderBody, ctx: RequestCo
     ok: false, code: 'LEAD_DELIVERY_FAILED', delivery: { lead: leadDelivery.status },
     error: 'Ihre Anfrage konnte nicht bestätigt werden. Bitte kontaktieren Sie uns telefonisch; die Zustellung ist möglicherweise unklar.',
   });
+  // Versuch "persoenliche Pruefung": keine Kundenmail, kein Newsletter-Eintrag und kein Bild in der Antwort.
+  if (review) {
+    res.setHeader('Set-Cookie', counterCookie(cookie + 1, today));
+    delivered = true;
+    return reviewAnswer(leadDelivery);
+  }
 
   // Customer mail failure preserves the approved image, with an explicit warning.
   const customerDelivery = await sendCustomerMail({

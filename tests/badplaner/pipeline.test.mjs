@@ -2923,3 +2923,112 @@ test('Beratung nach einem zurueckgehaltenen Bild nennt dessen Lead-ID in eigener
     assert.match(JSON.stringify(mails().at(-1)), row('Lead-ID Ideenbild zurückgehalten', leadId));
   }
 });
+
+// Versuch "persoenliche Pruefung" (Diego, 05.10.): bei einem Bad mit Dusche zuerst der Kontakt, dann das Bild nur an NLD,
+// das es prueft, anruft und erst danach schickt. Intern: nur mit VITE_BADPLANER_PRUEFUNG=1 auf einem Vorschau-Deployment.
+const reviewTrial = { VITE_BADPLANER_PRUEFUNG: '1', VERCEL_ENV: 'preview' };
+const reviewShower = { dusche: 'duschwanne', badewanne: 'keine' };
+const reviewMails = (h) => h.calls.filter((call) => call.url === 'https://api.resend.com/emails').map((call) => call.body);
+// Wie im Test oben: Vorpruefung mit Stirnwand rechts, die Armaturen im Bild an der genannten Wand.
+const reviewPhoto = () => photoChecked(true, JSON.stringify({ is_bathroom: true, reason: 'bathroom', walls: inv({ toilet: 'right', washbasin: 'right', bathtub: 'back' }),
+  order: ['bathtub', 'washbasin', 'toilet'], nearest: 'toilet', ceiling: 'flat', shower_back: 'along', shower_left: true, shower_right: true, basin_beside_end: true }));
+const reviewCheck = (walls) => () => checkedInv({ bathtub: 'back' }, { shower: 'back' }, { shower_fittings_walls: walls, shower_floor_after: 'tray', shower_step: false });
+const reviewOk = { photoChecks: [reviewPhoto], checks: [reviewCheck(['right'])] };
+
+test('Versuch persoenliche Pruefung: nur auf Vorschau-Deployments; dort zuerst der Kontakt, ohne Modellaufruf', async () => {
+  // Ohne Schalter oder in Produktion: die Vorschau wie bisher, und pruefung: true wird vor jedem Aufruf abgelehnt.
+  for (const env of [{}, { VITE_BADPLANER_PRUEFUNG: '1', VERCEL_ENV: 'production' }, { VERCEL_ENV: 'preview' }]) {
+    const res = await harness({ env, ...reviewOk }).invoke(previewPayload(reviewShower));
+    assert.equal(res.statusCode, 200, JSON.stringify(env));
+    assert.ok(res.body.image?.data);
+    const off = harness({ env });
+    const refused = await off.invoke(payload({ ...reviewShower, pruefung: true }));
+    assert.equal(refused.statusCode, 400, JSON.stringify(env));
+    assert.equal(off.calls.length, 0);
+  }
+
+  // Im Versuch: die Vorschau eines Badezimmers mit Dusche endet vor jedem Aufruf (keine Vorpruefung, kein Bild, keine
+  // Mail) und ohne Zaehler; erst der Versuch mit Kontakt ruft Gemini, so oft wie eine normale Vorschau.
+  const normal = harness({ env: { VERCEL_ENV: 'preview' }, ...reviewOk });
+  assert.equal((await normal.invoke(previewPayload(reviewShower))).statusCode, 200);
+  const h = harness({ env: { ...reviewTrial, BADPLANER_DAILY_CAP: '2' }, photoChecks: [reviewPhoto, reviewPhoto], checks: [reviewCheck(['right']), reviewCheck(['right'])] });
+  const stopped = async () => {
+    const stop = await h.invoke(previewPayload(reviewShower));
+    assert.equal(stop.statusCode, 409);
+    assert.equal(stop.body.code, 'PERSONAL_REVIEW');
+    assert.equal(stop.body.image, undefined);
+    assert.equal(stop.headers['Set-Cookie'], undefined);
+  };
+  const withContact = async () => (await h.invoke(payload({ ...reviewShower, pruefung: true }))).statusCode;
+  await stopped();
+  await stopped();
+  assert.equal(h.calls.length, 0, 'vor dem Kontakt kein Aufruf');
+  assert.equal(await withContact(), 200);
+  assert.deepEqual(h.counts(), normal.counts(), 'so viele Bilder, Pruefungen und Mails wie eine normale Vorschau');
+  assert.equal(h.photoCount(), normal.photoCount());
+  // Tagesdeckel 2: die Antworten 409 zaehlen nicht, also geht ein zweiter Versuch mit Kontakt durch, ein dritter nicht.
+  await stopped();
+  await stopped();
+  assert.equal(await withContact(), 200);
+  assert.equal(await withContact(), 429);
+  // Ohne Dusche bleibt es die Vorschau mit Bild.
+  const noShower = await harness({ env: reviewTrial }).invoke(previewPayload({ dusche: 'keine' }));
+  assert.equal(noShower.statusCode, 200);
+  assert.ok(noShower.body.image?.data);
+});
+
+test('Versuch persoenliche Pruefung: das Bild geht nur an NLD, ohne Kundenmail und ohne Bild in der Antwort', async () => {
+  const h = harness({ env: reviewTrial, ...reviewOk });
+  const res = await h.invoke(payload({ ...reviewShower, pruefung: true }));
+  assert.equal(res.statusCode, 200);
+  assert.equal(res.body.pruefung, true);
+  assert.equal(res.body.image, undefined);
+  assert.equal(res.body.ticket, undefined);
+  const mails = reviewMails(h);
+  assert.equal(mails.length, 1, 'keine Kundenmail');
+  const [lead] = mails;
+  assert.ok(!lead.to.includes('fixture@example.invalid'));
+  assert.equal(lead.reply_to, 'fixture@example.invalid');
+  assert.match(lead.subject, /^Badplaner-Lead: Fixture Person – .+ – Ideenbild persönlich prüfen$/);
+  assert.deepEqual(lead.attachments.map(({ filename }) => filename), ['foto.png', 'ideenbild.png']);
+  const text = JSON.stringify(lead);
+  assert.match(text, /Persönliche Prüfung \(Versuch\): Der Kunde hat das Ideenbild weder gesehen noch per Mail erhalten/);
+  assert.match(text, new RegExp(`>Lead-ID</td><td[^>]*>${res.body.leadId}<`));
+  assert.match(text, />Ideenbild<\/td><td[^>]*>nicht angezeigt, persönliche Prüfung</);
+  assert.match(text, />PLZ \/ Ort<\/td><td[^>]*>4800 Zofingen</);
+  assert.match(text, />Newsletter<\/td><td[^>]*>nein</);
+
+  // Schwerer Hinweis oder verworfen: NLD bekommt Bild und Befund, der Kunde dieselbe Bestaetigung und keine Mail.
+  for (const [settings, subject, file, finding] of [
+    [{ photoChecks: [reviewPhoto], checks: [reviewCheck(['back']), reviewCheck(['back'])] }, /– Ideenbild zurückgehalten \(schwerer Hinweis\)$/, 'zurueckgehalten.png', /meldet einen schweren Hinweis/],
+    [{ checks: [() => checked(true), () => checked(true)] }, /– Ideenbild abgelehnt$/, 'verworfen.jpg', /hat das Bild verworfen \(siehe Fensterprüfung\): nicht senden/],
+  ]) {
+    const held = harness({ env: reviewTrial, ...settings });
+    const answer = await held.invoke(payload({ ...reviewShower, pruefung: true }));
+    assert.equal(answer.statusCode, 200);
+    assert.equal(answer.body.pruefung, true);
+    assert.equal(answer.body.image, undefined);
+    const [mail, ...more] = reviewMails(held);
+    assert.equal(more.length, 0, 'keine Kundenmail');
+    assert.match(mail.subject, subject);
+    assert.deepEqual(mail.attachments.map(({ filename }) => filename), ['foto.png', file]);
+    assert.match(JSON.stringify(mail), finding);
+  }
+});
+
+test('Versuch persoenliche Pruefung: ohne Resend geht der Kontakt ohne Bilder an NLD; geht gar nichts, sagt es die Antwort', async () => {
+  const fallback = harness({ env: reviewTrial, ...reviewOk, mails: [() => response({ message: 'fixture' }, 500)] });
+  const res = await fallback.invoke(payload({ ...reviewShower, pruefung: true }));
+  assert.equal(res.statusCode, 200);
+  assert.equal(res.body.delivery.leadAttachments, false);
+  assert.equal(reviewMails(fallback).length, 1, 'nur der gescheiterte Versuch an NLD, keine Kundenmail');
+  const form = fallback.calls.find((call) => call.url.startsWith('https://formspree.io/')).body;
+  assert.equal(form.hinweis, 'Bilder konnten nicht angehängt werden');
+  assert.equal(form['PLZ / Ort'], '4800 Zofingen');
+
+  const lost = harness({ env: reviewTrial, ...reviewOk, mails: [() => response({}, 500)], formspree: () => response({}, 500) });
+  const lostRes = await lost.invoke(payload({ ...reviewShower, pruefung: true }));
+  assert.equal(lostRes.statusCode, 502);
+  assert.equal(lostRes.body.code, 'LEAD_DELIVERY_FAILED');
+  assert.equal(lostRes.body.image, undefined);
+});
