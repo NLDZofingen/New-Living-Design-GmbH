@@ -3016,15 +3016,26 @@ test('Versuch persoenliche Pruefung: das Bild geht nur an NLD, ohne Kundenmail u
   }
 });
 
-test('Versuch persoenliche Pruefung: ohne Resend geht der Kontakt ohne Bilder an NLD; geht gar nichts, sagt es die Antwort', async () => {
-  const fallback = harness({ env: reviewTrial, ...reviewOk, mails: [() => response({ message: 'fixture' }, 500)] });
-  const res = await fallback.invoke(payload({ ...reviewShower, pruefung: true }));
-  assert.equal(res.statusCode, 200);
-  assert.equal(res.body.delivery.leadAttachments, false);
-  assert.equal(reviewMails(fallback).length, 1, 'nur der gescheiterte Versuch an NLD, keine Kundenmail');
-  const form = fallback.calls.find((call) => call.url.startsWith('https://formspree.io/')).body;
-  assert.equal(form.hinweis, 'Bilder konnten nicht angehängt werden');
-  assert.equal(form['PLZ / Ort'], '4800 Zofingen');
+test('Versuch persoenliche Pruefung: ohne Resend geht der Kontakt ohne Bilder an NLD, als Rueckruf und nicht als pruefbereites Bild', async () => {
+  // Bild ohne schweren Hinweis und zurueckgehaltenes Bild: ohne Anhaenge sagen Betreff und Text "anrufen", nicht "pruefen".
+  for (const settings of [reviewOk, { photoChecks: [reviewPhoto], checks: [reviewCheck(['back']), reviewCheck(['back'])] }]) {
+    const fallback = harness({ env: reviewTrial, ...settings, mails: [() => response({ message: 'fixture' }, 500)] });
+    const res = await fallback.invoke(payload({ ...reviewShower, pruefung: true }));
+    assert.equal(res.statusCode, 200);
+    assert.equal(res.body.delivery.leadAttachments, false);
+    assert.equal(reviewMails(fallback).length, 1, 'nur der gescheiterte Versuch an NLD, keine Kundenmail');
+    const form = fallback.calls.find((call) => call.url.startsWith('https://formspree.io/')).body;
+    const intro = form.message.split('\n')[0];
+    assert.match(form._subject, /^Badplaner-Lead: Fixture Person – .+ – OHNE Foto und Ideenbild: Kunde anrufen$/);
+    assert.match(intro, /Foto und Ideenbild fehlen in dieser Mail.+Nichts prüfen und nichts senden: den Kunden anrufen/);
+    assert.doesNotMatch(`${form._subject} ${intro}`, /persönlich prüfen|Vor dem Senden|zurückgehalten|abgelehnt/);
+    assert.equal(form.hinweis, 'Bilder konnten nicht angehängt werden');
+    assert.equal(form['PLZ / Ort'], '4800 Zofingen');
+  }
+  // Ausserhalb des Versuchs bleibt die Mail ohne Anhaenge wie bisher.
+  const ordinary = harness({ mails: [() => response({}, 500)] });
+  await ordinary.invoke();
+  assert.equal(ordinary.calls.find((call) => call.url.startsWith('https://formspree.io/')).body._subject, 'Badplaner-Lead: Fixture Person – Essenza');
 
   const lost = harness({ env: reviewTrial, ...reviewOk, mails: [() => response({}, 500)], formspree: () => response({}, 500) });
   const lostRes = await lost.invoke(payload({ ...reviewShower, pruefung: true }));

@@ -930,6 +930,12 @@ async function handleRender(req: any, res: any, body: RenderBody, ctx: RequestCo
     ? res.status(200).json({ ok: true, pruefung: true, leadId, delivery: { lead: delivery.status, leadProvider: delivery.provider, leadAttachments: delivery.attachments } })
     : res.status(502).json({ ok: false, code: 'LEAD_DELIVERY_FAILED', delivery: { lead: delivery.status },
       error: 'Ihre Anfrage konnte nicht bestätigt werden. Bitte kontaktieren Sie uns telefonisch; die Zustellung ist möglicherweise unklar.' });
+  // Geht die Mail ohne Anhaenge ueber Formspree, darf sie nicht nach einem pruefbereiten Bild aussehen.
+  const reviewWithoutImages = review ? {
+    subject: `Badplaner-Lead: ${name} – ${isGuestWc ? 'Gäste-WC' : pkg.name} – OHNE Foto und Ideenbild: Kunde anrufen`,
+    intro: 'Persönliche Prüfung (Versuch): Foto und Ideenbild fehlen in dieser Mail, der Versand mit Anhängen ist gescheitert. '
+      + 'Nichts prüfen und nichts senden: den Kunden anrufen und das weitere Vorgehen besprechen.',
+  } : undefined;
   // Ein Bild, das der Kunde nicht sehen soll: NLD bekommt Foto, Bild und Grund, der Besucher die Antwort eines verworfenen
   // Bildes mit dem Weg zur Beratung (RENDER_REJECTED). Eine Vorschau ist anonym: NLD kann dort kein Bild nachschicken,
   // Kontaktdaten kommen erst mit einer Beratungsanfrage.
@@ -940,6 +946,7 @@ async function handleRender(req: any, res: any, body: RenderBody, ctx: RequestCo
         ? `Badplaner-Fehler ohne Kontakt – ${isGuestWc ? 'Gäste-WC' : pkg.name} – ${outcome}`
         : `Badplaner-Lead: ${name} – ${isGuestWc ? 'Gäste-WC' : pkg.name} – ${outcome}`,
       replyTo: email || undefined,
+      withoutAttachments: reviewWithoutImages,
       intro: review ? `${reviewIntro} ${held ? 'Die automatische Prüfung meldet einen schweren Hinweis (siehe Fensterprüfung).'
         : 'Die automatische Prüfung hat das Bild verworfen (siehe Fensterprüfung): nicht senden, den Kunden anrufen.'}` : held
         ? `${preview ? 'Anonymer Badplaner-Versuch ohne Kontaktdaten. ' : ''}Das Ideenbild hat einen schweren Hinweis der Prüfung (siehe Fensterprüfung) und wurde ${preview ? 'nicht angezeigt; ohne Kontaktdaten können wir es nicht nachschicken' : 'dem Kunden weder angezeigt noch geschickt'}. Originalfoto, Auswahl und Bild liegen bei.`
@@ -1067,6 +1074,7 @@ async function handleRender(req: any, res: any, body: RenderBody, ctx: RequestCo
   const leadDelivery = await sendLeadMail({
     subject: `Badplaner-Lead: ${name} – ${isGuestWc ? 'Gäste-WC' : pkg.name}${review ? ' – Ideenbild persönlich prüfen' : ''}`,
     replyTo: email,
+    withoutAttachments: reviewWithoutImages,
     intro: review ? reviewIntro : 'Neuer Lead aus dem Badplaner. Foto und Ideenbild im Anhang.',
     details,
     attachments: [
@@ -2176,6 +2184,8 @@ interface LeadMail {
   details: [string, string][];
   attachments: { filename: string; content: string }[];
   replyTo?: string;
+  // Betreff und Text, falls die Mail ohne Anhaenge ueber Formspree geht (Versuch persoenliche Pruefung).
+  withoutAttachments?: { subject: string; intro: string };
 }
 
 /**
@@ -2220,11 +2230,12 @@ async function sendLeadMail(mail: LeadMail, ctx: RequestContext): Promise<MailRe
   try {
     const fullName = (mail.details.find(([k]) => k === 'Name') || ['', ''])[1].trim();
     const [firstName, ...rest] = fullName.split(/\s+/);
+    const plain = mail.withoutAttachments ? { ...mail, ...mail.withoutAttachments } : mail;
     const fields: Record<string, string> = {
-      _subject: mail.subject,
+      _subject: plain.subject,
       firstName: firstName || 'Badplaner',
       lastName: rest.join(' ') || '–',
-      message: leadText(mail),
+      message: leadText(plain),
       quelle: 'Badplaner',
       hinweis: 'Bilder konnten nicht angehängt werden',
     };

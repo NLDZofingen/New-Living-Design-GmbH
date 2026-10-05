@@ -152,8 +152,9 @@ const REVIEW_TRIAL = import.meta.env.VITE_BADPLANER_PRUEFUNG === '1';
 const howSteps = [
   { n: '1', title: 'Raum, Stil und Ausstattung wählen', text: 'Badezimmer oder Gäste-WC wählen. Danach Stil, Materialien und die passenden Positionen bestimmen oder direkt eine individuelle Beratung anfragen.' },
   { n: '2', title: 'Foto vom Raum machen', text: 'Am Handy neu aufnehmen oder ein Foto aus der Galerie wählen. Von der Tür aus, den ganzen Raum im Bild, Licht an. Das Foto wird vor dem Senden verkleinert.' },
-  { n: '3', title: 'Ideenbild ansehen, dann in voller Qualität erhalten', text: 'Nach ein bis zwei Minuten sehen Sie Ihr Bad mit den gewählten Materialien als Vorschau. Mit Ihren Kontaktangaben erhalten Sie es in voller Qualität per E-Mail, dazu den Fixpreis des Pakets und eine kostenlose Beratung.'
-    + (REVIEW_TRIAL ? ' Bei einem Bad mit Dusche prüfen wir das Ideenbild zuerst persönlich: Sie hinterlassen Ihre Kontaktdaten, und wir rufen Sie an Arbeitstagen so rasch wie möglich an.' : '') },
+  REVIEW_TRIAL
+    ? { n: '3', title: 'Ideenbild ansehen oder persönlich prüfen lassen', text: 'Ohne Dusche sehen Sie Ihr Bad nach ein bis zwei Minuten mit den gewählten Materialien als Vorschau; mit Ihren Kontaktangaben erhalten Sie es in voller Qualität per E-Mail, dazu den Fixpreis des Pakets und eine kostenlose Beratung. Bei einem Bad mit Dusche hinterlassen Sie zuerst Ihre Kontaktdaten: Wir prüfen das Ideenbild persönlich und rufen Sie an Arbeitstagen so rasch wie möglich an. Besteht es unsere Prüfung, senden wir es Ihnen nach dem Gespräch per E-Mail.' }
+    : { n: '3', title: 'Ideenbild ansehen, dann in voller Qualität erhalten', text: 'Nach ein bis zwei Minuten sehen Sie Ihr Bad mit den gewählten Materialien als Vorschau. Mit Ihren Kontaktangaben erhalten Sie es in voller Qualität per E-Mail, dazu den Fixpreis des Pakets und eine kostenlose Beratung.' },
 ];
 
 /** Musterbild; fehlt es (noch nicht geladen), zeigt es eine farbige Fläche. */
@@ -360,6 +361,12 @@ const Badplaner: React.FC = () => {
   useEffect(() => {
     if (result) resultRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }, [result]);
+
+  // Versuch "persoenliche Pruefung": Formular und Bestaetigung gelten nur fuer Raum, Paket, Auswahl, Foto, Fenster und
+  // Spuelkasten, mit denen sie kamen; aendert sich etwas davon, verschwinden sie, und ein neuer Versuch entscheidet neu.
+  useEffect(() => {
+    setReviewStep('');
+  }, [room, pkg, individuell, sel, photo, windows, cistern]);
 
   const options = pkg ? optionsForPackage(pkg) : null;
   const pkgInfo = pkg ? bathPackages.find((p) => p.id === pkg) : undefined;
@@ -1053,7 +1060,9 @@ const Badplaner: React.FC = () => {
             <a href="#planer" className={styles.ctaPrimary} onClick={() => trackBadplaner('badplaner_start')}>Jetzt starten</a>
             <a href="#ablauf" className={styles.ctaSecondary}>So funktioniert's</a>
           </div>
-          <p className={styles.heroText}>Materialien wählen, Foto vom Bad hochladen: nach ein bis zwei Minuten sehen Sie Ihr Bad neu.{REVIEW_TRIAL && ' Bei einem Bad mit Dusche prüfen wir das Ideenbild zuerst persönlich.'} Kostenlos und unverbindlich, aus Zofingen.</p>
+          <p className={styles.heroText}>{REVIEW_TRIAL
+            ? 'Materialien wählen, Foto vom Bad hochladen: ohne Dusche sehen Sie Ihr Bad nach ein bis zwei Minuten neu. Bei einem Bad mit Dusche prüfen wir das Ideenbild zuerst persönlich und rufen Sie an.'
+            : 'Materialien wählen, Foto vom Bad hochladen: nach ein bis zwei Minuten sehen Sie Ihr Bad neu.'} Kostenlos und unverbindlich, aus Zofingen.</p>
           <p className={styles.heroNote}>
             Ideenbild, kein Plan: Das Bild zeigt eine Stimmung mit den gewählten Materialien. Masse, Leitungen und Details klären wir vor Ort.
           </p>
