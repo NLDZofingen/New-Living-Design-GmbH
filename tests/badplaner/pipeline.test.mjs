@@ -3000,14 +3000,19 @@ test('Versuch persoenliche Pruefung: das Bild geht nur an NLD, ohne Kundenmail u
   // Diego und Carla, 06.10.: er prueft selbst; ein klar richtiges Bild erst nach dem Anruf senden, sonst nicht senden und
   // anrufen (falsch, zweifelhaft oder eine Duschsaeule statt des gewaehlten Up+).
   assert.match(text, /Diego prüft das Bild selbst, ohne zweiten Prüfer/);
-  assert.match(text, /Ist das Bild klar richtig: zuerst den Kunden anrufen, dann das Bild per E-Mail senden\./);
+  assert.match(text, /Ist das Bild klar richtig: zuerst den Kunden anrufen, dann nur ideenbild\.png per E-Mail senden, keinen anderen Anhang\./);
   assert.match(text, /falsch oder zweifelhaft, oder zeigt es eine Duschsäule statt des gewählten Up\+: nicht senden, den Kunden anrufen und es erklären/);
 
-  // Schwerer Hinweis oder verworfen: NLD bekommt Bild und Befund mit "nicht senden", der Kunde dieselbe Bestaetigung.
-  for (const [settings, subject, file, finding] of [
-    [{ photoChecks: [reviewPhoto], checks: [reviewCheck(['back']), reviewCheck(['back'])] }, /– Ideenbild zurückgehalten \(schwerer Hinweis\)$/, 'zurueckgehalten.png',
-      /hat das Bild zurückgehalten \(schwerer Hinweis, siehe Fensterprüfung\): nicht senden, den Kunden anrufen und es erklären/],
-    [{ checks: [() => checked(true), () => checked(true)] }, /– Ideenbild abgelehnt$/, 'verworfen.jpg', /hat das Bild verworfen \(siehe Fensterprüfung\): nicht senden, den Kunden anrufen und es erklären/],
+  // Diego, 06.10.: haelt die Pruefung das Bild nur wegen der Armaturen zurueck (moeglicher Fehlalarm, P2/P5), darf er es nach
+  // eigener Pruefung und dem Anruf von Hand senden; es kommt als ideenbild.* mit diesem Auftrag. Ein anderer schwerer Hinweis,
+  // auch neben den Armaturen, und ein verworfenes Bild bleiben gesperrt. Der Kunde bekommt in allen Faellen weder Bild noch Mail.
+  const fittings = (extra = {}) => () => checkedInv({ bathtub: 'back' }, { shower: 'back' }, { shower_fittings_walls: ['back'], shower_floor_after: 'tray', shower_step: false, ...extra });
+  for (const [settings, subject, file, finding, sendable] of [
+    [{ photoChecks: [reviewPhoto], checks: [fittings(), fittings()] }, /– Ideenbild zurückgehalten \(Armaturen, möglicher Fehlalarm\)$/, 'ideenbild.png',
+      /nur wegen der Armaturen zurückgehalten \(siehe Fensterprüfung\), möglicherweise ein Fehlalarm\. Diego prüft das Bild selbst.+zuerst den Kunden anrufen, dann nur ideenbild\.png per E-Mail senden, keinen anderen Anhang.+Duschsäule statt des gewählten Up\+: nicht senden/, true],
+    [{ photoChecks: [reviewPhoto], checks: [fittings({ mirror_kept: true }), fittings({ mirror_kept: true })] }, /– Ideenbild zurückgehalten \(schwerer Hinweis\)$/, 'zurueckgehalten.png',
+      /hat das Bild zurückgehalten \(schwerer Hinweis, siehe Fensterprüfung\): nicht senden, den Kunden anrufen und es erklären/, false],
+    [{ checks: [() => checked(true), () => checked(true)] }, /– Ideenbild abgelehnt$/, 'verworfen.jpg', /hat das Bild verworfen \(siehe Fensterprüfung\): nicht senden, den Kunden anrufen und es erklären/, false],
   ]) {
     const held = harness({ env: reviewTrial, ...settings });
     const answer = await held.invoke(payload({ ...reviewShower, pruefung: true }));
@@ -3016,10 +3021,11 @@ test('Versuch persoenliche Pruefung: das Bild geht nur an NLD, ohne Kundenmail u
     assert.equal(answer.body.image, undefined);
     const [mail, ...more] = reviewMails(held);
     assert.equal(more.length, 0, 'keine Kundenmail');
+    assert.ok(!mail.to.includes('fixture@example.invalid'));
     assert.match(mail.subject, subject);
     assert.deepEqual(mail.attachments.map(({ filename }) => filename), ['foto.png', file]);
     assert.match(JSON.stringify(mail), finding);
-    assert.doesNotMatch(JSON.stringify(mail), /per E-Mail senden/, 'zurueckgehaltene und verworfene Bilder gehen nie hinaus');
+    if (!sendable) assert.doesNotMatch(JSON.stringify(mail), /per E-Mail senden|Fehlalarm/, 'gesperrt: kein Auftrag zum Senden');
   }
 });
 
@@ -3035,7 +3041,7 @@ test('Versuch persoenliche Pruefung: ohne Resend geht der Kontakt ohne Bilder an
     const intro = form.message.split('\n')[0];
     assert.match(form._subject, /^Badplaner-Lead: Fixture Person – .+ – OHNE Foto und Ideenbild: Kunde anrufen$/);
     assert.match(intro, /Foto und Ideenbild fehlen in dieser Mail.+Nichts prüfen und nichts senden: den Kunden anrufen/);
-    assert.doesNotMatch(`${form._subject} ${intro}`, /persönlich prüfen|Vor dem Senden|zurückgehalten|abgelehnt/);
+    assert.doesNotMatch(`${form._subject} ${intro}`, /persönlich prüfen|Vor dem Senden|zurückgehalten|abgelehnt|Fehlalarm|per E-Mail senden/);
     assert.equal(form.hinweis, 'Bilder konnten nicht angehängt werden');
     assert.equal(form['PLZ / Ort'], '4800 Zofingen');
   }

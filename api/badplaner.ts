@@ -922,13 +922,15 @@ async function handleRender(req: any, res: any, body: RenderBody, ctx: RequestCo
   const others = [...discarded, ...notShown].sort(byNumber);
   // Versuch "persoenliche Pruefung": NLD bekommt das Bild mit dem Auftrag zu pruefen, der Kunde nur die Bestaetigung,
   // weder Bild noch Mail (Carla, 05.10.). Diego, 06.10.: er prueft selbst, ohne zweiten Pruefer; eine Duschsaeule statt
-  // des gewaehlten Up+ geht nicht hinaus, ebenso jedes Bild im Zweifel. Zurueckgehaltene und verworfene Bilder nie.
+  // des gewaehlten Up+ geht nicht hinaus, ebenso jedes Bild im Zweifel. Verworfene Bilder nie, zurueckgehaltene nur, wenn
+  // allein die Armaturen der Grund sind (siehe withhold).
   // Carla, 06.10.: angerufen wird vor jedem Versand, auch wenn der kurze Text fuer den Kunden den Anruf nicht nennt.
   const reviewHead = 'Persönliche Prüfung (Versuch): Der Kunde hat das Ideenbild weder gesehen noch per Mail erhalten.';
-  const reviewIntro = `${reviewHead} Diego prüft das Bild selbst, ohne zweiten Prüfer: Foto und Bild in voller Auflösung im `
+  // Auftrag fuer ein Bild, das Diego nach eigener Pruefung und Anruf von Hand senden darf; `file` ist der einzige Anhang dafuer.
+  const reviewTask = (file: string) => 'Diego prüft das Bild selbst, ohne zweiten Prüfer: Foto und Bild in voller Auflösung im '
     + 'Anhang, Lead-ID, Foto und Auswahl abgleichen; Fenster, Raumform, alle Armaturen, Glas und Produkte prüfen. Ist das Bild '
-    + 'klar richtig: zuerst den Kunden anrufen, dann das Bild per E-Mail senden. Ist es falsch oder zweifelhaft, oder zeigt es '
-    + 'eine Duschsäule statt des gewählten Up+: nicht senden, den Kunden anrufen und es erklären.';
+    + `klar richtig: zuerst den Kunden anrufen, dann nur ${file} per E-Mail senden, keinen anderen Anhang. Ist es falsch oder `
+    + 'zweifelhaft, oder zeigt es eine Duschsäule statt des gewählten Up+: nicht senden, den Kunden anrufen und es erklären.';
   const reviewAnswer = (delivery: MailResult) => delivery.status === 'accepted'
     ? res.status(200).json({ ok: true, pruefung: true, leadId, delivery: { lead: delivery.status, leadProvider: delivery.provider, leadAttachments: delivery.attachments } })
     : res.status(502).json({ ok: false, code: 'LEAD_DELIVERY_FAILED', delivery: { lead: delivery.status },
@@ -943,14 +945,23 @@ async function handleRender(req: any, res: any, body: RenderBody, ctx: RequestCo
   // Bildes mit dem Weg zur Beratung (RENDER_REJECTED). Eine Vorschau ist anonym: NLD kann dort kein Bild nachschicken,
   // Kontaktdaten kommen erst mit einer Beratungsanfrage.
   const withhold = async (note: string, image: { mime: string; data: string }, held: boolean, extra: { filename: string; content: string }[] = []) => {
-    const outcome = held ? 'Ideenbild zurückgehalten (schwerer Hinweis)' : 'Ideenbild abgelehnt';
+    // Versuch, Diego 06.10.: haelt die Pruefung das Bild nur wegen der Armaturen zurueck, kann es ein Fehlalarm sein (P2/P5);
+    // nach seiner Pruefung und dem Anruf darf er es von Hand senden. Es heisst dann ideenbild.*, wie jedes Bild, das er senden
+    // darf. Jeder andere schwere Hinweis und jedes verworfene Bild bleiben gesperrt.
+    const fittingsOnly = review && held && check.status === 'approved' && !!check.serious?.length
+      && check.serious.every((hint) => hint.startsWith('the shower fittings are'));
+    const ext = image.mime === 'image/png' ? 'png' : 'jpg';
+    const outcome = fittingsOnly ? 'Ideenbild zurückgehalten (Armaturen, möglicher Fehlalarm)'
+      : held ? 'Ideenbild zurückgehalten (schwerer Hinweis)' : 'Ideenbild abgelehnt';
     const leadDelivery = await sendLeadMail({
       subject: preview
         ? `Badplaner-Fehler ohne Kontakt – ${isGuestWc ? 'Gäste-WC' : pkg.name} – ${outcome}`
         : `Badplaner-Lead: ${name} – ${isGuestWc ? 'Gäste-WC' : pkg.name} – ${outcome}`,
       replyTo: email || undefined,
       withoutAttachments: reviewWithoutImages,
-      intro: review ? `${reviewHead} Die automatische Prüfung hat das Bild ${held ? 'zurückgehalten (schwerer Hinweis, siehe Fensterprüfung)'
+      intro: fittingsOnly ? `${reviewHead} Die automatische Prüfung hat das Bild nur wegen der Armaturen zurückgehalten (siehe `
+        + `Fensterprüfung), möglicherweise ein Fehlalarm. ${reviewTask(`ideenbild.${ext}`)}`
+        : review ? `${reviewHead} Die automatische Prüfung hat das Bild ${held ? 'zurückgehalten (schwerer Hinweis, siehe Fensterprüfung)'
         : 'verworfen (siehe Fensterprüfung)'}: nicht senden, den Kunden anrufen und es erklären.` : held
         ? `${preview ? 'Anonymer Badplaner-Versuch ohne Kontaktdaten. ' : ''}Das Ideenbild hat einen schweren Hinweis der Prüfung (siehe Fensterprüfung) und wurde ${preview ? 'nicht angezeigt; ohne Kontaktdaten können wir es nicht nachschicken' : 'dem Kunden weder angezeigt noch geschickt'}. Originalfoto, Auswahl und Bild liegen bei.`
         : preview
@@ -962,7 +973,7 @@ async function handleRender(req: any, res: any, body: RenderBody, ctx: RequestCo
       // Prüfung recht hatte oder ein brauchbares Bild unnötig zurückblieb.
       attachments: [
         { filename: photoName, content: photo.data },
-        { filename: held ? `zurueckgehalten.${image.mime === 'image/png' ? 'png' : 'jpg'}` : 'verworfen.jpg', content: image.data },
+        { filename: fittingsOnly ? `ideenbild.${ext}` : held ? `zurueckgehalten.${ext}` : 'verworfen.jpg', content: image.data },
         ...extra,
       ],
     }, ctx);
@@ -1078,7 +1089,7 @@ async function handleRender(req: any, res: any, body: RenderBody, ctx: RequestCo
     subject: `Badplaner-Lead: ${name} – ${isGuestWc ? 'Gäste-WC' : pkg.name}${review ? ' – Ideenbild persönlich prüfen' : ''}`,
     replyTo: email,
     withoutAttachments: reviewWithoutImages,
-    intro: review ? reviewIntro : 'Neuer Lead aus dem Badplaner. Foto und Ideenbild im Anhang.',
+    intro: review ? `${reviewHead} ${reviewTask(imageName)}` : 'Neuer Lead aus dem Badplaner. Foto und Ideenbild im Anhang.',
     details,
     attachments: [
       { filename: photoName, content: photo.data },
