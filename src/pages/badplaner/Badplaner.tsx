@@ -1357,7 +1357,7 @@ const Badplaner: React.FC = () => {
                         <form className={styles.consultationForm} onSubmit={(e) => { e.preventDefault(); submitRender(true); }}>
                           <div className={styles.processNote}>
                             <strong>Ihr Ideenbild prüfen wir zuerst</strong>
-                            <span>Bei diesem Bad kann das Bild Fehler enthalten. Wir schauen es deshalb selbst an und senden es Ihnen so rasch wie möglich.</span>
+                            <span>Bei diesem Bad kann das Bild Fehler enthalten. Wir schauen es deshalb selbst an und melden uns so rasch wie möglich bei Ihnen.</span>
                             <span>Bitte hinterlassen Sie uns dafür Ihre Kontaktdaten.</span>
                           </div>
                           <div className={styles.formRow}>
