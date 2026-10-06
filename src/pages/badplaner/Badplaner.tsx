@@ -1307,7 +1307,7 @@ const Badplaner: React.FC = () => {
                         <span>
                           Ich habe die <Link to="/datenschutz#badplaner" target="_blank" rel="noopener noreferrer">Datenschutzerklärung</Link> gelesen. Mein Foto wird zur
                           Erstellung des Ideenbilds an Google (Gemini API) übermittelt und uns normalerweise per E-Mail zugestellt.
-                          Klappt der Versand mit Anhängen nicht, erhalten wir nur meine Angaben, ohne Foto.
+                          Klappt der Versand mit Anhängen nicht, erhält New Living Design nur die Angaben zur Anfrage, ohne Foto und Ideenbild.
                         </span>
                       </label>
                       <div className={styles.stepActions}>
