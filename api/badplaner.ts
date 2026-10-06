@@ -18,6 +18,8 @@
  *                      (VERCEL_ENV=preview): die Vorschau fuer ein Badezimmer mit Dusche endet ohne Modellaufruf mit
  *                      409 PERSONAL_REVIEW; die Seite fragt den Kontakt ab und schickt kind 'render' mit Kontakt und
  *                      pruefung: true. Das Bild geht dann nur an NLD, weder an den Browser noch per Mail an den Kunden.
+ *                      Fuer ein Bad mit Dusche gilt das auch ohne pruefung (alter Weg ohne stage); 'anfrage' mit
+ *                      einem Ticket fuer ein Bad mit Dusche endet beim Einloesen ohne Mail mit 409 PERSONAL_REVIEW.
  *
  * Ablauf bei kind: 'render'
  *   1. Pflichtfelder, alle Ausstattungs-IDs und Bildheader streng pruefen
@@ -83,7 +85,7 @@
  * den Mail-Anbieter ist kein Nachweis der Zustellung. Siehe /datenschutz#badplaner.
  */
 /* eslint-disable @typescript-eslint/no-explicit-any -- keine @vercel/node-Typen im Projekt, req/res sind deshalb any */
-import { type PackageId } from '../src/data/badplaner.js';
+import { showerOptions, type PackageId } from '../src/data/badplaner.js';
 import { bathPackages, business, individualPackage, packageNote, type BathPackage } from '../src/config/business.js';
 import { Budget, TimeoutError, type Clock } from '../server/badplaner/budget.js';
 import { normalizeSelection, ValidationError } from '../server/badplaner/validation.js';
@@ -138,6 +140,7 @@ const CHECK_RETRY_DELAY_MS = 750;
 const checkThinking = (model: string, level: 'low' | 'high' = 'low') => (/^gemini-3/.test(model) ? { thinkingConfig: { thinkingLevel: level } } : {});
 const COOKIE_NAME = 'nldbp';
 const TICKET_TTL_MS = 2 * 60 * 60 * 1000;     // so lange gilt die Vorschau fuer die Anfrage
+const NO_SHOWER_LABEL = showerOptions.find((option) => option.id === 'keine')?.label; // Zeile "Dusche" im Ticket ohne Dusche
 const MAX_ANFRAGE_BYTES = 4_400_000;          // unter der 4.5-MB-Grenze von Vercel fuer den Request
 
 /* ---------- Typen ---------- */
@@ -397,6 +400,11 @@ async function handler(req: any, res: any) {
 
 /* ---------- kind: render ---------- */
 
+/** Versuch "persoenliche Pruefung": nur mit VITE_BADPLANER_PRUEFUNG=1 auf einem Vorschau-Deployment (siehe Kopf). */
+function reviewTrialActive(): boolean {
+  return env.VITE_BADPLANER_PRUEFUNG === '1' && env.VERCEL_ENV === 'preview';
+}
+
 async function handleRender(req: any, res: any, body: RenderBody, ctx: RequestContext) {
   const { room, isGuestWc, cistern, pkg, opts, isAtelier, individuell, tile, floorTile, base, top, basinType,
     tapSeriesOption, finish, sanitary, wall, shower, bathtub, basin, mirror, look, format,
@@ -408,9 +416,12 @@ async function handleRender(req: any, res: any, body: RenderBody, ctx: RequestCo
   // Vorschau: das Bild kommt vor den Kontaktangaben, die folgen mit kind 'anfrage'.
   const preview = body.stage === 'vorschau';
   // Versuch "persoenliche Pruefung" (Diego, 05.10.): bei einem Badezimmer mit Dusche zuerst der Kontakt, dann das Bild,
-  // das nur NLD bekommt. Nur auf Vorschau-Deployments mit VITE_BADPLANER_PRUEFUNG=1; sonst gibt es den Weg nicht.
-  const reviewTrial = env.VITE_BADPLANER_PRUEFUNG === '1' && env.VERCEL_ENV === 'preview';
-  const review = !preview && body.pruefung === true;
+  // das nur NLD bekommt. Nur auf Vorschau-Deployments mit VITE_BADPLANER_PRUEFUNG=1; sonst gibt es den Weg nicht. Im
+  // Versuch gilt jedes Bild mit Kontakt fuer ein Bad mit Dusche als persoenliche Pruefung, auch ohne pruefung (alter Weg
+  // ohne stage): kein Kanal liefert dann ein Bild an den Browser oder eine Mail an den Kunden.
+  const reviewTrial = reviewTrialActive();
+  const showerBath = !!shower && shower.id !== 'keine';
+  const review = !preview && (body.pruefung === true || (reviewTrial && showerBath));
   const name = preview ? '(noch ohne Kontakt)' : text(body.name, 120);
   const phone = preview ? '–' : text(body.telefon ?? body.phone, 60);
   const email = preview ? '' : text(body.email, 120);
@@ -440,9 +451,9 @@ async function handleRender(req: any, res: any, body: RenderBody, ctx: RequestCo
   }
   // Im Versuch keine Vorschau fuer ein Badezimmer mit Dusche: die Seite fragt jetzt den Kontakt ab. Ohne Modellaufruf,
   // und das Tageslimit zaehlt nicht.
-  if (reviewTrial && preview && room === 'badezimmer' && shower && shower.id !== 'keine') {
+  if (reviewTrial && preview && showerBath) {
     return res.status(409).json({ ok: false, code: 'PERSONAL_REVIEW',
-      error: 'Bei diesem Badtyp prüfen wir jedes Ideenbild persönlich, bevor Sie es erhalten. Bitte laden Sie die Seite neu.' });
+      error: 'Bei diesem Badtyp prüfen wir jedes Ideenbild zuerst persönlich. Bitte laden Sie die Seite neu.' });
   }
 
   // Limits. Auf den Vorschau-Deployments von Vercel gelten die Limits pro Geraet und pro IP nicht (Carla, 27.09.: nach
@@ -1203,6 +1214,13 @@ async function handleAnfrage(res: any, raw: Uint8Array, ctx: RequestContext) {
   if (typeof body.ticket !== 'string' || body.ticket !== expected) {
     console.warn('[badplaner] Anfrage mit ungueltigem Ticket', leadId);
     return bad(res, 'Diese Vorschau können wir nicht zuordnen. Bitte erstellen Sie das Ideenbild noch einmal.');
+  }
+  // Versuch "persoenliche Pruefung", geprueft beim Einloesen: eine Vorschau von vor dem Einschalten bringt fuer ein Bad mit
+  // Dusche (Zeile "Dusche" im Ticket) keine Mail an den Kunden. Der Kunde erstellt das Bild neu und kommt so in den Versuch:
+  // zuerst der Kontakt, dann geht das Bild mit Foto, Auswahl und Lead-ID nur an NLD.
+  if (reviewTrialActive() && auswahl.some(([label, value]) => label === 'Dusche' && value !== NO_SHOWER_LABEL)) {
+    return res.status(409).json({ ok: false, code: 'PERSONAL_REVIEW',
+      error: 'Bei diesem Bad prüfen wir das Ideenbild jetzt zuerst. Bitte erstellen Sie es oben noch einmal und hinterlassen Sie uns dann Ihre Kontaktdaten.' });
   }
 
   const name = text(body.name, 120);

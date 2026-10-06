@@ -2934,6 +2934,12 @@ const reviewPhoto = () => photoChecked(true, JSON.stringify({ is_bathroom: true,
   order: ['bathtub', 'washbasin', 'toilet'], nearest: 'toilet', ceiling: 'flat', shower_back: 'along', shower_left: true, shower_right: true, basin_beside_end: true }));
 const reviewCheck = (walls) => () => checkedInv({ bathtub: 'back' }, { shower: 'back' }, { shower_fittings_walls: walls, shower_floor_after: 'tray', shower_step: false });
 const reviewOk = { photoChecks: [reviewPhoto], checks: [reviewCheck(['right'])] };
+// Der ganze Auftrag an Diego in der Mail an NLD (Checkliste von Carla, 06.10.), Wort fuer Wort.
+const reviewChecklist = (file) => 'Diego prüft das Bild selbst, ohne zweiten Prüfer: Foto und Bild in voller Auflösung im Anhang, '
+  + 'Lead-ID, Foto und Auswahl abgleichen; Fenster, Raumform, alle Armaturen, Glas und Produkte prüfen. Ist das Bild klar richtig: '
+  + `zuerst den Kunden anrufen, dann nur ${file} per E-Mail senden, keinen anderen Anhang. Ist es falsch oder zweifelhaft, oder `
+  + 'zeigt es eine Duschsäule statt des gewählten Up+: nicht senden, den Kunden anrufen und es erklären.';
+const reviewIntro = (file) => `Persönliche Prüfung (Versuch): Der Kunde hat das Ideenbild weder gesehen noch per Mail erhalten. ${reviewChecklist(file)}`;
 
 test('Versuch persoenliche Pruefung: nur auf Vorschau-Deployments; dort zuerst der Kontakt, ohne Modellaufruf', async () => {
   // Ohne Schalter oder in Produktion: die Vorschau wie bisher, und pruefung: true wird vor jedem Aufruf abgelehnt.
@@ -3002,6 +3008,7 @@ test('Versuch persoenliche Pruefung: das Bild geht nur an NLD, ohne Kundenmail u
   assert.match(text, /Diego prüft das Bild selbst, ohne zweiten Prüfer/);
   assert.match(text, /Ist das Bild klar richtig: zuerst den Kunden anrufen, dann nur ideenbild\.png per E-Mail senden, keinen anderen Anhang\./);
   assert.match(text, /falsch oder zweifelhaft, oder zeigt es eine Duschsäule statt des gewählten Up\+: nicht senden, den Kunden anrufen und es erklären/);
+  assert.equal(lead.text.split('\n')[0], reviewIntro('ideenbild.png'), 'die ganze Checkliste');
 
   // Diego, 06.10.: haelt die Pruefung das Bild nur wegen der Armaturen zurueck (moeglicher Fehlalarm, P2/P5), darf er es nach
   // eigener Pruefung und dem Anruf von Hand senden; es kommt als ideenbild.* mit diesem Auftrag. Ein anderer schwerer Hinweis,
@@ -3025,6 +3032,7 @@ test('Versuch persoenliche Pruefung: das Bild geht nur an NLD, ohne Kundenmail u
     assert.match(mail.subject, subject);
     assert.deepEqual(mail.attachments.map(({ filename }) => filename), ['foto.png', file]);
     assert.match(JSON.stringify(mail), finding);
+    if (sendable) assert.ok(mail.text.split('\n')[0].endsWith(`möglicherweise ein Fehlalarm. ${reviewChecklist(file)}`), 'die ganze Checkliste');
     if (!sendable) assert.doesNotMatch(JSON.stringify(mail), /per E-Mail senden|Fehlalarm/, 'gesperrt: kein Auftrag zum Senden');
   }
 });
@@ -3055,4 +3063,62 @@ test('Versuch persoenliche Pruefung: ohne Resend geht der Kontakt ohne Bilder an
   assert.equal(lostRes.statusCode, 502);
   assert.equal(lostRes.body.code, 'LEAD_DELIVERY_FAILED');
   assert.equal(lostRes.body.image, undefined);
+});
+
+test('Versuch persoenliche Pruefung: auch der alte Weg ohne stage und ohne pruefung bringt bei einem Bad mit Dusche weder Bild noch Kundenmail', async () => {
+  // Bis 6c4f858 gab kind 'render' mit Kontakt, aber ohne stage und ohne pruefung, im Versuch das Bild zurueck und schickte die
+  // Kundenmail. Jetzt ist jedes Bild mit Kontakt fuer ein Bad mit Dusche eine persoenliche Pruefung, auch mit Newsletter.
+  for (const [changes, settings, subject, file] of [
+    [{}, reviewOk, /– Ideenbild persönlich prüfen$/, 'ideenbild.png'],
+    [{ stage: 'kontakt', pruefung: false, newsletter: true }, reviewOk, /– Ideenbild persönlich prüfen$/, 'ideenbild.png'],
+    [{}, { checks: [() => checked(true), () => checked(true)] }, /– Ideenbild abgelehnt$/, 'verworfen.jpg'],
+  ]) {
+    const h = harness({ env: { ...reviewTrial, RESEND_AUDIENCE_ID: 'fixture-audience' }, ...settings });
+    const res = await h.invoke(payload({ ...reviewShower, ...changes }));
+    assert.equal(res.statusCode, 200, JSON.stringify(changes));
+    assert.equal(res.body.pruefung, true);
+    assert.equal(res.body.image, undefined);
+    assert.equal(res.body.ticket, undefined);
+    assert.ok(!h.calls.some((call) => call.url.includes('/audiences/')), 'kein Newsletter-Eintrag');
+    assert.match(reviewMails(h)[0].text, /\nNewsletter: nein\n/);
+    const [lead, ...more] = reviewMails(h);
+    assert.equal(more.length, 0, 'keine Kundenmail');
+    assert.ok(!lead.to.includes('fixture@example.invalid'));
+    assert.match(lead.subject, subject);
+    assert.deepEqual(lead.attachments.map(({ filename }) => filename), ['foto.png', file]);
+    assert.match(lead.text, /\nDusche: Dusche mit Duschwanne\n/);
+    assert.match(lead.text, /\nLead-ID: bp-fixture-\d+$/);
+    if (file === 'ideenbild.png') assert.equal(lead.text.split('\n')[0], reviewIntro(file), 'die ganze Checkliste');
+  }
+  // Ohne Dusche und im Gaeste-WC bleibt der alte Weg auch im Versuch: Bild in der Antwort und Kundenmail.
+  for (const changes of [{ dusche: 'keine' }, { raum: 'gaeste-wc', dusche: '', badewanne: '', waschtisch: 'einzel' }]) {
+    const res = await harness({ env: reviewTrial }).invoke(payload(changes));
+    assert.equal(res.statusCode, 200, JSON.stringify(changes));
+    assert.ok(res.body.image?.data);
+    assert.equal(res.body.delivery.customer, 'accepted');
+  }
+});
+
+test('Versuch persoenliche Pruefung: eine Vorschau von vor dem Einschalten bringt bei einem Bad mit Dusche keine Kundenmail', async () => {
+  // Das Ticket gilt 2 h und haengt nur am Schluessel: eine Vorschau aus einem Deployment ohne Versuch kann eingeloest
+  // werden, wenn der Versuch schon laeuft. Geprueft wird beim Einloesen, vor jeder Mail und ohne Anbieter.
+  const anfrage = (preview) => anfrageBody({ ...contactFields, newsletter: true, leadId: preview.leadId, exp: preview.exp, ticket: preview.ticket,
+    auswahl: preview.auswahl, paket: preview.paket, mime: preview.image.mime }, Buffer.from(preview.image.data, 'base64'));
+  const before = (await harness({ env: { VERCEL_ENV: 'preview' }, ...reviewOk }).invoke(previewPayload(reviewShower))).body;
+  assert.ok(before.ticket);
+  const trial = harness({ env: { ...reviewTrial, RESEND_AUDIENCE_ID: 'fixture-audience' } });
+  const refused = await trial.invoke(anfrage(before));
+  assert.equal(refused.statusCode, 409);
+  assert.equal(refused.body.code, 'PERSONAL_REVIEW');
+  assert.equal(trial.calls.length, 0, 'keine Mail an NLD oder den Kunden, kein Newsletter');
+  // Dasselbe Ticket ohne Versuch: wie bisher Lead und Kundenmail.
+  assert.equal((await harness({ env: { VERCEL_ENV: 'preview' } }).invoke(anfrage(before))).body.delivery.customer, 'accepted');
+  // Im Versuch bleiben die Vorschau ohne Dusche und die des Gaeste-WCs mit ihrer Anfrage wie bisher.
+  for (const changes of [{ dusche: 'keine' }, { raum: 'gaeste-wc', dusche: '', badewanne: '', waschtisch: 'einzel' }]) {
+    const h = harness({ env: reviewTrial });
+    const preview = (await h.invoke(previewPayload(changes))).body;
+    const res = await h.invoke(anfrage(preview));
+    assert.equal(res.statusCode, 200, JSON.stringify(changes));
+    assert.equal(res.body.delivery.customer, 'accepted');
+  }
 });
