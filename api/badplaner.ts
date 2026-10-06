@@ -923,11 +923,12 @@ async function handleRender(req: any, res: any, body: RenderBody, ctx: RequestCo
   // Versuch "persoenliche Pruefung": NLD bekommt das Bild mit dem Auftrag zu pruefen, der Kunde nur die Bestaetigung,
   // weder Bild noch Mail (Carla, 05.10.). Diego, 06.10.: er prueft selbst, ohne zweiten Pruefer; eine Duschsaeule statt
   // des gewaehlten Up+ geht nicht hinaus, ebenso jedes Bild im Zweifel. Zurueckgehaltene und verworfene Bilder nie.
+  // Carla, 06.10.: angerufen wird vor jedem Versand, auch wenn der kurze Text fuer den Kunden den Anruf nicht nennt.
   const reviewHead = 'Persönliche Prüfung (Versuch): Der Kunde hat das Ideenbild weder gesehen noch per Mail erhalten.';
   const reviewIntro = `${reviewHead} Diego prüft das Bild selbst, ohne zweiten Prüfer: Foto und Bild in voller Auflösung im `
-    + 'Anhang, Lead-ID, Foto und Auswahl abgleichen; Fenster, Raumform, alle Armaturen, Glas und Produkte prüfen. Zeigt das Bild '
-    + 'eine Duschsäule statt des gewählten Up+, nicht senden; im Zweifel ebenfalls nicht. Besteht das Bild die Prüfung, so rasch '
-    + 'wie möglich per E-Mail senden; sonst den Kunden anrufen.';
+    + 'Anhang, Lead-ID, Foto und Auswahl abgleichen; Fenster, Raumform, alle Armaturen, Glas und Produkte prüfen. Ist das Bild '
+    + 'klar richtig: zuerst den Kunden anrufen, dann das Bild per E-Mail senden. Ist es falsch oder zweifelhaft, oder zeigt es '
+    + 'eine Duschsäule statt des gewählten Up+: nicht senden, den Kunden anrufen und es erklären.';
   const reviewAnswer = (delivery: MailResult) => delivery.status === 'accepted'
     ? res.status(200).json({ ok: true, pruefung: true, leadId, delivery: { lead: delivery.status, leadProvider: delivery.provider, leadAttachments: delivery.attachments } })
     : res.status(502).json({ ok: false, code: 'LEAD_DELIVERY_FAILED', delivery: { lead: delivery.status },
@@ -950,7 +951,7 @@ async function handleRender(req: any, res: any, body: RenderBody, ctx: RequestCo
       replyTo: email || undefined,
       withoutAttachments: reviewWithoutImages,
       intro: review ? `${reviewHead} Die automatische Prüfung hat das Bild ${held ? 'zurückgehalten (schwerer Hinweis, siehe Fensterprüfung)'
-        : 'verworfen (siehe Fensterprüfung)'}: nicht senden, den Kunden anrufen.` : held
+        : 'verworfen (siehe Fensterprüfung)'}: nicht senden, den Kunden anrufen und es erklären.` : held
         ? `${preview ? 'Anonymer Badplaner-Versuch ohne Kontaktdaten. ' : ''}Das Ideenbild hat einen schweren Hinweis der Prüfung (siehe Fensterprüfung) und wurde ${preview ? 'nicht angezeigt; ohne Kontaktdaten können wir es nicht nachschicken' : 'dem Kunden weder angezeigt noch geschickt'}. Originalfoto, Auswahl und Bild liegen bei.`
         : preview
           ? 'Anonymer Badplaner-Versuch ohne Kontaktdaten. Das Ideenbild wurde von der Qualitätsprüfung abgelehnt und nicht angezeigt. Originalfoto, Auswahl und verworfenes Bild liegen bei.'
