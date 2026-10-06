@@ -153,7 +153,7 @@ const howSteps = [
   { n: '1', title: 'Raum, Stil und Ausstattung wählen', text: 'Badezimmer oder Gäste-WC wählen. Danach Stil, Materialien und die passenden Positionen bestimmen oder direkt eine individuelle Beratung anfragen.' },
   { n: '2', title: 'Foto vom Raum machen', text: 'Am Handy neu aufnehmen oder ein Foto aus der Galerie wählen. Von der Tür aus, den ganzen Raum im Bild, Licht an. Das Foto wird vor dem Senden verkleinert.' },
   REVIEW_TRIAL
-    ? { n: '3', title: 'Ideenbild ansehen oder persönlich prüfen lassen', text: 'Ohne Dusche sehen Sie Ihr Bad nach ein bis zwei Minuten mit den gewählten Materialien als Vorschau; mit Ihren Kontaktangaben erhalten Sie es in voller Qualität per E-Mail, dazu den Fixpreis des Pakets und eine kostenlose Beratung. Bei einem Bad mit Dusche hinterlassen Sie zuerst Ihre Kontaktdaten: Wir prüfen das Ideenbild persönlich und rufen Sie an Arbeitstagen so rasch wie möglich an. Besteht es unsere Prüfung, senden wir es Ihnen nach dem Gespräch per E-Mail.' }
+    ? { n: '3', title: 'Ideenbild ansehen oder persönlich prüfen lassen', text: 'Ohne Dusche sehen Sie Ihr Bad nach ein bis zwei Minuten mit den gewählten Materialien als Vorschau; mit Ihren Kontaktangaben erhalten Sie es in voller Qualität per E-Mail, dazu den Fixpreis des Pakets und eine kostenlose Beratung. Bei einem Bad mit Dusche prüfen wir das Ideenbild zuerst: Sie hinterlassen Ihre Kontaktdaten, wir schauen das Bild selbst an und senden es Ihnen so rasch wie möglich.' }
     : { n: '3', title: 'Ideenbild ansehen, dann in voller Qualität erhalten', text: 'Nach ein bis zwei Minuten sehen Sie Ihr Bad mit den gewählten Materialien als Vorschau. Mit Ihren Kontaktangaben erhalten Sie es in voller Qualität per E-Mail, dazu den Fixpreis des Pakets und eine kostenlose Beratung.' },
 ];
 
@@ -1061,7 +1061,7 @@ const Badplaner: React.FC = () => {
             <a href="#ablauf" className={styles.ctaSecondary}>So funktioniert's</a>
           </div>
           <p className={styles.heroText}>{REVIEW_TRIAL
-            ? 'Materialien wählen, Foto vom Bad hochladen: ohne Dusche sehen Sie Ihr Bad nach ein bis zwei Minuten neu. Bei einem Bad mit Dusche prüfen wir das Ideenbild zuerst persönlich und rufen Sie an.'
+            ? 'Materialien wählen, Foto vom Bad hochladen: ohne Dusche sehen Sie Ihr Bad nach ein bis zwei Minuten neu. Bei einem Bad mit Dusche prüfen wir das Ideenbild zuerst und senden es Ihnen so rasch wie möglich.'
             : 'Materialien wählen, Foto vom Bad hochladen: nach ein bis zwei Minuten sehen Sie Ihr Bad neu.'} Kostenlos und unverbindlich, aus Zofingen.</p>
           <p className={styles.heroNote}>
             Ideenbild, kein Plan: Das Bild zeigt eine Stimmung mit den gewählten Materialien. Masse, Leitungen und Details klären wir vor Ort.
@@ -1356,8 +1356,9 @@ const Badplaner: React.FC = () => {
                       {reviewStep === 'form' && (
                         <form className={styles.consultationForm} onSubmit={(e) => { e.preventDefault(); submitRender(true); }}>
                           <div className={styles.processNote}>
-                            <strong>Ihr Ideenbild wird persönlich geprüft</strong>
-                            <span>Bei diesem Badtyp schauen wir jedes Ideenbild selbst an, bevor Sie es erhalten. Wir prüfen, ob Fenster, Raumform und Armaturen zu Ihrem Bad passen. Hinterlassen Sie uns Ihre Kontaktdaten. Wir rufen Sie an Arbeitstagen so rasch wie möglich an. Wenn das Bild unsere Prüfung besteht, senden wir es Ihnen nach dem Gespräch per E-Mail. Besteht ein Bild unsere Prüfung nicht, sagen wir Ihnen das offen und besprechen mit Ihnen, wie es weitergeht. Das Ideenbild ist ein Vorschlag und keine Ausführungsplanung.</span>
+                            <strong>Ihr Ideenbild prüfen wir zuerst</strong>
+                            <span>Bei diesem Bad kann das Bild Fehler enthalten. Wir schauen es deshalb selbst an und senden es Ihnen so rasch wie möglich.</span>
+                            <span>Bitte hinterlassen Sie uns dafür Ihre Kontaktdaten.</span>
                           </div>
                           <div className={styles.formRow}>
                             <label className={styles.field} htmlFor="bp-review-name"><span>Vorname und Name</span><input id="bp-review-name" required autoComplete="name" value={contact.name} onChange={(e) => setContact({ ...contact, name: e.target.value })} /></label>
@@ -1370,7 +1371,7 @@ const Badplaner: React.FC = () => {
                           <button type="submit" className={styles.ctaDark} disabled={status === 'sending'}>{status === 'sending' ? 'Wird gesendet…' : 'Ideenbild persönlich prüfen lassen'}</button>
                         </form>
                       )}
-                      {reviewStep === 'sent' && <p className={styles.success} role="status">Vielen Dank. Ihre Angaben sind bei uns. Wir rufen Sie an Arbeitstagen so rasch wie möglich an.</p>}
+                      {reviewStep === 'sent' && <p className={styles.success} role="status">Vielen Dank. Ihre Angaben sind bei uns. Wir schauen Ihr Ideenbild selbst an und senden es Ihnen so rasch wie möglich.</p>}
                       <div className={`${styles.uploadActions} ${styles.changePhoto}`}>
                         <span className={styles.uploadAction}>
                           <input

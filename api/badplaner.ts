@@ -921,11 +921,13 @@ async function handleRender(req: any, res: any, body: RenderBody, ctx: RequestCo
   const byNumber = (a: string, b: string) => parseInt(a.replace(/^Bild /, ''), 10) - parseInt(b.replace(/^Bild /, ''), 10);
   const others = [...discarded, ...notShown].sort(byNumber);
   // Versuch "persoenliche Pruefung": NLD bekommt das Bild mit dem Auftrag zu pruefen, der Kunde nur die Bestaetigung,
-  // weder Bild noch Mail (Carla, 05.10.).
-  const reviewIntro = 'Persönliche Prüfung (Versuch): Der Kunde hat das Ideenbild weder gesehen noch per Mail erhalten. '
-    + 'Vor dem Senden: Foto und Bild in voller Auflösung im Anhang, Lead-ID, Foto und Auswahl abgleichen; Fenster, Raumform, '
-    + 'alle Armaturen, Glas und Produkte prüfen. Zeigt das Bild eine Duschsäule statt Up+, bleibt es zurück. Zuerst anrufen, '
-    + 'das Bild erst danach per E-Mail senden und nur, wenn es die Prüfung besteht.';
+  // weder Bild noch Mail (Carla, 05.10.). Diego, 06.10.: er prueft selbst, ohne zweiten Pruefer; eine Duschsaeule statt
+  // des gewaehlten Up+ geht nicht hinaus, ebenso jedes Bild im Zweifel. Zurueckgehaltene und verworfene Bilder nie.
+  const reviewHead = 'Persönliche Prüfung (Versuch): Der Kunde hat das Ideenbild weder gesehen noch per Mail erhalten.';
+  const reviewIntro = `${reviewHead} Diego prüft das Bild selbst, ohne zweiten Prüfer: Foto und Bild in voller Auflösung im `
+    + 'Anhang, Lead-ID, Foto und Auswahl abgleichen; Fenster, Raumform, alle Armaturen, Glas und Produkte prüfen. Zeigt das Bild '
+    + 'eine Duschsäule statt des gewählten Up+, nicht senden; im Zweifel ebenfalls nicht. Besteht das Bild die Prüfung, so rasch '
+    + 'wie möglich per E-Mail senden; sonst den Kunden anrufen.';
   const reviewAnswer = (delivery: MailResult) => delivery.status === 'accepted'
     ? res.status(200).json({ ok: true, pruefung: true, leadId, delivery: { lead: delivery.status, leadProvider: delivery.provider, leadAttachments: delivery.attachments } })
     : res.status(502).json({ ok: false, code: 'LEAD_DELIVERY_FAILED', delivery: { lead: delivery.status },
@@ -947,8 +949,8 @@ async function handleRender(req: any, res: any, body: RenderBody, ctx: RequestCo
         : `Badplaner-Lead: ${name} – ${isGuestWc ? 'Gäste-WC' : pkg.name} – ${outcome}`,
       replyTo: email || undefined,
       withoutAttachments: reviewWithoutImages,
-      intro: review ? `${reviewIntro} ${held ? 'Die automatische Prüfung meldet einen schweren Hinweis (siehe Fensterprüfung).'
-        : 'Die automatische Prüfung hat das Bild verworfen (siehe Fensterprüfung): nicht senden, den Kunden anrufen.'}` : held
+      intro: review ? `${reviewHead} Die automatische Prüfung hat das Bild ${held ? 'zurückgehalten (schwerer Hinweis, siehe Fensterprüfung)'
+        : 'verworfen (siehe Fensterprüfung)'}: nicht senden, den Kunden anrufen.` : held
         ? `${preview ? 'Anonymer Badplaner-Versuch ohne Kontaktdaten. ' : ''}Das Ideenbild hat einen schweren Hinweis der Prüfung (siehe Fensterprüfung) und wurde ${preview ? 'nicht angezeigt; ohne Kontaktdaten können wir es nicht nachschicken' : 'dem Kunden weder angezeigt noch geschickt'}. Originalfoto, Auswahl und Bild liegen bei.`
         : preview
           ? 'Anonymer Badplaner-Versuch ohne Kontaktdaten. Das Ideenbild wurde von der Qualitätsprüfung abgelehnt und nicht angezeigt. Originalfoto, Auswahl und verworfenes Bild liegen bei.'

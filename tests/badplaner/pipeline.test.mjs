@@ -2997,11 +2997,15 @@ test('Versuch persoenliche Pruefung: das Bild geht nur an NLD, ohne Kundenmail u
   assert.match(text, />Ideenbild<\/td><td[^>]*>nicht angezeigt, persönliche Prüfung</);
   assert.match(text, />PLZ \/ Ort<\/td><td[^>]*>4800 Zofingen</);
   assert.match(text, />Newsletter<\/td><td[^>]*>nein</);
+  // Diego, 06.10.: er prueft selbst; eine Duschsaeule statt des gewaehlten Up+ oder ein Zweifel heisst: nicht senden.
+  assert.match(text, /Diego prüft das Bild selbst, ohne zweiten Prüfer/);
+  assert.match(text, /Duschsäule statt des gewählten Up\+, nicht senden; im Zweifel ebenfalls nicht/);
 
-  // Schwerer Hinweis oder verworfen: NLD bekommt Bild und Befund, der Kunde dieselbe Bestaetigung und keine Mail.
+  // Schwerer Hinweis oder verworfen: NLD bekommt Bild und Befund mit "nicht senden", der Kunde dieselbe Bestaetigung.
   for (const [settings, subject, file, finding] of [
-    [{ photoChecks: [reviewPhoto], checks: [reviewCheck(['back']), reviewCheck(['back'])] }, /– Ideenbild zurückgehalten \(schwerer Hinweis\)$/, 'zurueckgehalten.png', /meldet einen schweren Hinweis/],
-    [{ checks: [() => checked(true), () => checked(true)] }, /– Ideenbild abgelehnt$/, 'verworfen.jpg', /hat das Bild verworfen \(siehe Fensterprüfung\): nicht senden/],
+    [{ photoChecks: [reviewPhoto], checks: [reviewCheck(['back']), reviewCheck(['back'])] }, /– Ideenbild zurückgehalten \(schwerer Hinweis\)$/, 'zurueckgehalten.png',
+      /hat das Bild zurückgehalten \(schwerer Hinweis, siehe Fensterprüfung\): nicht senden, den Kunden anrufen/],
+    [{ checks: [() => checked(true), () => checked(true)] }, /– Ideenbild abgelehnt$/, 'verworfen.jpg', /hat das Bild verworfen \(siehe Fensterprüfung\): nicht senden, den Kunden anrufen/],
   ]) {
     const held = harness({ env: reviewTrial, ...settings });
     const answer = await held.invoke(payload({ ...reviewShower, pruefung: true }));
@@ -3013,6 +3017,7 @@ test('Versuch persoenliche Pruefung: das Bild geht nur an NLD, ohne Kundenmail u
     assert.match(mail.subject, subject);
     assert.deepEqual(mail.attachments.map(({ filename }) => filename), ['foto.png', file]);
     assert.match(JSON.stringify(mail), finding);
+    assert.doesNotMatch(JSON.stringify(mail), /per E-Mail senden/, 'zurueckgehaltene und verworfene Bilder gehen nie hinaus');
   }
 });
 
