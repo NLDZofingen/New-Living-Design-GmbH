@@ -3122,3 +3122,26 @@ test('Versuch persoenliche Pruefung: eine Vorschau von vor dem Einschalten bring
     assert.equal(res.body.delivery.customer, 'accepted');
   }
 });
+
+test('Versuch persoenliche Pruefung: fehlt bei einem Bad mit Dusche die E-Mail, verspricht die Antwort keine Mail mit dem Bild', async () => {
+  const neutral = 'Bitte geben Sie Ihre E-Mail-Adresse an, damit wir Sie kontaktieren können.';
+  const promise = 'Bitte E-Mail-Adresse angeben: wir schicken Ihnen das Ideenbild auch per Mail.';
+  // Im Versuch mit Dusche, mit pruefung (die Seite) und ohne (alter Weg): Antwort vor jedem Aufruf eines Anbieters.
+  for (const changes of [{ pruefung: true, email: '' }, { email: '   ' }]) {
+    const h = harness({ env: reviewTrial });
+    const res = await h.invoke(payload({ ...reviewShower, ...changes }));
+    assert.equal(res.statusCode, 400, JSON.stringify(changes));
+    assert.equal(res.body.error, neutral);
+    assert.equal(h.calls.length, 0);
+  }
+  // Ohne Versuch oder ohne Dusche bleibt der Text, beim Bild mit Kontakt wie bei der Anfrage nach der Vorschau.
+  for (const [env, changes] of [[{}, reviewShower], [{ VERCEL_ENV: 'preview' }, reviewShower], [reviewTrial, { dusche: 'keine' }]]) {
+    assert.equal((await harness({ env }).invoke(payload({ ...changes, email: '' }))).body.error, promise, JSON.stringify([env, changes]));
+  }
+  const h = harness({ env: reviewTrial });
+  const preview = (await h.invoke(previewPayload({ dusche: 'keine' }))).body;
+  const anfrage = await h.invoke(anfrageBody({ ...contactFields, email: '', leadId: preview.leadId, exp: preview.exp, ticket: preview.ticket,
+    auswahl: preview.auswahl, paket: preview.paket, mime: preview.image.mime }, Buffer.from(preview.image.data, 'base64')));
+  assert.equal(anfrage.statusCode, 400);
+  assert.equal(anfrage.body.error, promise);
+});

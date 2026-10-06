@@ -428,7 +428,7 @@ async function handleRender(req: any, res: any, body: RenderBody, ctx: RequestCo
   const place = preview ? '' : text(body.place, 120);
   const newsletter = !preview && !review && body.newsletter === true;
   if (!preview) {
-    const contactError = contactProblem(name, phone, email, place);
+    const contactError = contactProblem(name, phone, email, place, !(reviewTrial && showerBath));
     if (contactError) return bad(res, contactError);
   }
   if (body.consent !== true) return bad(res, 'Bitte bestätigen Sie die Datenschutzerklärung.');
@@ -1152,9 +1152,11 @@ async function handleRender(req: any, res: any, body: RenderBody, ctx: RequestCo
 }
 
 /** Dieselben Pruefungen fuer das Formular vor dem Bild (alt) und fuer die Anfrage danach. */
-function contactProblem(name: string, phone: string, email: string, place: string): string {
+function contactProblem(name: string, phone: string, email: string, place: string, promiseMail = true): string {
   if (!name || !phone) return 'Bitte Name und Telefonnummer angeben.';
-  if (!email) return 'Bitte E-Mail-Adresse angeben: wir schicken Ihnen das Ideenbild auch per Mail.';
+  // Im Versuch mit Dusche geht das Bild nur an NLD: dort kein Versprechen einer Mail.
+  if (!email) return promiseMail ? 'Bitte E-Mail-Adresse angeben: wir schicken Ihnen das Ideenbild auch per Mail.'
+    : 'Bitte geben Sie Ihre E-Mail-Adresse an, damit wir Sie kontaktieren können.';
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return 'Die E-Mail-Adresse sieht nicht richtig aus.';
   if (!place) return 'Bitte PLZ und Ort angeben.';
   return '';
