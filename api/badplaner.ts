@@ -489,7 +489,10 @@ async function handleRender(req: any, res: any, body: RenderBody, ctx: RequestCo
   // 429, 503, 500 oder Zeitueberschreitung. Kommt er auf keinem Weg an, entsteht kein Bild. Bei unklarer Zustellung
   // geht es weiter: die zweite Mail traegt den Kontakt nochmals.
   if (!preview && reviewTrial && showerBath) {
-    const followUp = 'Bild oder Fehler kommen mit derselben Lead-ID in einer zweiten Mail; kommt sie nicht innert 5 Minuten, den Kunden anrufen.';
+    // Ablauf im Buero (Carla, 06.10.): jeder neue Kunde wird angerufen; fehlt die zweite Mail, heisst das nicht, dass das Bild
+    // gescheitert ist, nur dass noch keines freigegeben ist.
+    const followUp = 'Diego ruft jeden neuen Kunden an. Vorher sucht er die Mail zum Ideenbild mit derselben Lead-ID. Fehlt sie oder '
+      + 'meldet sie einen Fehler, ruft er trotzdem an, erklärt, dass es noch kein freigegebenes Ideenbild gibt, und vereinbart das weitere Vorgehen.';
     const contactDelivery = await sendLeadMail({
       subject: `Badplaner-Lead: ${name} – ${pkg.name} – Kontakt eingegangen – Ideenbild folgt`,
       replyTo: email,

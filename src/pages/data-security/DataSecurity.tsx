@@ -170,7 +170,7 @@ const DataSecurity: React.FC = () => {
             <h3>9. Badplaner (Ideenbild mit KI)</h3>
             <p>Mit dem Badplaner auf <Link to="/badplaner">/badplaner</Link> können Sie aus einem Foto Ihres Bads ein Ideenbild mit den gewählten Materialien erstellen lassen.</p>
             <ul className={styles.list}>
-              <li><strong>Welche Daten:</strong> Foto des Bads, Name, Telefonnummer, optional E-Mail-Adresse und Wohnort, die gewählte Ausstattung (Paket, Platten, Farben, Armaturen),
+              <li><strong>Welche Daten:</strong> Foto des Bads, Name, Telefonnummer, E-Mail-Adresse und Wohnort, die gewählte Ausstattung (Paket, Platten, Farben, Armaturen),
                 optional ein Grundriss und die Bad-Grösse in m².</li>
               <li><strong>Zweck:</strong> Erstellung des Ideenbilds und Kontaktaufnahme für eine Beratung (Telefon, WhatsApp, Termin in der Ausstellung).</li>
               <li><strong>Bildgenerierung:</strong> Das Foto und die Materialangaben werden an <strong>Google LLC</strong> (Gemini API, USA) übermittelt, um das Ideenbild zu erzeugen.
@@ -178,7 +178,7 @@ const DataSecurity: React.FC = () => {
                 des Data Privacy Framework bzw. von Standardvertragsklauseln.</li>
               <li><strong>Keine Speicherung auf unseren Servern:</strong> Foto und Ideenbild werden nicht auf unseren Servern gespeichert. Sie werden uns per E-Mail zugestellt,
                 sobald das Ideenbild erstellt ist, auch wenn Sie danach keine Kontaktangaben hinterlassen; Ihre Kontaktangaben folgen mit einer zweiten E-Mail. Prüfen wir ein Ideenbild
-                vor der Zustellung persönlich, geben Sie Ihre Kontaktangaben vorher an, und wir erhalten Foto, Ideenbild und Kontaktangaben in einer E-Mail. Als Versanddienst nutzen wir <strong>Resend Inc.</strong> (USA). Fällt dieser aus, gehen die Angaben ohne Bilder über <strong>Formspree Inc.</strong> (USA) an uns.</li>
+                vor der Zustellung persönlich, geben Sie Name, Telefonnummer, E-Mail-Adresse und Wohnort vorher an, und wir erhalten Foto, Ideenbild und Kontaktangaben per E-Mail. Als Versanddienst nutzen wir <strong>Resend Inc.</strong> (USA). Fällt dieser aus, gehen die Angaben ohne Bilder über <strong>Formspree Inc.</strong> (USA) an uns.</li>
               <li><strong>Löschung:</strong> Fotos und Ideenbilder löschen wir spätestens 30 Tage nach Abschluss der Anfrage, sofern kein Auftrag zustande kommt.</li>
               <li><strong>Rechtsgrundlage:</strong> Ihre Einwilligung (Checkbox vor dem Erstellen des Ideenbilds). Sie können die Einwilligung jederzeit mit Wirkung für die Zukunft
                 per E-Mail an die oben genannte Adresse widerrufen; wir löschen die Daten dann umgehend.</li>

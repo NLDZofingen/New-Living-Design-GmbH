@@ -3151,12 +3151,15 @@ test('Versuch persoenliche Pruefung: fehlt bei einem Bad mit Dusche die E-Mail, 
 // Versuch mit Dusche (Diego und Carla, 06.10.): der Kontakt geht vor Tageslimit und Gemini an NLD, Bild oder Fehler folgen.
 const isGemini = (call) => call.url.includes('generativelanguage.googleapis.com');
 const contactRequest = payload({ ...reviewShower, pruefung: true, newsletter: true });
+// Ablauf im Buero (Carla, 06.10.), Wort fuer Wort; ohne Frist und ohne zu sagen, das Bild sei gescheitert.
+const contactProcedure = 'Diego ruft jeden neuen Kunden an. Vorher sucht er die Mail zum Ideenbild mit derselben Lead-ID. Fehlt sie oder '
+  + 'meldet sie einen Fehler, ruft er trotzdem an, erklärt, dass es noch kein freigegebenes Ideenbild gibt, und vereinbart das weitere Vorgehen.';
 function assertContactMail(mail, leadId) {
   assert.equal(mail.subject, 'Badplaner-Lead: Fixture Person – Essenza – Kontakt eingegangen – Ideenbild folgt');
   assert.ok(!mail.to.includes('fixture@example.invalid'), 'nur an NLD');
   assert.equal(mail.reply_to, 'fixture@example.invalid');
   assert.deepEqual(mail.attachments.map(({ filename }) => filename), ['foto.png']);
-  assert.match(mail.text, /^Persönliche Prüfung \(Versuch\): Kontakt eingegangen – Ideenbild folgt\. Das Foto liegt bei\./);
+  assert.equal(mail.text.split('\n')[0], `Persönliche Prüfung (Versuch): Kontakt eingegangen – Ideenbild folgt. Das Foto liegt bei. ${contactProcedure}`);
   assert.match(mail.text, /\nName: Fixture Person\nTelefon \/ WhatsApp: \+41 00 000 00 00\nE-Mail: fixture@example\.invalid\nPLZ \/ Ort: 4800 Zofingen\nRaum: Badezimmer\n/);
   assert.match(mail.text, /\nDusche: Dusche mit Duschwanne\n/);
   assert.match(mail.text, new RegExp(`\\nLead-ID: ${leadId}$`));
@@ -3224,8 +3227,10 @@ test('Versuch persoenliche Pruefung: die Mail mit dem Kontakt geht notfalls ohne
   const [form, ...moreForms] = viaForm.calls.filter((call) => call.url.startsWith('https://formspree.io/')).map((call) => call.body);
   assert.equal(moreForms.length, 0);
   assert.equal(form._subject, 'Badplaner-Lead: Fixture Person – Essenza – Kontakt eingegangen – Ideenbild folgt – OHNE Foto');
-  assert.match(form.message.split('\n')[0], /Das Foto fehlt in dieser Mail, der Versand mit Anhängen ist gescheitert\./);
+  assert.equal(form.message.split('\n')[0], 'Persönliche Prüfung (Versuch): Kontakt eingegangen – Ideenbild folgt. Das Foto fehlt in dieser Mail, '
+    + `der Versand mit Anhängen ist gescheitert. ${contactProcedure}`);
   assert.equal(form.hinweis, 'Bilder konnten nicht angehängt werden');
+  assert.ok(!JSON.stringify(form).includes(PNG), 'kein Foto ueber Formspree');
   assert.deepEqual([form.Name, form['Telefon / WhatsApp'], form['E-Mail'], form['PLZ / Ort'], form.Dusche, form['Lead-ID']],
     ['Fixture Person', '+41 00 000 00 00', 'fixture@example.invalid', '4800 Zofingen', 'Dusche mit Duschwanne', res.body.leadId]);
   assert.equal(viaForm.counts().generation, 1);
