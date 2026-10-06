@@ -924,7 +924,7 @@ export const badplanerFaq: { question: string; answer: string }[] = [
   },
   {
     question: 'Was passiert mit meinem Foto?',
-    answer: 'Ihr Foto wird zur Erstellung des Ideenbilds an Google (Gemini API) übermittelt und zusammen mit dem Ergebnis per E-Mail an uns geschickt. Wir speichern die Fotos nicht auf unseren Servern und löschen Foto und Ideenbild spätestens 30 Tage nach Abschluss der Anfrage, wenn kein Auftrag zustande kommt. Details stehen in der Datenschutzerklärung.',
+    answer: 'Ihr Foto wird zur Erstellung des Ideenbilds an Google (Gemini API) übermittelt und normalerweise zusammen mit dem Ergebnis per E-Mail an uns geschickt. Klappt der Versand mit Anhängen nicht, erhalten wir nur Ihre Angaben, ohne Foto und Ideenbild. Wir speichern die Fotos nicht auf unseren Servern und löschen Foto und Ideenbild spätestens 30 Tage nach Abschluss der Anfrage, wenn kein Auftrag zustande kommt. Details stehen in der Datenschutzerklärung.',
   },
   {
     question: 'Was passiert danach?',

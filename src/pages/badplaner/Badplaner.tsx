@@ -1306,7 +1306,8 @@ const Badplaner: React.FC = () => {
                         <input type="checkbox" id="bp-consent" name="consent" required checked={contact.consent} onChange={(e) => setContact({ ...contact, consent: e.target.checked })} />
                         <span>
                           Ich habe die <Link to="/datenschutz#badplaner" target="_blank" rel="noopener noreferrer">Datenschutzerklärung</Link> gelesen. Mein Foto wird zur
-                          Erstellung des Ideenbilds an Google (Gemini API) übermittelt und uns per E-Mail zugestellt.
+                          Erstellung des Ideenbilds an Google (Gemini API) übermittelt und uns normalerweise per E-Mail zugestellt.
+                          Klappt der Versand mit Anhängen nicht, erhalten wir nur meine Angaben, ohne Foto.
                         </span>
                       </label>
                       <div className={styles.stepActions}>
