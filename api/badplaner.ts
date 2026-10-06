@@ -20,6 +20,7 @@
  *                      pruefung: true. Das Bild geht dann nur an NLD, weder an den Browser noch per Mail an den Kunden.
  *                      Fuer ein Bad mit Dusche gilt das auch ohne pruefung (alter Weg ohne stage); 'anfrage' mit
  *                      einem Ticket fuer ein Bad mit Dusche endet beim Einloesen ohne Mail mit 409 PERSONAL_REVIEW.
+ *                      Der Kontakt geht vorab an NLD ("Kontakt eingegangen – Ideenbild folgt"), vor Tageslimit und Gemini.
  *
  * Ablauf bei kind: 'render'
  *   1. Pflichtfelder, alle Ausstattungs-IDs und Bildheader streng pruefen
@@ -445,6 +446,65 @@ async function handleRender(req: any, res: any, body: RenderBody, ctx: RequestCo
     photoRatio = nearestAspectRatio(size.width, size.height);
     photoSent = `${size.width}×${size.height}`;
   } catch { return bad(res, 'Das Foto ist ungültig oder zu gross. Bitte JPEG, PNG oder WebP wählen.'); }
+
+  // Armaturen: Essenza Aufputz verchromt, Colore in der gewählten Serie und Oberfläche,
+  // Atelier Unterputz in der gewählten Oberfläche.
+  const taps = tapDescription(pkg.id as PackageId, finish, tapSeriesOption, opts.tapSeries);
+  // Auswahl in Klartext: dieselben Zeilen für Lead- und Kundenmail. Sie
+  // werden vor der Prüfung aufgebaut, damit NLD den bereits erfassten Lead
+  // auch dann erhält, wenn kein Ideenbild sicher angezeigt werden darf.
+  const packageLabel = requiresQuote
+    ? `${pkg.name} – Individuelle Offerte`
+    : `${pkg.name} (ab CHF ${pkg.priceLabel})`;
+  const auswahl: [string, string][] = [];
+  const row = (label: string, value: string) => auswahl.push([label, value]);
+  row('Raum', isGuestWc ? 'Gäste-WC' : 'Badezimmer');
+  row(isGuestWc ? 'Stilrichtung' : 'Paket', packageLabel);
+  if (look) row('Look', look.label);
+  row('Format', `${format.replace('x', '×')} cm`);
+  row(floorTile ? 'Platten Wand' : 'Platten', tileName(tile));
+  if (floorTile) row('Platten Boden', `${tileName(floorTile)}, ${floorFormat.replace('x', '×')} cm`);
+  if (isAtelier && accentMode) row('Kombination', accentMode.label);
+  if (accent && placement) {
+    row('Akzentfläche', placement.label);
+    row('Akzentmaterial', `${accent.supplier} ${accent.label}`);
+  }
+  row('Wandplatten', isGuestWc && wall.id === 'halbhoch'
+    ? 'Wände bis ca. 120 cm, oberhalb weiss gestrichen'
+    : wall.label);
+  if (shower) row('Dusche', shower.label);
+  if (bathtub) row('Badewanne', bathtub.label);
+  row('Unterbau', `${base.label} (${base.supplier})`);
+  row('Waschtischplatte', `${top.label} (${top.supplier})`);
+  if (basinType) row('Waschbecken', basinType.label);
+  row('Armatur', taps.label);
+  row('Sanitärkeramik', `${sanitary.label} (${sanitary.supplier})`);
+  row('Waschtisch', basin.label);
+  row('Spiegel', mirror.label);
+
+  const leadId = newId();
+  const photoName = photo.mime === 'image/png' ? 'foto.png' : photo.mime === 'image/webp' ? 'foto.webp' : 'foto.jpg';
+  // Versuch "persoenliche Pruefung" mit Dusche (Diego und Carla, 06.10.): der Kontakt geht sofort an NLD, vor dem
+  // Tageslimit und vor jedem Aufruf von Gemini; Bild oder Fehler folgen mit derselben Lead-ID. So bleibt er auch bei
+  // 429, 503, 500 oder Zeitueberschreitung. Kommt er auf keinem Weg an, entsteht kein Bild. Bei unklarer Zustellung
+  // geht es weiter: die zweite Mail traegt den Kontakt nochmals.
+  if (!preview && reviewTrial && showerBath) {
+    const followUp = 'Bild oder Fehler kommen mit derselben Lead-ID in einer zweiten Mail; kommt sie nicht innert 5 Minuten, den Kunden anrufen.';
+    const contactDelivery = await sendLeadMail({
+      subject: `Badplaner-Lead: ${name} – ${pkg.name} – Kontakt eingegangen – Ideenbild folgt`,
+      replyTo: email,
+      withoutAttachments: {
+        subject: `Badplaner-Lead: ${name} – ${pkg.name} – Kontakt eingegangen – Ideenbild folgt – OHNE Foto`,
+        intro: `Persönliche Prüfung (Versuch): Kontakt eingegangen – Ideenbild folgt. Das Foto fehlt in dieser Mail, der Versand mit Anhängen ist gescheitert. ${followUp}`,
+      },
+      intro: `Persönliche Prüfung (Versuch): Kontakt eingegangen – Ideenbild folgt. Das Foto liegt bei. ${followUp}`,
+      details: [['Name', name], ['Telefon / WhatsApp', phone], ['E-Mail', email], ['PLZ / Ort', place], ...auswahl,
+        ['Zeitpunkt', swissTime()], ['Lead-ID', leadId]],
+      attachments: [{ filename: photoName, content: photo.data }],
+    }, ctx);
+    if (contactDelivery.status === 'failed') return res.status(502).json({ ok: false, code: 'LEAD_DELIVERY_FAILED', delivery: { lead: contactDelivery.status },
+      error: 'Ihre Anfrage konnte nicht bestätigt werden. Bitte kontaktieren Sie uns telefonisch; die Zustellung ist möglicherweise unklar.' });
+  }
   if (!env.GEMINI_API_KEY) {
     console.error('[badplaner] Bilddienst nicht konfiguriert');
     return res.status(503).json({ ok: false, code: 'SERVICE_UNAVAILABLE', error: 'Der Badplaner ist im Moment nicht verfügbar. Rufen Sie uns an: ' + business.phone.display });
@@ -548,9 +608,6 @@ async function handleRender(req: any, res: any, body: RenderBody, ctx: RequestCo
   const references = [swatch, floorSwatch, accentSwatch, topSwatch, baseSwatch === topSwatch ? null : baseSwatch, mirrorImage, moduleImage, wcImage, tapsImage, showerImage, bathImage];
   const imageNumber = (image: Photo | null) => (image ? 2 + references.filter(Boolean).indexOf(image) : 0);
 
-  // Armaturen: Essenza Aufputz verchromt, Colore in der gewählten Serie und Oberfläche,
-  // Atelier Unterputz in der gewählten Oberfläche.
-  const taps = tapDescription(pkg.id as PackageId, finish, tapSeriesOption, opts.tapSeries);
   // Die Wanne bekommt ihre eigene Armatur (Diego, 25.09.): die Einbauwanne an der Wand, mit Handbrause und ohne
   // Kopfbrause, die freistehende eine Standarmatur am Boden.
   const bathFiller = !bathtub || bathtub.id === 'keine' ? ''
@@ -659,42 +716,8 @@ async function handleRender(req: any, res: any, body: RenderBody, ctx: RequestCo
     showerLongWall,
   });
 
-  // Auswahl in Klartext: dieselben Zeilen für Lead- und Kundenmail. Sie
-  // werden vor der Prüfung aufgebaut, damit NLD den bereits erfassten Lead
-  // auch dann erhält, wenn kein Ideenbild sicher angezeigt werden darf.
-  const packageLabel = requiresQuote
-    ? `${pkg.name} – Individuelle Offerte`
-    : `${pkg.name} (ab CHF ${pkg.priceLabel})`;
-  const auswahl: [string, string][] = [];
-  const row = (label: string, value: string) => auswahl.push([label, value]);
-  row('Raum', isGuestWc ? 'Gäste-WC' : 'Badezimmer');
-  row(isGuestWc ? 'Stilrichtung' : 'Paket', packageLabel);
-  if (look) row('Look', look.label);
-  row('Format', `${format.replace('x', '×')} cm`);
-  row(floorTile ? 'Platten Wand' : 'Platten', tileName(tile));
-  if (floorTile) row('Platten Boden', `${tileName(floorTile)}, ${floorFormat.replace('x', '×')} cm`);
-  if (isAtelier && accentMode) row('Kombination', accentMode.label);
-  if (accent && placement) {
-    row('Akzentfläche', placement.label);
-    row('Akzentmaterial', `${accent.supplier} ${accent.label}`);
-  }
-  row('Wandplatten', isGuestWc && wall.id === 'halbhoch'
-    ? 'Wände bis ca. 120 cm, oberhalb weiss gestrichen'
-    : wall.label);
-  if (shower) row('Dusche', shower.label);
-  if (bathtub) row('Badewanne', bathtub.label);
-  row('Unterbau', `${base.label} (${base.supplier})`);
-  row('Waschtischplatte', `${top.label} (${top.supplier})`);
-  if (basinType) row('Waschbecken', basinType.label);
-  row('Armatur', taps.label);
-  row('Sanitärkeramik', `${sanitary.label} (${sanitary.supplier})`);
-  row('Waschtisch', basin.label);
-  row('Spiegel', mirror.label);
-
-  const leadId = newId();
   // Was die Pruefung an der Dusche des gezeigten Bildes sah; steht erst nach der Pruefung fest.
   let showerSeen = '';
-  const photoName = photo.mime === 'image/png' ? 'foto.png' : photo.mime === 'image/webp' ? 'foto.webp' : 'foto.jpg';
   const leadDetails = (checkStatus: string, imageStatus?: string): [string, string][] => [
     ['Name', name],
     ['Telefon / WhatsApp', phone],

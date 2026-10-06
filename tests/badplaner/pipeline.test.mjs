@@ -2970,7 +2970,7 @@ test('Versuch persoenliche Pruefung: nur auf Vorschau-Deployments; dort zuerst d
   await stopped();
   assert.equal(h.calls.length, 0, 'vor dem Kontakt kein Aufruf');
   assert.equal(await withContact(), 200);
-  assert.deepEqual(h.counts(), normal.counts(), 'so viele Bilder, Pruefungen und Mails wie eine normale Vorschau');
+  assert.deepEqual(h.counts(), { ...normal.counts(), mail: normal.counts().mail + 1 }, 'so viele Bilder und Pruefungen wie eine normale Vorschau, dazu die Mail mit dem Kontakt vorab');
   assert.equal(h.photoCount(), normal.photoCount());
   // Tagesdeckel 2: die Antworten 409 zaehlen nicht, also geht ein zweiter Versuch mit Kontakt durch, ein dritter nicht.
   await stopped();
@@ -2991,8 +2991,8 @@ test('Versuch persoenliche Pruefung: das Bild geht nur an NLD, ohne Kundenmail u
   assert.equal(res.body.image, undefined);
   assert.equal(res.body.ticket, undefined);
   const mails = reviewMails(h);
-  assert.equal(mails.length, 1, 'keine Kundenmail');
-  const [lead] = mails;
+  assert.equal(mails.length, 2, 'Kontakt vorab und Bild, keine Kundenmail');
+  const [, lead] = mails;
   assert.ok(!lead.to.includes('fixture@example.invalid'));
   assert.equal(lead.reply_to, 'fixture@example.invalid');
   assert.match(lead.subject, /^Badplaner-Lead: Fixture Person – .+ – Ideenbild persönlich prüfen$/);
@@ -3026,7 +3026,7 @@ test('Versuch persoenliche Pruefung: das Bild geht nur an NLD, ohne Kundenmail u
     assert.equal(answer.statusCode, 200);
     assert.equal(answer.body.pruefung, true);
     assert.equal(answer.body.image, undefined);
-    const [mail, ...more] = reviewMails(held);
+    const [, mail, ...more] = reviewMails(held);
     assert.equal(more.length, 0, 'keine Kundenmail');
     assert.ok(!mail.to.includes('fixture@example.invalid'));
     assert.match(mail.subject, subject);
@@ -3040,12 +3040,12 @@ test('Versuch persoenliche Pruefung: das Bild geht nur an NLD, ohne Kundenmail u
 test('Versuch persoenliche Pruefung: ohne Resend geht der Kontakt ohne Bilder an NLD, als Rueckruf und nicht als pruefbereites Bild', async () => {
   // Bild ohne schweren Hinweis und zurueckgehaltenes Bild: ohne Anhaenge sagen Betreff und Text "anrufen", nicht "pruefen".
   for (const settings of [reviewOk, { photoChecks: [reviewPhoto], checks: [reviewCheck(['back']), reviewCheck(['back'])] }]) {
-    const fallback = harness({ env: reviewTrial, ...settings, mails: [() => response({ message: 'fixture' }, 500)] });
+    const fallback = harness({ env: reviewTrial, ...settings, mails: [() => response({ message: 'fixture' }, 500), () => response({ message: 'fixture' }, 500)] });
     const res = await fallback.invoke(payload({ ...reviewShower, pruefung: true }));
     assert.equal(res.statusCode, 200);
     assert.equal(res.body.delivery.leadAttachments, false);
-    assert.equal(reviewMails(fallback).length, 1, 'nur der gescheiterte Versuch an NLD, keine Kundenmail');
-    const form = fallback.calls.find((call) => call.url.startsWith('https://formspree.io/')).body;
+    assert.equal(reviewMails(fallback).length, 2, 'nur die gescheiterten Versuche an NLD (Kontakt und Bild), keine Kundenmail');
+    const form = fallback.calls.filter((call) => call.url.startsWith('https://formspree.io/')).at(-1).body;
     const intro = form.message.split('\n')[0];
     assert.match(form._subject, /^Badplaner-Lead: Fixture Person – .+ – OHNE Foto und Ideenbild: Kunde anrufen$/);
     assert.match(intro, /Foto und Ideenbild fehlen in dieser Mail.+Nichts prüfen und nichts senden: den Kunden anrufen/);
@@ -3058,11 +3058,13 @@ test('Versuch persoenliche Pruefung: ohne Resend geht der Kontakt ohne Bilder an
   await ordinary.invoke();
   assert.equal(ordinary.calls.find((call) => call.url.startsWith('https://formspree.io/')).body._subject, 'Badplaner-Lead: Fixture Person – Essenza');
 
-  const lost = harness({ env: reviewTrial, ...reviewOk, mails: [() => response({}, 500)], formspree: () => response({}, 500) });
+  // Der Kontakt kommt vorab an, die Mail mit dem Bild auf keinem Weg.
+  const lost = harness({ env: reviewTrial, ...reviewOk, mails: [null, () => response({}, 500)], formspree: () => response({}, 500) });
   const lostRes = await lost.invoke(payload({ ...reviewShower, pruefung: true }));
   assert.equal(lostRes.statusCode, 502);
   assert.equal(lostRes.body.code, 'LEAD_DELIVERY_FAILED');
   assert.equal(lostRes.body.image, undefined);
+  assert.equal(lost.counts().generation, 1);
 });
 
 test('Versuch persoenliche Pruefung: auch der alte Weg ohne stage und ohne pruefung bringt bei einem Bad mit Dusche weder Bild noch Kundenmail', async () => {
@@ -3080,8 +3082,8 @@ test('Versuch persoenliche Pruefung: auch der alte Weg ohne stage und ohne pruef
     assert.equal(res.body.image, undefined);
     assert.equal(res.body.ticket, undefined);
     assert.ok(!h.calls.some((call) => call.url.includes('/audiences/')), 'kein Newsletter-Eintrag');
-    assert.match(reviewMails(h)[0].text, /\nNewsletter: nein\n/);
-    const [lead, ...more] = reviewMails(h);
+    assert.match(reviewMails(h)[1].text, /\nNewsletter: nein\n/);
+    const [, lead, ...more] = reviewMails(h);
     assert.equal(more.length, 0, 'keine Kundenmail');
     assert.ok(!lead.to.includes('fixture@example.invalid'));
     assert.match(lead.subject, subject);
@@ -3144,4 +3146,116 @@ test('Versuch persoenliche Pruefung: fehlt bei einem Bad mit Dusche die E-Mail, 
     auswahl: preview.auswahl, paket: preview.paket, mime: preview.image.mime }, Buffer.from(preview.image.data, 'base64')));
   assert.equal(anfrage.statusCode, 400);
   assert.equal(anfrage.body.error, promise);
+});
+
+// Versuch mit Dusche (Diego und Carla, 06.10.): der Kontakt geht vor Tageslimit und Gemini an NLD, Bild oder Fehler folgen.
+const isGemini = (call) => call.url.includes('generativelanguage.googleapis.com');
+const contactRequest = payload({ ...reviewShower, pruefung: true, newsletter: true });
+function assertContactMail(mail, leadId) {
+  assert.equal(mail.subject, 'Badplaner-Lead: Fixture Person – Essenza – Kontakt eingegangen – Ideenbild folgt');
+  assert.ok(!mail.to.includes('fixture@example.invalid'), 'nur an NLD');
+  assert.equal(mail.reply_to, 'fixture@example.invalid');
+  assert.deepEqual(mail.attachments.map(({ filename }) => filename), ['foto.png']);
+  assert.match(mail.text, /^Persönliche Prüfung \(Versuch\): Kontakt eingegangen – Ideenbild folgt\. Das Foto liegt bei\./);
+  assert.match(mail.text, /\nName: Fixture Person\nTelefon \/ WhatsApp: \+41 00 000 00 00\nE-Mail: fixture@example\.invalid\nPLZ \/ Ort: 4800 Zofingen\nRaum: Badezimmer\n/);
+  assert.match(mail.text, /\nDusche: Dusche mit Duschwanne\n/);
+  assert.match(mail.text, new RegExp(`\\nLead-ID: ${leadId}$`));
+}
+
+test('Versuch persoenliche Pruefung: der Kontakt geht vor Tageslimit und Gemini an NLD; Bild, 429, 503, Zeitablauf und Fehler danach', async () => {
+  const env = { ...reviewTrial, RESEND_AUDIENCE_ID: 'fixture-audience' };
+  const noCustomer = (h) => {
+    assert.ok(!reviewMails(h).some((mail) => mail.to.includes('fixture@example.invalid')), 'keine Mail an den Kunden');
+    assert.ok(!h.calls.some((call) => call.url.includes('/audiences/')), 'kein Newsletter-Eintrag');
+  };
+  // Bild: zuerst die Mail mit dem Kontakt, dann Gemini wie bisher, dann die Mail mit dem Bild; dieselbe Lead-ID ueberall.
+  const h = harness({ env, ...reviewOk });
+  const res = await h.invoke(contactRequest);
+  assert.equal(res.statusCode, 200);
+  assert.equal(res.body.pruefung, true);
+  assert.equal(h.calls[0].url, 'https://api.resend.com/emails');
+  assert.ok(h.calls.findIndex(isGemini) > 0, 'Gemini erst nach der Mail mit dem Kontakt');
+  assert.deepEqual(h.counts(), { generation: 1, checks: 1, mail: 2 }, 'kein Aufruf von Gemini mehr als bisher');
+  const [contact, lead, ...more] = reviewMails(h);
+  assert.equal(more.length, 0);
+  assertContactMail(contact, res.body.leadId);
+  assert.match(lead.subject, /– Ideenbild persönlich prüfen$/);
+  assert.match(lead.text, new RegExp(`\\nLead-ID: ${res.body.leadId}$`));
+  noCustomer(h);
+
+  // Tageslimit (hier 1): der zweite Kontakt kommt an, dann 429, ohne Gemini.
+  const capped = harness({ env: { ...env, BADPLANER_DAILY_CAP: '1' }, ...reviewOk });
+  assert.equal((await capped.invoke(contactRequest)).statusCode, 200);
+  const before = capped.calls.length;
+  assert.equal((await capped.invoke(contactRequest)).statusCode, 429);
+  const after = capped.calls.slice(before);
+  assert.deepEqual(after.map((call) => call.url), ['https://api.resend.com/emails']);
+  assertContactMail(after[0].body, 'bp-fixture-2');
+  noCustomer(capped);
+
+  // Ohne Schluessel fuer Gemini (503): der Kontakt ist schon bei NLD.
+  const noKey = harness({ env: { ...env, GEMINI_API_KEY: '' } });
+  assert.equal((await noKey.invoke(contactRequest)).statusCode, 503);
+  assert.deepEqual(noKey.calls.map((call) => call.url), ['https://api.resend.com/emails']);
+  assertContactMail(noKey.calls[0].body, 'bp-fixture-1');
+
+  // Die Zeit laeuft nach dem Kontakt ab (die Vorpruefung haengt bis nach der Frist): fuer die zweite Mail bleibt keine.
+  const late = harness({ env, photoChecks: [reviewPhoto], photoCheckDelays: [230000] });
+  const lateRes = await late.invoke(contactRequest);
+  assert.equal(lateRes.statusCode, 502);
+  assert.deepEqual([lateRes.body.code, lateRes.body.delivery.lead], ['RENDER_FAILED', 'unknown']);
+  assert.equal(reviewMails(late).length, 1);
+  assertContactMail(reviewMails(late)[0], 'bp-fixture-1');
+  noCustomer(late);
+
+  // Unerwarteter Fehler nach dem Kontakt (hier beim Lesen des Cookies fuer das Limit): 500, der Kontakt ist bei NLD.
+  const broken = harness({ env, ...reviewOk });
+  const brokenRes = await broken.invoke(contactRequest, { headers: { get cookie() { throw new Error('fixture'); } } });
+  assert.equal(brokenRes.statusCode, 500);
+  assert.deepEqual(broken.calls.map((call) => call.url), ['https://api.resend.com/emails']);
+  assertContactMail(broken.calls[0].body, 'bp-fixture-1');
+});
+
+test('Versuch persoenliche Pruefung: die Mail mit dem Kontakt geht notfalls ohne Foto ueber Formspree; ohne Zustellung kein Bild', async () => {
+  // Resend lehnt ab: der Kontakt geht ohne Foto ueber Formspree, deutlich so bezeichnet; das Bild folgt wie bisher.
+  const viaForm = harness({ env: reviewTrial, ...reviewOk, mails: [() => response({ message: 'fixture' }, 500)] });
+  const res = await viaForm.invoke(contactRequest);
+  assert.equal(res.statusCode, 200);
+  const [form, ...moreForms] = viaForm.calls.filter((call) => call.url.startsWith('https://formspree.io/')).map((call) => call.body);
+  assert.equal(moreForms.length, 0);
+  assert.equal(form._subject, 'Badplaner-Lead: Fixture Person – Essenza – Kontakt eingegangen – Ideenbild folgt – OHNE Foto');
+  assert.match(form.message.split('\n')[0], /Das Foto fehlt in dieser Mail, der Versand mit Anhängen ist gescheitert\./);
+  assert.equal(form.hinweis, 'Bilder konnten nicht angehängt werden');
+  assert.deepEqual([form.Name, form['Telefon / WhatsApp'], form['E-Mail'], form['PLZ / Ort'], form.Dusche, form['Lead-ID']],
+    ['Fixture Person', '+41 00 000 00 00', 'fixture@example.invalid', '4800 Zofingen', 'Dusche mit Duschwanne', res.body.leadId]);
+  assert.equal(viaForm.counts().generation, 1);
+  assert.ok(!reviewMails(viaForm).some((mail) => mail.to.includes('fixture@example.invalid')));
+
+  // Zustellung unklar (Resend ohne ID): es geht weiter, die zweite Mail traegt den Kontakt nochmals.
+  const unclear = harness({ env: reviewTrial, ...reviewOk, mails: [() => response({})] });
+  assert.equal((await unclear.invoke(contactRequest)).statusCode, 200);
+  assert.equal(unclear.counts().generation, 1);
+
+  // Beide Wege scheitern: kein Bild, kein Aufruf von Gemini, das Tageslimit bleibt unberuehrt.
+  const lost = harness({ env: { ...reviewTrial, BADPLANER_DAILY_CAP: '1' }, ...reviewOk, mails: [() => response({}, 500)], formspree: () => response({}, 500) });
+  const lostRes = await lost.invoke(contactRequest);
+  assert.equal(lostRes.statusCode, 502);
+  assert.equal(lostRes.body.code, 'LEAD_DELIVERY_FAILED');
+  assert.equal(lostRes.body.image, undefined);
+  assert.equal(lost.calls.filter(isGemini).length, 0);
+  assert.equal((await lost.invoke(contactRequest)).statusCode, 200, 'der gescheiterte Versuch zaehlt nicht');
+
+  // Ungueltige Anfragen: keine Mail und kein Aufruf.
+  for (const changes of [{ email: '' }, { telefon: '' }, { place: '' }, { consent: false }, { foto: 'data:image/png;base64,AAAA' }]) {
+    const invalid = harness({ env: reviewTrial });
+    assert.equal((await invalid.invoke({ ...contactRequest, ...changes })).statusCode, 400, JSON.stringify(changes));
+    assert.equal(invalid.calls.length, 0);
+  }
+  // Ohne Versuch und ohne Dusche keine Mail mit dem Kontakt vorab: wie bisher Lead, dann Kundenmail.
+  for (const [env, changes, settings] of [[{}, reviewShower, reviewOk], [{ VERCEL_ENV: 'preview' }, reviewShower, reviewOk], [reviewTrial, { dusche: 'keine' }, {}]]) {
+    const ordinary = harness({ env, ...settings });
+    assert.equal((await ordinary.invoke(payload(changes))).statusCode, 200, JSON.stringify(env));
+    assert.deepEqual(reviewMails(ordinary).map((mail) => mail.to.includes('fixture@example.invalid')), [false, true], JSON.stringify(env));
+    assert.ok(!reviewMails(ordinary).some((mail) => /Kontakt eingegangen/.test(mail.subject)));
+  }
 });
